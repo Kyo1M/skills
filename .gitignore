@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Logs / scratch
+*.log
+*.tmp
+scratch/
+
+# Secrets
+.env
+.env.*
+*.token
+*.key
