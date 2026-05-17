@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>[資料タイトル]</title>
+<style>
+  :root {
+    /* continova v1 color tokens */
+    --brand-klein: #002FA7;
+    --brand-blue: #1D6CFF;
+    --brand-blue-soft: #EAF1FF;
+    --ink: #111111;
+    --stone: #2F3135;
+    --pebble: #6F7175;
+    --fog: #A9AAAD;
+    --border: #B7B7B7;
+    --border-soft: #DDDDDD;
+    --snow: #F6F5F2;
+    --white: #FFFFFF;
+    --success: #10B981;
+    --warning: #F59E0B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #E8E8E6;
+    font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+    color: var(--ink);
+    padding: 40px 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+  }
+
+  /* Slide container — 16:9 fixed at 1672x941, scaled to viewport */
+  .slide {
+    width: 1672px;
+    height: 941px;
+    background: var(--white);
+    position: relative;
+    padding: 58px 70px 38px 70px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    transform-origin: top center;
+    transform: scale(min(1, calc((100vw - 80px) / 1672)));
+    margin-bottom: calc((1 - min(1, (100vw - 80px) / 1672)) * -941px);
+  }
+
+  @media (min-width: 1752px) {
+    .slide { transform: none; margin-bottom: 0; }
+  }
+
+  /* Title block */
+  .slide-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: var(--pebble);
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .slide-title {
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    font-size: 46px;
+    line-height: 1.25;
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .title-rule {
+    width: 60px;
+    height: 3px;
+    background: var(--brand-klein);
+    margin: 22px 0 22px 0;
+  }
+  .top-message {
+    font-size: 22px;
+    line-height: 1.55;
+    color: var(--stone);
+    font-weight: 500;
+    max-width: 1400px;
+    letter-spacing: 0.005em;
+  }
+  .top-message .accent { color: var(--brand-klein); font-weight: 700; }
+
+  /* Body area */
+  .body {
+    margin-top: 36px;
+    height: calc(100% - 270px);
+    position: relative;
+  }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    left: 70px;
+    right: 70px;
+    bottom: 22px;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--pebble);
+    letter-spacing: 0.05em;
+  }
+  .footer .left { font-weight: 500; }
+
+  /* Section label utility */
+  .label {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--pebble);
+    font-weight: 600;
+  }
+
+  /* SVG common */
+  .diagram { display: block; width: 100%; height: auto; }
+  text { font-family: "Hiragino Sans", "Noto Sans JP", sans-serif; }
+
+  /* ======================================================== */
+  /* スライドパターンごとの追加CSSは、slide-patterns.mdから        */
+  /* 必要なものをここに追加していく                                  */
+  /* ======================================================== */
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+<!-- ============================================================
+SLIDE 1: [スライドタイトル]
+============================================================ -->
+<section class="slide" id="s1">
+  <div class="slide-eyebrow">01 / SECTION_LABEL</div>
+  <h1 class="slide-title">[スライドタイトル]</h1>
+  <div class="title-rule"></div>
+  <p class="top-message">
+    [トップメッセージ。重要語句は]<span class="accent">accent</span>[で強調。1-2文に収める。]
+  </p>
+
+  <div class="body">
+    <!-- 主役オブジェクトをここに配置                              -->
+    <!-- パターンHTML/CSSは references/slide-patterns.md を参照     -->
+    <p style="color: var(--pebble); font-size: 14px;">
+      ※ 主役オブジェクト(チャート、図解、比較表、SVGダイアグラム等)を配置
+    </p>
+  </div>
+
+  <div class="footer">
+    <span class="left">[資料名] | [サブタイトル]</span>
+    <span>01 / NN</span>
+  </div>
+</section>
+
+
+<!-- ============================================================
+SLIDE 2: [次のスライドタイトル]
+============================================================ -->
+<!--
+<section class="slide" id="s2">
+  <div class="slide-eyebrow">02 / ...</div>
+  <h1 class="slide-title">...</h1>
+  <div class="title-rule"></div>
+  <p class="top-message">...</p>
+  <div class="body">
+    ...
+  </div>
+  <div class="footer">
+    <span class="left">...</span>
+    <span>02 / NN</span>
+  </div>
+</section>
+-->
+
+</div>
+
+</body>
+</html>
