@@ -145,18 +145,7 @@ font-family: "Helvetica Neue", "Inter", Arial, sans-serif;
 - 文章が3点以上並ぶ場合、`bulletList` よりも `threePanel`、`matrix`、`arrowFlow`、`cycleFlow`、`comparisonTable` を検討
 - 因果や悪循環は `cycleFlow`、時系列は `roadmap`、手順は `arrowFlow`、意思決定は `matrix` または `comparisonTable` を優先
 - KPI は数字だけを大きく置くのではなく、推移・示唆・次アクションと一体で見せる
-- 主役オブジェクトは SVG ダイアグラムのほか、codex で生成したアイソメトリック画像でもよい（「Image Generation Direction」参照）
-
-### アイコンの使い方
-
-アイコンは codex で生成したラスター画像（PNG）を使う。`references/image-prompts.md` のテンプレ C と `references/image-generation.md` を参照。
-
-- **目的**: ラベル・セクション・カテゴリの識別補助、構造の視認性向上
-- **生成方法**: デッキで使うアイコンは 1 回の codex セッションで一括生成し、共通スタイル仕様で画風を揃える
-- **位置**: カード見出しの直前、eyebrow 横、テーブルヘッダ横、リスト行頭の機能補助
-- **サイズ**: `--icon-size-md` (24px) を標準。インラインは `--icon-size-sm` (16px)、単独セクション標識は `--icon-size-lg` (40px)
-- **色**: 主役・推奨アイコンは Klein Blue を効かせ、1 スライド 1-2 個まで。標準はインク、脇役はグレー
-- **避けるべき**: 装飾目的の大量配置、絵文字との混在、画風の不揃い
+- アイコンは意味を補うために使う。装飾目的のアイコン大量配置は避ける
 
 ### SVGダイアグラムの基本ルール
 
@@ -185,11 +174,10 @@ font-family: "Helvetica Neue", "Inter", Arial, sans-serif;
 - 1枚に複数の主張を詰め込む
 - 箇条書きを大きなカードに入れて並べるだけの構成
 - 青い面を広げすぎて Klein Blue の意味を弱める
-- 生成画像にラベル・数値・日本語の文章を焼き込む（テキストは HTML 側で重ねる）
+- 説明文を画像として固定し後から直せない状態にする
 - スライド構成が固まる前に HTML を作り始める
-- 装飾目的のアイコン大量配置・画風の不揃いなアイコン
+- 装飾目的のアイコン大量配置
 - ストック写真風のフリー素材
-- 光沢のある3Dレンダ調・グラデーション過多のアイソメトリック
 - 紫グラデーション + 白背景の汎用コーポレート風
 - ノイジーな背景・大きな装飾ブロブ
 
@@ -197,19 +185,10 @@ font-family: "Helvetica Neue", "Inter", Arial, sans-serif;
 
 ## Image Generation Direction
 
-スライドのビジュアルは **SVG と codex 生成画像を併用**する。正確な数値・比較表・座標図は SVG、構造や概念を直感的に伝えるイラスト・ヒーロー・アイコンは生成画像。Phase 3 でスライドごとに選ぶ。生成手順は `references/image-generation.md`、プロンプトは `references/image-prompts.md`。
+スライド内に画像を配置する場合は、以下のルールに従う(本スキルでは原則SVG優先):
 
-### 共通の制約（continova v1）
-
-- 純白背景、Klein Blue `#002FA7` を唯一のアクセント、本体はインク／グレー、淡い面は `#EAF1FF` / `#F6F5F2`
-- フラットで幾何学的。余白をたっぷり取り、1 画像 1 主題
-- **禁止**: 光沢のある3Dレンダ、グラデーション、ドロップシャドウ、ストック写真風、紫系コーポレートクリシェ、ノイジーな背景、装飾ブロブ
-- **テキストを焼き込まない**: AI 画像生成は日本語の描画品質が低く、後から直せない。ラベル・凡例・数値は HTML テキストで重ねる／隣に置く
-
-### 3 つのカテゴリ
-
-| カテゴリ | 用途 | スタイル | HTML 受け |
-|---|---|---|---|
-| ヒーロー / セクション扉 | タイトル・章区切りの象徴イラスト | フラットなアイソメトリックなシーン。左に余白を空けテキストを重ねる | `.hero-visual` |
-| アイソメトリック図解 | スライドの主役オブジェクト（構造・流れ） | label-light なアイソメトリック図。ノードは分離し周囲に余白 | `.figure` |
-| アイコン | カード見出し・eyebrow 横などの識別補助 | 正面フラットの2トーン、正方形。1 セッション一括生成で統一 | `img.icon` |
+- continova v1: white background, thin rules, ample whitespace, Klein Blue accent `#002FA7`
+- minimal premium consulting slide, Japanese business deck, 16:9
+- one dominant idea, clean hierarchy, no stock-photo feeling
+- if infographic: precise geometric structure, editable reconstruction expected
+- avoid: heavy gradients, purple/blue corporate cliche, noisy backgrounds, oversized decorative blobs, dense text
