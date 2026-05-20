@@ -13,7 +13,7 @@ description: ビジネス・コンサル向けの議論用スライド資料をH
 
 - 議論先行で問いと構造を確定させてからHTMLに着手する
 - 統一されたデザインシステム(continova v1)で品質を担保
-- 9つの再利用可能なスライドパターンで設計効率化
+- 12の再利用可能なスライドパターン(すべて手書きSVG・HTML/CSS)で設計効率化
 - スクロール形式で議論中も全体俯瞰できるHTMLとして出力
 
 ## ワークフロー
@@ -94,7 +94,7 @@ Slide N: [スライドタイトル]
 
 各スライドで、以下から主役オブジェクトのパターンを選ぶ。
 
-### 9つのスライドパターン
+### 12のスライドパターン
 
 | # | パターン | 用途 |
 |---|---|---|
@@ -108,8 +108,10 @@ Slide N: [スライドタイトル]
 | 08 | step-flow-with-mockup | 手順フロー + 出力イメージ |
 | 09 | limitation-matrix | 限界事項の3列マトリクス(項目/説明/対応) |
 | 10 | phased-roadmap | フェーズ別ロードマップ + 議論項目 |
+| 11 | concept-schematic | 仕組み・系を1枚の手書きSVG模式図で示す |
+| 12 | visual-band | 変化・遷移を表す補助スリム帯(任意・単調さの緩和) |
 
-各パターンの詳細(HTML/CSS/SVGコード)は `references/slide-patterns.md` を参照。
+各パターンの詳細(HTML/CSS/SVGコード)は `references/slide-patterns.md` を参照。すべて手書きSVG・HTML/CSSで完結し、外部生成画像は使わない(品質が不安定なため)。
 
 ### パターン選択の指針
 
@@ -117,6 +119,8 @@ Slide N: [スライドタイトル]
 - **対比・トレードオフ** → comparison-cards / tradeoff-axis
 - **時系列・フロー** → step-flow-with-mockup / phased-roadmap
 - **限界・前提** → limitation-matrix(必ず「対応」列を入れて誠実さを示す)
+- **仕組み・系を1枚で** → concept-schematic(手書きSVGの平面模式図)
+- **変化・遷移を補助的に見せたい / デッキの単調さを和らげたい** → visual-band(主役オブジェクトを保ったまま挟む補助帯)
 
 ---
 
@@ -283,7 +287,7 @@ derived_from:
 
 - `references/design-system.md` — カラートークン、フォント、余白、ロゴ規約
 - `assets/template.html` — ベースの HTML テンプレート（CSS 変数・フォント・ヘッダー）
-- `references/slide-patterns.md` — 9 パターンの色・アクセントの参照値
+- `references/slide-patterns.md` — 12 パターンの色・アクセントの参照値
 
 カスタマイズ手順例:
 
@@ -318,5 +322,5 @@ derived_from:
 ## 参照ファイル
 
 - `references/design-system.md` — continova v1の完全仕様(色・タイポ・余白・避けるべきこと)
-- `references/slide-patterns.md` — 9つのスライドパターンの詳細HTMLコード
+- `references/slide-patterns.md` — 12のスライドパターンの詳細HTML/SVGコード
 - `assets/template.html` — HTMLスタートテンプレート(ヘッダ・フッタ・基本CSS済み)

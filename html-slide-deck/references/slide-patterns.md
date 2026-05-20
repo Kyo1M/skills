@@ -1,6 +1,6 @@
 # Slide Patterns
 
-continova v1スライドで使える10種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。
+continova v1スライドで使える12種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。すべて手書きSVG・HTML/CSSで完結し、外部生成画像は使わない。
 
 ## 目次
 
@@ -16,6 +16,8 @@ continova v1スライドで使える10種類のパターン。各パターンは
 | 08 | step-flow-with-mockup | 手順フロー + アウトプット例 | 実装パート |
 | 09 | limitation-matrix | 限界事項の3列マトリクス | 限界・前提 |
 | 10 | phased-roadmap | フェーズ別ロードマップ + 議論項目 | 締め |
+| 11 | concept-schematic | 仕組み・系を1枚の手書きSVG模式図で | 概念・設計パート |
+| 12 | visual-band | 変化・遷移を表す補助スリム帯 | 任意(単調さの緩和) |
 
 ---
 
@@ -704,6 +706,126 @@ continova v1スライドで使える10種類のパターン。各パターンは
 
 ---
 
+## Pattern 11: concept-schematic
+
+**用途**: 1 つの系(システム / 仕組み / データフロー)を手書き SVG の平面模式図で示す。Pattern 02(dual-panel)が左右 2 概念の対比なのに対し、本パターンは「要素 + 関係」を 1 枚の図にまとめる。表やカードの上に補助図(スリム版)として置くと、密度の高いスライドに概念の見取り図を与えられる。主役オブジェクトとしても使える。
+
+**設計方針**:
+- 要素 = 矩形ブロック。関係 = 矢印・破線・内包枠で表す
+- 内包(グループが要素を含む)は枠で囲い、枠外の要素との連携は破線で示す
+- 主役・本命ノードだけ Klein Blue、残りはインク / グレーの線画
+- ラベルは SVG text。長文は焼き込まず、詳細は隣接する表・カードに逃がす
+- viewBox で固定。補助バンドなら横長スリム(~1500x130)、主役オブジェクトなら縦を広げる(~1500x430)
+
+**追加CSS**(補助バンドとして表・カードの上に置く場合):
+```css
+.viz-strip {
+  margin-bottom: 18px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.viz-strip svg { display: block; width: 100%; height: auto; }
+```
+
+**HTML**(「内包 + 外部連携 + エンジン」型の模式図 — 表の上に補助バンドとして配置):
+```html
+<div class="viz-strip">
+  <svg class="diagram" viewBox="0 0 1500 124" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <marker id="schemaArr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+        <polygon points="0 0, 9 4.5, 0 9" fill="#002FA7"/>
+      </marker>
+    </defs>
+    <!-- 内包枠: グループが要素 A・B を含む -->
+    <rect x="150" y="8" width="586" height="72" rx="8" fill="none" stroke="#002FA7" stroke-width="1.6"/>
+    <rect x="166" y="1" width="214" height="14" fill="#FFFFFF"/>
+    <text x="172" y="12" font-size="11" fill="#002FA7" font-weight="700" letter-spacing="0.04em">グループ名（器）</text>
+    <!-- 要素 A・B: 枠の内側 -->
+    <rect x="170" y="20" width="546" height="26" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.2"/>
+    <text x="188" y="37" font-size="13" fill="#002FA7" font-weight="700">要素 A</text>
+    <rect x="170" y="50" width="546" height="26" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.2"/>
+    <text x="188" y="67" font-size="13" fill="#002FA7" font-weight="700">要素 B</text>
+    <!-- 要素 C: 枠外。破線コネクタで連携 -->
+    <rect x="170" y="92" width="546" height="26" fill="#F6F5F2" stroke="#A9AAAD" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <text x="188" y="109" font-size="13" fill="#6F7175" font-weight="700">要素 C（枠外）</text>
+    <line x1="116" y1="105" x2="170" y2="105" stroke="#002FA7" stroke-width="1.4" stroke-dasharray="4 3"/>
+    <text x="46" y="102" font-size="10.5" fill="#002FA7" font-weight="700">連携</text>
+    <text x="38" y="115" font-size="10.5" fill="#6F7175">外部参照</text>
+    <!-- エンジン / 処理ノードが全要素を横断参照 -->
+    <path d="M716 33 C 812 33, 814 66, 896 66" fill="none" stroke="#002FA7" stroke-width="1.5" marker-end="url(#schemaArr)"/>
+    <path d="M716 63 C 802 63, 808 66, 896 66" fill="none" stroke="#002FA7" stroke-width="1.5" marker-end="url(#schemaArr)"/>
+    <path d="M716 105 C 814 105, 810 66, 896 66" fill="none" stroke="#002FA7" stroke-width="1.5" marker-end="url(#schemaArr)"/>
+    <rect x="902" y="38" width="468" height="56" rx="10" fill="#FFFFFF" stroke="#002FA7" stroke-width="1.6"/>
+    <text x="938" y="64" font-size="14.5" fill="#002FA7" font-weight="700">エンジン / 処理ノード</text>
+    <text x="938" y="83" font-size="12" fill="#2F3135">＝ 横断参照と生成の役割</text>
+  </svg>
+</div>
+```
+
+**カスタマイズポイント**:
+- 内包枠で「内 / 外」「対象 / 対象外」を視覚化できる(○/△ バッジの代わり)
+- 補助バンドとして使う場合、下に詳細表(Pattern 03)やカードを置き、図は見取り図に徹する
+- 主役オブジェクトにする場合は viewBox を縦に広げ、各ブロックを大きくして注釈を増やす
+- これは旧 codex 生成版「isometric-diagram」の手書き SVG 後継。生成画像は品質が不安定なため使わない
+
+---
+
+## Pattern 12: visual-band(transition strip)
+
+**用途**: トップメッセージと主役オブジェクトの間に挟む、変化・遷移・段階を表す横長スリムな SVG 帯。AS-IS→TO-BE、Before→After、個人→組織 などの「動き」を補助的に可視化し、カード・表が続くデッキの視覚的単調さを和らげる。**主役オブジェクトではなく補助要素**。
+
+**設計方針**:
+- 高さは控えめ(viewBox ~1500x80)。`.viz-strip`(Pattern 11 と共通)で margin と下罫線
+- 左に変化前(グレー・不揃い)、中央に矢印、右に変化後(整列・Klein Blue アクセント数個)
+- 「動き」が一目で伝われば十分。要素を詰め込まない
+- 1 スライドにつき 1 本まで。これを主役オブジェクトに昇格させない
+
+**HTML**(AS-IS→TO-BE の変化を表す帯 — トップメッセージ直下に配置):
+```html
+<div class="viz-strip">
+  <svg class="diagram" viewBox="0 0 1500 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- 変化前: 不揃いに散らばった要素(グレー) -->
+    <g fill="#FFFFFF" stroke="#A9AAAD" stroke-width="1.3">
+      <rect x="72" y="16" width="18" height="18" transform="rotate(-9 81 25)"/>
+      <rect x="170" y="40" width="18" height="18" transform="rotate(8 179 49)"/>
+      <rect x="122" y="6" width="18" height="18" transform="rotate(13 131 15)"/>
+      <rect x="248" y="30" width="18" height="18" transform="rotate(-6 257 39)"/>
+      <rect x="332" y="9" width="18" height="18" transform="rotate(9 341 18)"/>
+      <rect x="300" y="44" width="18" height="18" transform="rotate(-12 309 53)"/>
+      <rect x="412" y="34" width="18" height="18" transform="rotate(6 421 43)"/>
+      <rect x="458" y="12" width="18" height="18" transform="rotate(-8 467 21)"/>
+    </g>
+    <text x="74" y="74" font-size="11.5" fill="#6F7175" letter-spacing="0.5">変化前の状態(AS-IS)</text>
+    <!-- 遷移の矢印 -->
+    <line x1="620" y1="36" x2="952" y2="36" stroke="#002FA7" stroke-width="1.8"/>
+    <polygon points="952,36 936,28 936,44" fill="#002FA7"/>
+    <text x="620" y="22" font-size="10.5" fill="#6F7175" letter-spacing="0.18em">TRANSITION</text>
+    <!-- 変化後: 整列した要素 + Klein Blue アクセント -->
+    <g>
+      <rect x="1020" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1092" y="6"  width="20" height="20" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.4"/>
+      <rect x="1164" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1236" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1308" y="6"  width="20" height="20" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.4"/>
+      <rect x="1380" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1020" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1092" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1164" y="34" width="20" height="20" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.4"/>
+      <rect x="1236" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1308" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1380" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+    </g>
+    <text x="1020" y="74" font-size="11.5" fill="#002FA7" letter-spacing="0.5" font-weight="700">変化後の状態(TO-BE)</text>
+  </svg>
+</div>
+```
+
+**カスタマイズポイント**:
+- 散らばり / 整列のほか、段階バー(個人→チーム→組織)や Before/After のミニ図でもよい
+- Klein Blue は変化後の数個(視覚面積 5-12%)に絞る
+- ラベルは短く。詳細は下のカード・表で語る
+
+---
+
 ## パターン組み合わせの推奨
 
 8枚構成の場合の典型的なパターン配置:
@@ -720,3 +842,5 @@ continova v1スライドで使える10種類のパターン。各パターンは
 | 8 | 10 phased-roadmap | ロードマップと議論項目 |
 
 これは標準形であり、内容に応じて入れ替え可能。ただし「冒頭に目的、末尾に議論項目」は変えない。
+
+Pattern 11(concept-schematic)・12(visual-band)は任意の補助ビジュアル。カード・表が続いて視覚的に単調なときに、各スライドの主役オブジェクトを保ったまま追加して概念図・変化の見取り図を与える。詰め込みすぎると逆効果なので、効くスライド(仕組み説明・目的の AS-IS→TO-BE など)に絞る。
