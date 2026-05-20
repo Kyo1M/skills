@@ -30,6 +30,7 @@ Claude Code を再起動して認識を確認したら、リポジトリ側で `
 |-------|------|
 | [meeting-minutes](./meeting-minutes/SKILL.md) | `project-context-template` リポジトリ専用の議事録作成スキル。`_drafts/` の議事メモから対話を通じて内容を補完し、`docs/minutes/` 正式版 + `decisions/` / `tasks/` への派生抽出までを一気通貫で行う |
 | [html-slide-deck](./html-slide-deck/SKILL.md) | ビジネス・コンサル向けの議論用 HTML+SVG スライド作成スキル。continova v1 デザインシステム前提（自社ブランドへカスタマイズ可）。Claude.ai / Claude Code 両環境対応で、`project-context-template` リポジトリでは `docs/deliverables/` に出力 |
+| [article-pipeline](./article-pipeline/SKILL.md) | note・Zenn 記事を企画→構成→執筆→推敲→画像→公開準備の 6 フェーズで伴走するスキル。`writing-articles` リポジトリ専用。codex CLI でのネイティブ画像生成に対応。`note-writing-assistant.skill`（旧 note 専用レビュースキル）を作り直したもの |
 
 ## 注意
 
