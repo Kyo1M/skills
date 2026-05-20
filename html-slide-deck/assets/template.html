@@ -19,6 +19,11 @@
     --white: #FFFFFF;
     --success: #10B981;
     --warning: #F59E0B;
+
+    /* Icon image tokens (see references/image-prompts.md) */
+    --icon-size-sm: 16px;
+    --icon-size-md: 24px;
+    --icon-size-lg: 40px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -123,6 +128,45 @@
   /* SVG common */
   .diagram { display: block; width: 100%; height: auto; }
   text { font-family: "Hiragino Sans", "Noto Sans JP", sans-serif; }
+
+  /* Generated raster images — see references/image-generation.md */
+
+  /* Inline icon (codex-generated PNG, see image-prompts.md template C) */
+  img.icon {
+    display: inline-block;
+    vertical-align: middle;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  .icon-sm { width: var(--icon-size-sm); height: var(--icon-size-sm); }
+  .icon-md { width: var(--icon-size-md); height: var(--icon-size-md); }
+  .icon-lg { width: var(--icon-size-lg); height: var(--icon-size-lg); }
+
+  /* Main-object image (isometric diagram, see image-prompts.md template B) */
+  .figure { position: relative; }
+  .figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .figure-caption {
+    font-size: 11px;
+    color: var(--pebble);
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+  }
+  /* HTML text overlaid on a .figure image — labels are NOT baked into the PNG */
+  .figure-label {
+    position: absolute;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* Hero / section-divider illustration (see image-prompts.md template A) */
+  .hero-visual { display: block; width: 100%; height: auto; }
 
   /* ======================================================== */
   /* スライドパターンごとの追加CSSは、slide-patterns.mdから        */

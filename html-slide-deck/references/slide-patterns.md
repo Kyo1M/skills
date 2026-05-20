@@ -1,6 +1,6 @@
 # Slide Patterns
 
-continova v1スライドで使える10種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。
+continova v1スライドで使える12種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。Pattern 11-12 は codex 生成画像を使う（`references/image-generation.md` 参照）。
 
 ## 目次
 
@@ -16,6 +16,8 @@ continova v1スライドで使える10種類のパターン。各パターンは
 | 08 | step-flow-with-mockup | 手順フロー + アウトプット例 | 実装パート |
 | 09 | limitation-matrix | 限界事項の3列マトリクス | 限界・前提 |
 | 10 | phased-roadmap | フェーズ別ロードマップ + 議論項目 | 締め |
+| 11 | hero-isometric | タイトル/セクション扉の象徴イラスト | 冒頭・章区切り |
+| 12 | isometric-diagram | 主役オブジェクトをアイソメトリック生成画像で | 概念・設計パート |
 
 ---
 
@@ -701,6 +703,124 @@ continova v1スライドで使える10種類のパターン。各パターンは
 - 現フェーズには `.current` クラスを付けてKlein Blueでマーク
 - 議論項目は3-5個が適切。「フィードバックが欲しい具体的な論点」に絞る
 - 「ご質問ありますか?」のような汎用的な締めは避ける
+
+---
+
+## Pattern 11: hero-isometric
+
+**用途**: タイトルスライド・セクション扉。デッキ/章の主題を象徴するアイソメトリックイラストを右に置き、左にコピーを重ねる。画像は `references/image-generation.md` の手順で `assets/<slug>/hero.png` に生成しておく。
+
+**追加CSS**:
+```css
+.s11-hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; height: 100%; }
+.s11-hero .hero-copy .lead {
+  font-size: 17px; color: var(--stone); line-height: 1.7; margin-top: 18px; max-width: 540px;
+}
+.s11-hero .hero-copy .meta {
+  font-size: 12px; color: var(--pebble); letter-spacing: 0.1em; margin-top: 28px;
+}
+.s11-hero .hero-visual { width: 100%; height: auto; }
+```
+
+**HTML**(`.body` 内に配置):
+```html
+<div class="s11-hero">
+  <div class="hero-copy">
+    <div class="label">SECTION 01</div>
+    <p class="lead">
+      章の主題を1-2文で。<strong style="color:var(--brand-klein);">キーフレーズ</strong>はaccentで。
+    </p>
+    <div class="meta">資料名 | 日付</div>
+  </div>
+  <img class="hero-visual" src="assets/<slug>/hero.png" alt="主題を表すアイソメトリックイラスト">
+</div>
+```
+
+**設計のポイント**:
+- 画像にはテキストを焼き込まない。タイトル・コピーはすべて HTML テキスト
+- Klein Blue は画像内の主役 1-2 箇所＋コピーの accent に絞る
+- セクション扉は装飾スライドになりがち。主題が一目で伝わる構造イラストにする
+
+---
+
+## Pattern 12: isometric-diagram
+
+**用途**: スライドの主役オブジェクトを、構造・流れを直感的に見せるアイソメトリック生成画像にする。Pattern 02(dual-panel-diagram)の SVG 版に対し、概念を絵で速く伝えたいときに使う。画像は `assets/<slug>/NN-<desc>.png` に生成しておく。
+
+**追加CSS**: `template.html` の `.figure` / `.figure-caption` / `.figure-label` を使う(追加CSS不要)。ラベルを画像横に並べる場合のみ:
+```css
+.s12-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; height: 100%; }
+.s12-legend .leg-item {
+  display: grid; grid-template-columns: 22px 1fr; gap: 12px;
+  padding: 14px 0; border-bottom: 1px solid var(--border-soft);
+}
+.s12-legend .leg-item:first-child { border-top: 1px solid var(--ink); }
+.s12-legend .leg-no {
+  font-family: "Helvetica Neue", sans-serif; font-size: 13px;
+  font-weight: 700; color: var(--brand-klein);
+}
+.s12-legend h4 { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.s12-legend p { font-size: 12px; color: var(--pebble); line-height: 1.55; }
+```
+
+**HTML(ラベルを画像横に並べる版 — 推奨)**:
+```html
+<div class="s12-layout">
+  <div class="figure">
+    <img src="assets/<slug>/01-system-overview.png" alt="システム構造のアイソメトリック図">
+    <div class="figure-caption">図: 構成の全体像(ラベルは右の凡例を参照)</div>
+  </div>
+  <div class="s12-legend">
+    <div class="leg-item">
+      <div class="leg-no">1</div>
+      <div><h4>ノード名</h4><p>役割の説明。1-2行。</p></div>
+    </div>
+    <div class="leg-item">
+      <div class="leg-no">2</div>
+      <div><h4>ノード名</h4><p>説明</p></div>
+    </div>
+    <!-- 3-5項目 -->
+  </div>
+</div>
+```
+
+**HTML(ラベルを画像上に重ねる版)**:
+```html
+<div class="figure" style="height:100%;">
+  <img src="assets/<slug>/01-data-flow.png" alt="データフローのアイソメトリック図">
+  <!-- 画像内のノード位置に合わせて % 指定で重ねる -->
+  <div class="figure-label" style="top:18%; left:12%;">入力</div>
+  <div class="figure-label" style="top:46%; left:48%; color:var(--brand-klein);">処理(本命)</div>
+  <div class="figure-label" style="top:74%; left:80%;">出力</div>
+</div>
+```
+
+**設計のポイント**:
+- **ラベル・数値・凡例は画像に焼き込まず HTML テキストで持つ**(`design-system.md` Avoid 参照)
+- 重ねる版は画像生成後にノード位置を見て `%` を微調整する。ズレが許容できないなら凡例横置き版にする
+- 正確な数値比較・座標が要る図は生成画像ではなく SVG パターン(02 等)を使う
+
+---
+
+## アイコンの併用
+
+カード見出し・eyebrow 横・テーブルヘッダ横などに、codex 生成のアイコン画像を `img.icon` で添えられる。アイコンは `references/image-generation.md` の手順で `assets/<slug>/icons/<name>.png` に一括生成しておく。
+
+```html
+<!-- カード見出しにアイコンを添える例 -->
+<h3 style="display:flex; align-items:center; gap:8px;">
+  <img class="icon icon-md" src="assets/<slug>/icons/target.png" alt="">
+  カード見出し
+</h3>
+
+<!-- eyebrow 横 -->
+<div class="slide-eyebrow" style="display:flex; align-items:center; gap:6px;">
+  <img class="icon icon-sm" src="assets/<slug>/icons/cycle.png" alt="">
+  03 / APPROACH
+</div>
+```
+
+装飾目的の大量配置は避ける。1 スライドでアイコンに Klein Blue を効かせるのは 1-2 個まで(`design-system.md`「アイコンの使い方」参照)。
 
 ---
 

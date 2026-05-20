@@ -1,11 +1,11 @@
 ---
 name: html-slide-deck
-description: ビジネス・コンサル向けの議論用スライド資料をHTML+SVGで作成するスキル。「スライドを作りたい」「資料化したい」「クライアント説明用に」「議論用の資料を」「PoC設計をスライドに」「提案資料を」などのリクエスト時に使用。continova v1デザインシステム(白地・Klein Blueアクセント・ミニマル+情報リッチ)に従い、議論先行で問いを整理してから16:9スクロール形式のHTMLスライドを生成する。社内議論用、クライアント説明用、提案資料、合意形成資料などに広く適用可能。
+description: ビジネス・コンサル向けの議論用スライド資料をHTML+SVG・codex生成画像で作成するスキル。「スライドを作りたい」「資料化したい」「クライアント説明用に」「議論用の資料を」「PoC設計をスライドに」「提案資料を」などのリクエスト時に使用。continova v1デザインシステム(白地・Klein Blueアクセント・ミニマル+情報リッチ)に従い、議論先行で問いを整理してから16:9スクロール形式のHTMLスライドを生成する。アイソメトリックなイラスト・図解・アイコンはcodex CLIで生成。社内議論用、クライアント説明用、提案資料、合意形成資料などに広く適用可能。
 ---
 
 # HTML Slide Deck Creation
 
-ビジネス・コンサルティング向けの議論用・提案用スライドをHTML+SVGで作成する。**議論先行で問いを整理してから実装する**ことで、見栄えだけでなく構造化された情報設計が伴ったスライドを生成する。
+ビジネス・コンサルティング向けの議論用・提案用スライドを HTML+SVG と codex 生成画像で作成する。**議論先行で問いを整理してから実装する**ことで、見栄えだけでなく構造化された情報設計が伴ったスライドを生成する。
 
 ## このスキルが解決する課題
 
@@ -13,7 +13,8 @@ description: ビジネス・コンサル向けの議論用スライド資料をH
 
 - 議論先行で問いと構造を確定させてからHTMLに着手する
 - 統一されたデザインシステム(continova v1)で品質を担保
-- 9つの再利用可能なスライドパターンで設計効率化
+- 12の再利用可能なスライドパターン(SVG + 生成画像)で設計効率化
+- アイソメトリックなイラスト・図解・アイコンを codex CLI で生成し視認性を高める
 - スクロール形式で議論中も全体俯瞰できるHTMLとして出力
 
 ## ワークフロー
@@ -23,9 +24,9 @@ Phase 1: 問いの整理      (議論)
   ↓
 Phase 2: 全体構成の検討  (アウトライン)
   ↓
-Phase 3: スライド設計    (パターン選択)
+Phase 3: スライド設計    (パターン選択・ビジュアル方針)
   ↓
-Phase 4: HTML実装        (テンプレート + パターン適用)
+Phase 4: HTML実装        (画像生成 + テンプレート + パターン適用)
 ```
 
 **重要**: Phase 1-2を飛ばしてHTML実装に直行しない。ここを丁寧にやることが品質の8割を決める。
@@ -94,7 +95,7 @@ Slide N: [スライドタイトル]
 
 各スライドで、以下から主役オブジェクトのパターンを選ぶ。
 
-### 9つのスライドパターン
+### 12のスライドパターン
 
 | # | パターン | 用途 |
 |---|---|---|
@@ -108,8 +109,10 @@ Slide N: [スライドタイトル]
 | 08 | step-flow-with-mockup | 手順フロー + 出力イメージ |
 | 09 | limitation-matrix | 限界事項の3列マトリクス(項目/説明/対応) |
 | 10 | phased-roadmap | フェーズ別ロードマップ + 議論項目 |
+| 11 | hero-isometric | タイトル/セクション扉の象徴イラスト(生成画像) |
+| 12 | isometric-diagram | 主役オブジェクトをアイソメトリック生成画像で |
 
-各パターンの詳細(HTML/CSS/SVGコード)は `references/slide-patterns.md` を参照。
+各パターンの詳細(HTML/CSS/SVG/画像コード)は `references/slide-patterns.md` を参照。Pattern 01-10 は SVG・HTML、11-12 は codex 生成画像を使う。
 
 ### パターン選択の指針
 
@@ -117,6 +120,18 @@ Slide N: [スライドタイトル]
 - **対比・トレードオフ** → comparison-cards / tradeoff-axis
 - **時系列・フロー** → step-flow-with-mockup / phased-roadmap
 - **限界・前提** → limitation-matrix(必ず「対応」列を入れて誠実さを示す)
+- **タイトル・セクション扉** → hero-isometric(主題を象徴するイラスト)
+- **構造・流れを絵で速く伝えたい** → isometric-diagram
+
+### 生成画像とアイコンの使用
+
+SVG と codex 生成画像を併用する。スライドごとに次の基準で選ぶ。
+
+- **SVG を使う**(Pattern 01-10): 正確な数値・比較表・座標図、後から編集することが重要な図
+- **生成画像を使う**(Pattern 11-12): 構造・概念を直感的に伝えるアイソメトリックなイラスト・ヒーロー。迷ったら SVG
+- **アイコン**: カード見出し・eyebrow 横などの識別補助に codex 生成のアイコン画像を添える。デッキで使うアイコンは Phase 4 で 1 セッション一括生成し画風を揃える
+
+Phase 3 の終わりに、どのスライドで生成画像/アイコンを使うか、必要な画像のリストを確定する。詳細は `references/image-generation.md` / `references/image-prompts.md`。
 
 ---
 
@@ -124,12 +139,14 @@ Slide N: [スライドタイトル]
 
 ### 実装手順
 
-1. `assets/template.html` を `/home/claude/<filename>.html` にコピー
-2. デッキ全体のスライド数だけ `<section class="slide">` を増やす
-3. 各スライドに `references/slide-patterns.md` のパターンHTMLを貼る
-4. SVG主役オブジェクトを実装(パターン内のSVGコードを基に)
-5. HTMLバリデーション(タグの開閉確認)
-6. `/mnt/user-data/outputs/` にコピーし `present_files` で共有
+1. 出力先を決め、`assets/template.html` を `<出力先>/<filename>.html` にコピー
+2. 生成画像を使うスライド(Pattern 11-12)・アイコンがあれば、**先に** codex で画像を生成し `assets/<slug>/` に保存する(`references/image-generation.md`。アイコンは 1 セッション一括生成)
+3. デッキ全体のスライド数だけ `<section class="slide">` を増やす
+4. 各スライドに `references/slide-patterns.md` のパターンHTMLを貼る(SVG主役オブジェクト・生成画像 `<img>`・アイコンを実装)
+5. HTMLバリデーション(タグの開閉確認)＋ 全 `<img src>` が `assets/<slug>/` の実ファイルに解決することを確認
+6. ブラウザで表示確認(環境別の出力先・共有は「出力形式」参照)
+
+codex が使えない環境では、Pattern 11-12 を SVG パターン(01-10)に切り替える。生成画像は必須ではない。
 
 ### 検証コマンド
 
@@ -202,19 +219,20 @@ print('unclosed:', v.stack if v.stack else 'none')
 
 ## 出力形式
 
-最終的に1ファイルのHTMLとして出力:
+最終成果物は HTML ファイルと、それが参照する画像フォルダ:
 
-- 単一の `.html` ファイル(画像・CSS・JS全て埋め込み)
-- スクロール形式(全スライドが縦に並ぶ)
-- ブラウザで開けばすぐ見られる
+- `<filename>.html` — 全スライドが縦に並ぶスクロール形式。CSS は埋め込み
+- `assets/<slug>/` — codex 生成画像(図解・ヒーロー・`icons/`)。HTML と同階層に置き、相対パスで参照
+
+HTML 単体では生成画像が表示されないため、**共有・配布時は HTML と `assets/<slug>/` をセット**で扱う。生成画像を使わないデッキは HTML 単体で完結する。
 
 ### 環境別の出力先
 
-| 環境 | 出力先 | 補足 |
-|------|--------|------|
-| **Claude.ai** (オリジナル) | `/mnt/user-data/outputs/<filename>.html` | `present_files` で共有 |
-| **Claude Code (汎用)** | cwd 配下の任意パス（ユーザーが指定） | `open <path>` でローカル表示 |
-| **Claude Code + `project-context-template`** | `docs/deliverables/yyyymmdd_<slug>-slides.html` | 後述「project-context-template での使用」参照 |
+| 環境 | HTML | 画像フォルダ |
+|------|------|------|
+| **Claude.ai** (オリジナル) | `/mnt/user-data/outputs/<filename>.html` | `/mnt/user-data/outputs/assets/<slug>/`(`present_files` で HTML と画像を共有) |
+| **Claude Code (汎用)** | cwd 配下の任意パス(ユーザーが指定) | HTML と同階層の `assets/<slug>/`(`open <path>` でローカル表示) |
+| **Claude Code + `project-context-template`** | `docs/deliverables/yyyymmdd_<slug>-slides.html` | `docs/deliverables/assets/<slug>/`(後述参照) |
 
 スクロール形式のメリット:
 - 議論中に前後スライドを参照しやすい
@@ -229,9 +247,10 @@ print('unclosed:', v.stack if v.stack else 'none')
 
 ### 出力先と命名
 
-- パス: `docs/deliverables/yyyymmdd_<slug>-slides.html`
+- HTML パス: `docs/deliverables/yyyymmdd_<slug>-slides.html`
+- 画像フォルダ: `docs/deliverables/assets/<slug>/`(HTML から相対パス `assets/<slug>/...` で参照)
 - スラグは ASCII kebab-case
-- 例: `docs/deliverables/20260530_onboarding-overview-slides.html`
+- 例: `docs/deliverables/20260530_onboarding-overview-slides.html` ＋ `docs/deliverables/assets/onboarding-overview/`
 
 ### frontmatter（HTML コメント先頭埋め込み）
 
@@ -260,9 +279,9 @@ source_prompt: <生成プロンプトの要約>
 リポジトリの `AGENTS.md` の「Git 運用ルール」に従う:
 
 1. `git rev-parse --abbrev-ref HEAD` で main 上か確認、main なら `deliverable/<yyyymmdd>-<slug>` ブランチへ
-2. スライド生成 → HTML バリデーション
+2. 画像生成(必要時)→ スライド生成 → HTML バリデーション
 3. `npm run lint --prefix scripts` で frontmatter 検証
-4. コミットメッセージ案をユーザーに提示 → 確認後 commit
+4. コミットメッセージ案をユーザーに提示 → 確認後 commit(HTML と `docs/deliverables/assets/<slug>/` の両方をステージ)
 5. `git push -u origin <branch>` → ユーザーへマージ/PR 確認
 
 ### コミットメッセージ例
@@ -283,7 +302,8 @@ derived_from:
 
 - `references/design-system.md` — カラートークン、フォント、余白、ロゴ規約
 - `assets/template.html` — ベースの HTML テンプレート（CSS 変数・フォント・ヘッダー）
-- `references/slide-patterns.md` — 9 パターンの色・アクセントの参照値
+- `references/slide-patterns.md` — 12 パターンの色・アクセントの参照値
+- `references/image-prompts.md` — 生成画像の配色・スタイル（自社ブランドに合わせる場合）
 
 カスタマイズ手順例:
 
@@ -311,12 +331,15 @@ derived_from:
 - 1スライドに複数の主張を詰め込む
 - カードや箇条書きの反復だけで資料を構成する
 - 青い面を広げすぎてKlein Blueの意味を弱める
+- 生成画像にラベル・数値・日本語の文章を焼き込む(テキストはHTML側で重ねる)
 - ダミーデータを本物のように見せる(必ず`X`, `¥ X,XXX`等のプレースホルダで)
 
 ---
 
 ## 参照ファイル
 
-- `references/design-system.md` — continova v1の完全仕様(色・タイポ・余白・避けるべきこと)
-- `references/slide-patterns.md` — 9つのスライドパターンの詳細HTMLコード
-- `assets/template.html` — HTMLスタートテンプレート(ヘッダ・フッタ・基本CSS済み)
+- `references/design-system.md` — continova v1の完全仕様(色・タイポ・余白・画像方針・避けるべきこと)
+- `references/slide-patterns.md` — 12のスライドパターンの詳細HTML/SVG/画像コード
+- `references/image-generation.md` — codex CLI 画像生成のワークフロー(保存先・命名・フォールバック)
+- `references/image-prompts.md` — continova v1 用の画像生成プロンプト集(ヒーロー/図解/アイコン)
+- `assets/template.html` — HTMLスタートテンプレート(ヘッダ・フッタ・基本CSS・画像クラス済み)
