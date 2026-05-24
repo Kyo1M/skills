@@ -15,3 +15,6 @@ scratch/
 .env.*
 *.token
 *.key
+
+# Project-private skills (vaccinechoice_HH 等の限定公開スキル)
+vac-*/
