@@ -2,6 +2,10 @@
 
 continova v1スライドで使える12種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。すべて手書きSVG・HTML/CSSで完結し、外部生成画像は使わない。
 
+> **フォントサイズ**: 以下の例の `font-size` 値は最小限の目安。実際のデッキでは投影可読性のため `references/design-system.md`「サイズ階層」の新基準（**本文 16px 既定（最低 15px）／ top-message 26px ／ 注釈・ラベルは 12px 以上、11px 以下は使わない**）に合わせて底上げする。例の 11-14px は本文・チェックリストではそのまま使わない。
+>
+> **線アイコン**: 見出し・工程ラベル・レイヤー対応には、意味を補う手書き SVG 線アイコンを添えるとスキャン性が上がる。作り方（`<symbol>` sprite + `<use>`・currentColor 継承・やりすぎ回避）は `references/design-system.md`「線アイコンシステム」を参照。card-head・three-category-cards・step-flow・phased-roadmap・concept-schematic と相性が良い。
+
 ## 目次
 
 | # | パターン | 用途 | 推奨スライド位置 |
