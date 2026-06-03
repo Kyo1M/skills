@@ -393,7 +393,7 @@ derived_from:
 - **投影前提の下限**: 注釈・凡例・補助ラベル（SVG 図中ラベルを含む）は **12px を下限**。**11px 以下は使わない**
 - **下部 callout を削除して余白が空いた場合**: 情報を追加するのではなく、**既存要素を伸ばす**（カード高さ・フォント・padding）
 
-**レイアウトは固定サイズ＋scale**: `.slide` は `width:1672px; height:941px` 固定にし、狭いビューポートでは `transform: scale(...)` でデッキ全体を縮小する（`assets/template.html` の方式）。`aspect-ratio` で可変幅にすると、ウィンドウが 1672px 未満のとき**本文 px が固定のまま枠だけ縮んでクリップ**するので使わない。
+**レイアウトは固定サイズ＋scale**: `.slide` は `width:1672px; height:941px` 固定にし、狭いビューポートでは `transform: scale(...)` でデッキ全体を縮小する（`assets/template.html` の方式）。`aspect-ratio` で可変幅にすると、ウィンドウが 1672px 未満のとき**本文 px が固定のまま枠だけ縮んでクリップ**するので使わない。scale 値は末尾の小さな JS（resize 対応）で inline 設定する ── CSS calc の `length ÷ length = number` は新しめの Chromium/Safari/Firefox 限定のため、互換性重視で JS にする（JS 無効時は原寸表示で、内容はクリップされない）。
 
 ブラウザで 1672×941 がどう埋まるかを確認しながら微調整する。**はみ出しの機械チェックは Phase 5（`references/self-review-checklist.md` 観点 4）に従い、(a) 各 `.slide` を一時的に `height:auto` にして自然高さ ≤ 941px、(b) 内側の `overflow:hidden` 要素（掲載ボックス・ツリー・グリッドセル）も `scrollHeight ≤ clientHeight`、の両方を確認する**。投影環境のフォント差を見込み、自然高さは 941 ぴったりではなく **30px ほど余らせる** と安全。
 

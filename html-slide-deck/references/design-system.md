@@ -117,7 +117,7 @@ font-family: "Helvetica Neue", "Inter", Arial, sans-serif;
 
 ## Layout Rhythm
 
-- スライドサイズ: **1672 x 941 px**、16:9 固定。`.slide` は `width`/`height` を px で固定し、狭いビューポートでは `transform: scale()` でデッキ全体を縮小する（`aspect-ratio` で可変幅にすると、窓幅が 1672px 未満のとき本文 px が固定のまま枠だけ縮んで**はみ出し・クリップ**するため不可）
+- スライドサイズ: **1672 x 941 px**、16:9 固定。`.slide` は `width`/`height` を px で固定し、狭いビューポートでは `transform: scale()` でデッキ全体を縮小する（`aspect-ratio` で可変幅にすると、窓幅が 1672px 未満のとき本文 px が固定のまま枠だけ縮んで**はみ出し・クリップ**するため不可）。scale 値は末尾の小さなリサイズスクリプトで inline 設定する（CSS calc の `length ÷ length = number` は新しめの Chromium/Safari/Firefox 限定のため、互換性重視で JS にする。JS 無効時は原寸表示で内容はクリップされない）
 - 標準余白: 左右 70px、上 58px、下 38px
 - タイトル下のルール線(60×3px Klein Blue)とフッター線で資料全体の静かなリズム
 - トップメッセージは 1-2 文。スライド上部で読むべき結論を先に置く

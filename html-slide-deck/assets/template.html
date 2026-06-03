@@ -49,12 +49,9 @@
     padding: 58px 70px 38px 70px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.08);
     transform-origin: top center;
-    transform: scale(min(1, calc((100vw - 80px) / 1672px)));
-    margin-bottom: calc((1 - min(1, calc((100vw - 80px) / 1672px))) * -941px);
-  }
-
-  @media (min-width: 1752px) {
-    .slide { transform: none; margin-bottom: 0; }
+    /* 縮小は末尾の scale スクリプトが inline で設定する（全ブラウザ互換）。
+       CSS calc の length÷length=number は新しめの Chromium/Safari/Firefox 限定のため使わない。
+       JS 無効時は原寸 1672×941 で表示され横スクロールするが、内容はクリップされない。 */
   }
 
   /* Title block */
@@ -198,6 +195,24 @@ SLIDE 2: [次のスライドタイトル]
 -->
 
 </div>
+
+<script>
+/* 固定キャンバス(1672×941)をビューポート幅に合わせて縮小（全ブラウザ互換）。
+   JS が無効でも原寸表示されるだけで内容はクリップされない。 */
+(function () {
+  var W = 1672, H = 941, M = 80;
+  function fit() {
+    var s = Math.min(1, (document.documentElement.clientWidth - M) / W);
+    var slides = document.getElementsByClassName('slide');
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].style.transform = 'scale(' + s + ')';
+      slides[i].style.marginBottom = (s - 1) * H + 'px';
+    }
+  }
+  fit();
+  window.addEventListener('resize', fit);
+})();
+</script>
 
 </body>
 </html>
