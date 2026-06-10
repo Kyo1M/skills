@@ -1,6 +1,6 @@
 # Slide Patterns
 
-continova v1スライドで使える12種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。すべて手書きSVG・HTML/CSSで完結し、外部生成画像は使わない。
+continova v1スライドで使える14種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。すべて手書きSVG・HTML/CSSで完結し、外部生成画像は使わない。
 
 > **フォントサイズ**: 以下の例の `font-size` 値は最小限の目安。実際のデッキでは投影可読性のため `references/design-system.md`「サイズ階層」の新基準（**本文 16px 既定（最低 15px）／ top-message 26px ／ 注釈・ラベルは 12px 以上、11px 以下は使わない**）に合わせて底上げする。例の 11-14px は本文・チェックリストではそのまま使わない。
 >
@@ -23,6 +23,7 @@ continova v1スライドで使える12種類のパターン。各パターンは
 | 11 | concept-schematic | 仕組み・系を1枚の手書きSVG模式図で | 概念・設計パート |
 | 12 | visual-band | 変化・遷移を表す補助スリム帯 | 任意(単調さの緩和) |
 | 13 | isometric-concept | 節目スライドの主役アイソメ概念図(グレー3トーン＋青1ノード) | 表紙・章マップ・全体像・運用 |
+| 14 | question-decision | 議論ページの定型(問い・選択肢・推奨・判断基準・決めたいこと) | 議論駆動デッキの【議論】ページ |
 
 ---
 
@@ -906,6 +907,131 @@ continova v1スライドで使える12種類のパターン。各パターンは
 
 ---
 
+## Pattern 14: question-decision(議論ページ)
+
+**用途**: 定例・部会・レビュー会など「その場で決める」資料の【議論】ページ定型。問い・選択肢・推奨案・判断基準・「この場で決めたいこと」を 1 枚に収め、議論の発散を防ぐ。SKILL.md「ページ役割設計（議論駆動デッキ）」とセットで使う。
+
+**設計原則**:
+- **1 問い 1 ページ**。複数の問いがあるならページを分ける
+- **選択肢は 2〜3 個**。4 個以上あるなら事前に絞ってから出す（網羅比較は Appendix の【参考】ページ＝Pattern 03 comparison-table へ）
+- **判断基準は 3 つまで**。判断に効かない背景情報はこのページに置かない
+- 推奨案には Klein Blue 枠＋「推奨」バッジ（本命シグナルの規律と整合）
+- 末尾の `.qd-ask` 帯に「この場で決めたいこと」を 1 文で書く。持ち帰りになる場合の決め方（誰が・いつまでに）も添えると議論が締まる
+
+### 役割バッジ（デッキ共通コンポーネント）
+
+議論駆動デッキでは全スライド右上に役割バッジを付ける。`<section class="slide role-discuss">` のように slide 要素に役割クラスを与える。
+
+```css
+/* ページ役割バッジ（議論駆動デッキ）: スライド右上に役割と時間目安を表示 */
+.role-badge { position: absolute; top: 62px; right: 70px; display: flex; align-items: center; gap: 10px; }
+.role-badge .tag { font-size: 14px; font-weight: 700; letter-spacing: 0.12em; padding: 6px 16px; border: 1.5px solid var(--border-soft); }
+.role-badge .time { font-size: 13px; font-weight: 600; color: var(--pebble); }
+.role-report    .role-badge .tag { background: var(--snow); color: var(--stone); }
+.role-confirm   .role-badge .tag { background: var(--brand-blue-soft); border-color: var(--brand-blue-soft); color: var(--brand-klein); }
+.role-discuss   .role-badge .tag { background: var(--brand-klein); border-color: var(--brand-klein); color: var(--white); }
+.role-reference .role-badge .tag { background: var(--white); color: var(--pebble); }
+```
+
+```html
+<!-- 各スライドの .slide-eyebrow の直前に置く -->
+<div class="role-badge"><span class="tag">議論</span><span class="time">10 分</span></div>
+```
+
+【報告】= `role-report`、【確認】= `role-confirm`、【議論】= `role-discuss`、【参考】= `role-reference`。議論バッジだけ Klein Blue 塗り（このデッキの主役ページであることを示す）。
+
+### 議論ページ本体
+
+```css
+.qd-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; }
+.qd-option { border: 1.5px solid var(--border-soft); background: var(--white); padding: 28px 30px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.qd-option.recommended { border: 2px solid var(--brand-klein); }
+.qd-reco { position: absolute; top: -14px; left: 26px; background: var(--brand-klein); color: var(--white); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; padding: 4px 14px; }
+.qd-name { font-size: 21px; font-weight: 700; color: var(--ink); }
+.qd-sum { font-size: 16px; color: var(--stone); line-height: 1.7; }
+.qd-points { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 16px; color: var(--stone); }
+.qd-points li { padding-left: 26px; position: relative; }
+.qd-points li.pro::before { content: "○"; position: absolute; left: 0; color: var(--brand-klein); font-weight: 700; }
+.qd-points li.con::before { content: "△"; position: absolute; left: 0; color: var(--pebble); font-weight: 700; }
+.qd-criteria { margin-top: 24px; display: flex; align-items: center; gap: 14px; }
+.qd-criteria .chip { font-size: 15px; font-weight: 600; color: var(--stone); background: var(--snow); padding: 7px 16px; }
+.qd-ask { margin-top: 20px; border-left: 4px solid var(--brand-klein); background: var(--brand-blue-soft); padding: 14px 20px; font-size: 17px; font-weight: 600; color: var(--ink); }
+.qd-ask .label-inline { color: var(--brand-klein); font-weight: 700; margin-right: 10px; letter-spacing: 0.08em; }
+```
+
+```html
+<section class="slide role-discuss" id="s4">
+  <div class="role-badge"><span class="tag">議論</span><span class="time">10 分</span></div>
+  <div class="slide-eyebrow">04 / DISCUSSION 1</div>
+  <h1 class="slide-title">ハンズオンの開催形式</h1>
+  <div class="title-rule"></div>
+  <p class="top-message">
+    <span class="accent">Q1.</span> ハンズオンは 1 回 90 分で通すか、2 回 × 45 分に分けるか。
+  </p>
+
+  <div class="body">
+    <div class="qd-options">
+      <div class="qd-option recommended">
+        <span class="qd-reco">推奨</span>
+        <div class="qd-name">案 A: 1 回 90 分で通す</div>
+        <p class="qd-sum">準備〜レビュー〜commit までを 1 セッションで体験し、業務の一連の流れとして定着させる。</p>
+        <ul class="qd-points">
+          <li class="pro">流れが途切れず、当日中に「動いた」体験まで到達できる</li>
+          <li class="pro">日程調整が 1 回で済む</li>
+          <li class="con">90 分の拘束。途中離脱者へのフォローが必要</li>
+        </ul>
+      </div>
+      <div class="qd-option">
+        <div class="qd-name">案 B: 2 回 × 45 分に分ける</div>
+        <p class="qd-sum">第 1 回で環境準備と基本操作、第 2 回でレビュー実践に分けて負荷を下げる。</p>
+        <ul class="qd-points">
+          <li class="pro">1 回あたりの拘束が短く参加しやすい</li>
+          <li class="con">間が空くと第 1 回の内容を忘れる。環境トラブルの再発リスク</li>
+        </ul>
+      </div>
+    </div>
+    <div class="qd-criteria">
+      <span class="label">判断基準</span>
+      <span class="chip">参加者の拘束時間</span>
+      <span class="chip">体験の定着度</span>
+      <span class="chip">日程調整コスト</span>
+    </div>
+    <div class="qd-ask"><span class="label-inline">この場で決めたいこと</span>案 A / B の選択。持ち帰る場合は、誰がいつまでに決めるかをこの場で確定する。</div>
+  </div>
+
+  <div class="footer">
+    <span class="left">資料名 | サブタイトル</span>
+    <span>04 / 08</span>
+  </div>
+</section>
+```
+
+### 表紙の「本日の問い」リスト（議論駆動デッキの表紙部品）
+
+表紙（または 2 枚目）に本日の問いを 2〜3 個宣言し、議論が逸れたときのアンカーにする。各問いは【議論】ページと 1:1 対応させ、ページ番号を添える。
+
+```css
+.today-questions { margin-top: 40px; display: flex; flex-direction: column; gap: 16px; max-width: 1100px; }
+.today-questions .tq { display: grid; grid-template-columns: 64px 1fr 90px; align-items: center; gap: 18px; border: 1.5px solid var(--border-soft); background: var(--white); padding: 18px 24px; }
+.today-questions .tq-no { font-size: 22px; font-weight: 800; color: var(--brand-klein); }
+.today-questions .tq-text { font-size: 19px; font-weight: 600; color: var(--ink); }
+.today-questions .tq-page { font-size: 14px; color: var(--pebble); text-align: right; }
+```
+
+```html
+<div class="today-questions">
+  <div class="tq"><span class="tq-no">Q1</span><span class="tq-text">ハンズオンは 1 回 90 分か、2 回 × 45 分か</span><span class="tq-page">→ p.4</span></div>
+  <div class="tq"><span class="tq-no">Q2</span><span class="tq-text">対象テンプレートは最小版で開始してよいか</span><span class="tq-page">→ p.5</span></div>
+</div>
+```
+
+**カスタマイズポイント**:
+- 選択肢 3 個なら `.qd-options` を `repeat(3, 1fr)` に。カード内の文字量を減らして補う
+- 「やる / やらない」型の問いなら選択肢カード 2 枚（実施案 / 見送り案）で、見送り案にも誠実に利点を書く
+- 推奨を出さずフラットに問う場合は `.recommended` と `.qd-reco` を外す（ただし「推進リードとしての推奨はどちらか」を聞かれたら答えられるよう準備しておく）
+
+---
+
 ## パターン組み合わせの推奨
 
 8枚構成の場合の典型的なパターン配置:
@@ -922,5 +1048,17 @@ continova v1スライドで使える12種類のパターン。各パターンは
 | 8 | 10 phased-roadmap | ロードマップと議論項目 |
 
 これは標準形であり、内容に応じて入れ替え可能。ただし「冒頭に目的、末尾に議論項目」は変えない。
+
+**議論駆動デッキ（定例・部会）の場合**（SKILL.md「ページ役割設計」参照）:
+
+| Slide | 役割 | パターン | 内容例 |
+|---|---|---|---|
+| 1 | 表紙 | 14 today-questions | 本日の問い 2〜3 個の宣言 |
+| 2 | 【報告】 | 06 / 08 | 前回からの進捗（3 点以内） |
+| 3 | 【確認】 | 02 / 11 | 前提・解釈の合意 |
+| 4 | 【議論】 | **14 question-decision** | 問い 1（1 問い 1 ページ） |
+| 5 | 【議論】 | **14 question-decision** | 問い 2 |
+| 6 | まとめ | 10 | 決定事項＋持ち帰り論点＋次アクション |
+| A1〜 | 【参考】 | 03 / 05 / 09 | 網羅情報（高密度可）。本編から「詳細は Appendix N」で参照 |
 
 Pattern 11(concept-schematic)・12(visual-band)は任意の補助ビジュアル。カード・表が続いて視覚的に単調なときに、各スライドの主役オブジェクトを保ったまま追加して概念図・変化の見取り図を与える。詰め込みすぎると逆効果なので、効くスライド(仕組み説明・目的の AS-IS→TO-BE など)に絞る。

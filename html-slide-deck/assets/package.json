@@ -1,0 +1,10 @@
+{
+  "name": "html-slide-deck-tools",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "description": "check-slides.mjs (はみ出し・内側クリップ・小フォント検査) の依存。初回のみ npm install を実行する。",
+  "dependencies": {
+    "playwright-core": "^1.49.0"
+  }
+}

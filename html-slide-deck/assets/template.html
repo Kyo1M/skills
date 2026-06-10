@@ -137,6 +137,17 @@
         stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle; }
   .ic-title { width:32px; height:32px; vertical-align:-5px; margin-right:13px; color:var(--brand-klein); }
 
+  /* ページ役割バッジ（議論駆動デッキ）。<section class="slide role-discuss"> のように
+     役割クラスを slide に与え、.slide-eyebrow の直前に .role-badge を置く。
+     詳細は references/slide-patterns.md Pattern 14。議論バッジだけ Klein Blue 塗り。 */
+  .role-badge { position: absolute; top: 62px; right: 70px; display: flex; align-items: center; gap: 10px; }
+  .role-badge .tag { font-size: 14px; font-weight: 700; letter-spacing: 0.12em; padding: 6px 16px; border: 1.5px solid var(--border-soft); }
+  .role-badge .time { font-size: 13px; font-weight: 600; color: var(--pebble); }
+  .role-report    .role-badge .tag { background: var(--snow); color: var(--stone); }
+  .role-confirm   .role-badge .tag { background: var(--brand-blue-soft); border-color: var(--brand-blue-soft); color: var(--brand-klein); }
+  .role-discuss   .role-badge .tag { background: var(--brand-klein); border-color: var(--brand-klein); color: var(--white); }
+  .role-reference .role-badge .tag { background: var(--white); color: var(--pebble); }
+
   /* ======================================================== */
   /* スライドパターンごとの追加CSSは、slide-patterns.mdから        */
   /* 必要なものをここに追加していく                                  */
