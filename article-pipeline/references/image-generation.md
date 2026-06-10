@@ -1,6 +1,6 @@
 # 画像生成（codex CLI）
 
-記事に挿入する画像を codex CLI のネイティブ画像生成で作り、`assets/<slug>/` に配置する。
+記事に挿入する画像を codex CLI のネイティブ画像生成で作り、記事フォルダ内の `assets/` に配置する。
 
 ## 仕組み
 
@@ -14,7 +14,7 @@
 
 1. 画像の挿入位置と図解パターンを決める（`image-prompts.md` の 10 種）。
 2. 日本語の画像生成プロンプトを組み立てる。
-3. codex に画像生成 → `assets/<slug>/` への保存まで依頼する。codex は `--sandbox workspace-write` でリポジトリ内に書き込める。
+3. codex に画像生成 → 記事フォルダ内の `assets/` への保存まで依頼する。codex は `--sandbox workspace-write` でリポジトリ内に書き込める。
 
 ```bash
 codex exec --skip-git-repo-check --sandbox workspace-write \
@@ -22,24 +22,24 @@ codex exec --skip-git-repo-check --sandbox workspace-write \
   【プロンプト】
   <image-prompts.md のパターンに沿った日本語プロンプト>
 
-  生成できたら、その画像を assets/<slug>/<NN>-<desc>.png にコピーしてください。
+  生成できたら、その画像を articles/<yyyymmdd>_<slug>/assets/<NN>-<desc>.png にコピーしてください。
   最後の行に、コピー先の相対パスだけを出力してください。" < /dev/null
 ```
 
-4. `assets/<slug>/<NN>-<desc>.png` が出来たことを確認する。
+4. `articles/<yyyymmdd>_<slug>/assets/<NN>-<desc>.png` が出来たことを確認する。
 5. 記事本文の挿入位置に Markdown 画像を入れる:
 
    ```markdown
-   ![<alt テキスト>](../assets/<slug>/<NN>-<desc>.png)
+   ![<alt テキスト>](assets/<NN>-<desc>.png)
    ```
 
-   `drafts/` / `published/` の記事から見た `assets/` への相対パスは `../assets/...`。
+   `article.md` と `assets/` は同じ記事フォルダ内にあるため、相対パスは `assets/...`。公開時にフォルダごと `published/` へ移動してもこの相対パスは有効。
 
 ## 命名
 
 - `<NN>` は記事内の画像連番（`01`, `02`, ...）
 - `<desc>` は内容を表す kebab-case の短い英語（例: `before-after-workflow`）
-- 例: `assets/ai-driven-mvp/01-before-after-workflow.png`
+- 例: `articles/20260520_ai-driven-mvp/assets/01-before-after-workflow.png`
 
 ## 複数枚
 
@@ -57,5 +57,5 @@ codex exec --skip-git-repo-check --sandbox workspace-write \
   ---
   ```
 
-- codex が直接 `assets/` にコピーできなかった場合は、出力された `~/.codex/generated_images/.../ig_*.png` の絶対パスを読み取り、こちら側で `assets/<slug>/` へコピーする。
+- codex が直接 `assets/` にコピーできなかった場合は、出力された `~/.codex/generated_images/.../ig_*.png` の絶対パスを読み取り、こちら側で記事フォルダ内の `assets/` へコピーする。
 - 生成画像のアスペクト比は約 16:9。厳密な比率や透過が必要な場合は codex 側の `imagegen` スキルの指示に従う。

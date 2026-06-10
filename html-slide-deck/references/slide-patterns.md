@@ -1,6 +1,10 @@
 # Slide Patterns
 
-continova v1スライドで使える10種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。
+continova v1スライドで使える14種類のパターン。各パターンは `assets/template.html` の基本CSSをベースに、追加のスタイルとHTMLを示す。すべて手書きSVG・HTML/CSSで完結し、外部生成画像は使わない。
+
+> **フォントサイズ**: 以下の例の `font-size` 値は最小限の目安。実際のデッキでは投影可読性のため `references/design-system.md`「サイズ階層」の新基準（**本文 16px 既定（最低 15px）／ top-message 26px ／ 注釈・ラベルは 12px 以上、11px 以下は使わない**）に合わせて底上げする。例の 11-14px は本文・チェックリストではそのまま使わない。
+>
+> **線アイコン**: 見出し・工程ラベル・レイヤー対応には、意味を補う手書き SVG 線アイコンを添えるとスキャン性が上がる。作り方（`<symbol>` sprite + `<use>`・currentColor 継承・やりすぎ回避）は `references/design-system.md`「線アイコンシステム」を参照。card-head・three-category-cards・step-flow・phased-roadmap・concept-schematic と相性が良い。
 
 ## 目次
 
@@ -16,6 +20,10 @@ continova v1スライドで使える10種類のパターン。各パターンは
 | 08 | step-flow-with-mockup | 手順フロー + アウトプット例 | 実装パート |
 | 09 | limitation-matrix | 限界事項の3列マトリクス | 限界・前提 |
 | 10 | phased-roadmap | フェーズ別ロードマップ + 議論項目 | 締め |
+| 11 | concept-schematic | 仕組み・系を1枚の手書きSVG模式図で | 概念・設計パート |
+| 12 | visual-band | 変化・遷移を表す補助スリム帯 | 任意(単調さの緩和) |
+| 13 | isometric-concept | 節目スライドの主役アイソメ概念図(グレー3トーン＋青1ノード) | 表紙・章マップ・全体像・運用 |
+| 14 | question-decision | 議論ページの定型(問い・選択肢・推奨・判断基準・決めたいこと) | 議論駆動デッキの【議論】ページ |
 
 ---
 
@@ -704,6 +712,326 @@ continova v1スライドで使える10種類のパターン。各パターンは
 
 ---
 
+## Pattern 11: concept-schematic
+
+**用途**: 1 つの系(システム / 仕組み / データフロー)を手書き SVG の平面模式図で示す。Pattern 02(dual-panel)が左右 2 概念の対比なのに対し、本パターンは「要素 + 関係」を 1 枚の図にまとめる。表やカードの上に補助図(スリム版)として置くと、密度の高いスライドに概念の見取り図を与えられる。主役オブジェクトとしても使える。
+
+**設計方針**:
+- 要素 = 矩形ブロック。関係 = 矢印・破線・内包枠で表す
+- 内包(グループが要素を含む)は枠で囲い、枠外の要素との連携は破線で示す
+- 主役・本命ノードだけ Klein Blue、残りはインク / グレーの線画
+- ラベルは SVG text。長文は焼き込まず、詳細は隣接する表・カードに逃がす
+- viewBox で固定。補助バンドなら横長スリム(~1500x130)、主役オブジェクトなら縦を広げる(~1500x430)
+
+**追加CSS**(補助バンドとして表・カードの上に置く場合):
+```css
+.viz-strip {
+  margin-bottom: 18px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.viz-strip svg { display: block; width: 100%; height: auto; }
+```
+
+**HTML**(「内包 + 外部連携 + エンジン」型の模式図 — 表の上に補助バンドとして配置):
+```html
+<div class="viz-strip">
+  <svg class="diagram" viewBox="0 0 1500 124" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <marker id="schemaArr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+        <polygon points="0 0, 9 4.5, 0 9" fill="#002FA7"/>
+      </marker>
+    </defs>
+    <!-- 内包枠: グループが要素 A・B を含む -->
+    <rect x="150" y="8" width="586" height="72" rx="8" fill="none" stroke="#002FA7" stroke-width="1.6"/>
+    <rect x="166" y="1" width="214" height="14" fill="#FFFFFF"/>
+    <text x="172" y="12" font-size="11" fill="#002FA7" font-weight="700" letter-spacing="0.04em">グループ名（器）</text>
+    <!-- 要素 A・B: 枠の内側 -->
+    <rect x="170" y="20" width="546" height="26" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.2"/>
+    <text x="188" y="37" font-size="13" fill="#002FA7" font-weight="700">要素 A</text>
+    <rect x="170" y="50" width="546" height="26" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.2"/>
+    <text x="188" y="67" font-size="13" fill="#002FA7" font-weight="700">要素 B</text>
+    <!-- 要素 C: 枠外。破線コネクタで連携 -->
+    <rect x="170" y="92" width="546" height="26" fill="#F6F5F2" stroke="#A9AAAD" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <text x="188" y="109" font-size="13" fill="#6F7175" font-weight="700">要素 C（枠外）</text>
+    <line x1="116" y1="105" x2="170" y2="105" stroke="#002FA7" stroke-width="1.4" stroke-dasharray="4 3"/>
+    <text x="46" y="102" font-size="10.5" fill="#002FA7" font-weight="700">連携</text>
+    <text x="38" y="115" font-size="10.5" fill="#6F7175">外部参照</text>
+    <!-- エンジン / 処理ノードが全要素を横断参照 -->
+    <path d="M716 33 C 812 33, 814 66, 896 66" fill="none" stroke="#002FA7" stroke-width="1.5" marker-end="url(#schemaArr)"/>
+    <path d="M716 63 C 802 63, 808 66, 896 66" fill="none" stroke="#002FA7" stroke-width="1.5" marker-end="url(#schemaArr)"/>
+    <path d="M716 105 C 814 105, 810 66, 896 66" fill="none" stroke="#002FA7" stroke-width="1.5" marker-end="url(#schemaArr)"/>
+    <rect x="902" y="38" width="468" height="56" rx="10" fill="#FFFFFF" stroke="#002FA7" stroke-width="1.6"/>
+    <text x="938" y="64" font-size="14.5" fill="#002FA7" font-weight="700">エンジン / 処理ノード</text>
+    <text x="938" y="83" font-size="12" fill="#2F3135">＝ 横断参照と生成の役割</text>
+  </svg>
+</div>
+```
+
+**カスタマイズポイント**:
+- 内包枠で「内 / 外」「対象 / 対象外」を視覚化できる(○/△ バッジの代わり)
+- 補助バンドとして使う場合、下に詳細表(Pattern 03)やカードを置き、図は見取り図に徹する
+- 主役オブジェクトにする場合は viewBox を縦に広げ、各ブロックを大きくして注釈を増やす
+- これは旧 codex 生成版「isometric-diagram」の手書き SVG 後継。生成画像は品質が不安定なため使わない
+- 平面の模式図はこの Pattern 11、**立体（アイソメ）で「記憶に残る主役図」にしたいときは Pattern 13: isometric-concept** を使う
+
+---
+
+## Pattern 12: visual-band(transition strip)
+
+**用途**: トップメッセージと主役オブジェクトの間に挟む、変化・遷移・段階を表す横長スリムな SVG 帯。AS-IS→TO-BE、Before→After、個人→組織 などの「動き」を補助的に可視化し、カード・表が続くデッキの視覚的単調さを和らげる。**主役オブジェクトではなく補助要素**。
+
+**設計方針**:
+- 高さは控えめ(viewBox ~1500x80)。`.viz-strip`(Pattern 11 と共通)で margin と下罫線
+- 左に変化前(グレー・不揃い)、中央に矢印、右に変化後(整列・Klein Blue アクセント数個)
+- 「動き」が一目で伝われば十分。要素を詰め込まない
+- 1 スライドにつき 1 本まで。これを主役オブジェクトに昇格させない
+
+**HTML**(AS-IS→TO-BE の変化を表す帯 — トップメッセージ直下に配置):
+```html
+<div class="viz-strip">
+  <svg class="diagram" viewBox="0 0 1500 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- 変化前: 不揃いに散らばった要素(グレー) -->
+    <g fill="#FFFFFF" stroke="#A9AAAD" stroke-width="1.3">
+      <rect x="72" y="16" width="18" height="18" transform="rotate(-9 81 25)"/>
+      <rect x="170" y="40" width="18" height="18" transform="rotate(8 179 49)"/>
+      <rect x="122" y="6" width="18" height="18" transform="rotate(13 131 15)"/>
+      <rect x="248" y="30" width="18" height="18" transform="rotate(-6 257 39)"/>
+      <rect x="332" y="9" width="18" height="18" transform="rotate(9 341 18)"/>
+      <rect x="300" y="44" width="18" height="18" transform="rotate(-12 309 53)"/>
+      <rect x="412" y="34" width="18" height="18" transform="rotate(6 421 43)"/>
+      <rect x="458" y="12" width="18" height="18" transform="rotate(-8 467 21)"/>
+    </g>
+    <text x="74" y="74" font-size="11.5" fill="#6F7175" letter-spacing="0.5">変化前の状態(AS-IS)</text>
+    <!-- 遷移の矢印 -->
+    <line x1="620" y1="36" x2="952" y2="36" stroke="#002FA7" stroke-width="1.8"/>
+    <polygon points="952,36 936,28 936,44" fill="#002FA7"/>
+    <text x="620" y="22" font-size="10.5" fill="#6F7175" letter-spacing="0.18em">TRANSITION</text>
+    <!-- 変化後: 整列した要素 + Klein Blue アクセント -->
+    <g>
+      <rect x="1020" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1092" y="6"  width="20" height="20" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.4"/>
+      <rect x="1164" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1236" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1308" y="6"  width="20" height="20" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.4"/>
+      <rect x="1380" y="6"  width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1020" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1092" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1164" y="34" width="20" height="20" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.4"/>
+      <rect x="1236" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1308" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+      <rect x="1380" y="34" width="20" height="20" fill="#F6F5F2" stroke="#B7B7B7" stroke-width="1.2"/>
+    </g>
+    <text x="1020" y="74" font-size="11.5" fill="#002FA7" letter-spacing="0.5" font-weight="700">変化後の状態(TO-BE)</text>
+  </svg>
+</div>
+```
+
+**カスタマイズポイント**:
+- 散らばり / 整列のほか、段階バー(個人→チーム→組織)や Before/After のミニ図でもよい
+- Klein Blue は変化後の数個(視覚面積 5-12%)に絞る
+- ラベルは短く。詳細は下のカード・表で語る
+
+---
+
+## Pattern 13: isometric-concept(アイソメトリック概念図)
+
+**用途**: **節目スライド**（表紙・章マップ・全体像・運用イメージなど structural / concept スライド）の主役に、手書きのアイソメトリック概念図を置く。文字主体のデッキに「図の形」で記憶のアンカーを与える。Pattern 11（平面模式図）の立体版で、グラフィカルな質感（接地影・面の陰影・小ディテール）で印象を立てつつ consulting calm を崩さない。
+
+**置く場所（節目限定）**:
+- ✓ 表紙のヒーロー、章マップ／章扉、全体像（共通基盤＋枝分かれ）、運用ループ
+- ✗ 観点カードが密なスライド（チェックリスト 3カラム・2×2・table・掲載ボックス）には置かない ── 文字を優先し、はみ出させない
+
+**設計キット（必ず守る）**:
+- **グレー 3 トーンの面＝立体の形**: 天面 `--iso-top #FBFBFA` / 左面 `--iso-left #E7E7E4` / 右面 `--iso-right #D5D5D1`、輪郭 `--iso-line #6F7175`・`stroke-width:1.4`・`stroke-linejoin:round`（本文の `.ic` と同じ線質）。これは装飾ではなく「形」の情報設計（design-system.md「グレー面陰影は『形』であり装飾ではない」参照）。
+- **主役ノードだけ Klein Blue（1 図 1 ノード）**: その図の核を 1 ブロックだけ青で示す。面は `#EAF1FF / #C9D8F5 / #AFC4EF`、輪郭・ラベルは `#002FA7`。第 2 ブランドカラーは増やさない。
+- **ソフト接地影**: デッキ冒頭の `<defs>` に `<filter id="iso-shadow"><feGaussianBlur stdDeviation="7"/></filter>` を 1 つ定義し、各立体の下に淡いだ円（`fill="#2F3135" opacity="0.12" filter="url(#iso-shadow)"`）を敷く。これも「接地＝立体がそこに在る」の表現で、派手なドロップシャドウとは別物。
+- **小ディテールで意味を補う**（任意）: 立体の上に小さな線画アイコン（虫眼鏡＝解析・分析、モニタ＋バー＝可視化/ダッシュボード、菱形＝示唆、データ層の薄い線＝マート 等）。意味と 1:1 のときだけ。
+- **ラベルは SVG に焼き込まず横書き**: text 要素は水平（傾けない）、投影下限 12px。長文は隣接カードへ逃がす。
+- **`viewBox` 固定＋フィット**: 主役カードに入れるときは `preserveAspectRatio="xMidYMid meet"` ＋ `flex:1; min-height:0` で残り空間にフィットさせる（`height:auto` の固定だと枠を超えてクリップするので、はみ出し回避にはフィット方式が安全）。帯として使うときは `width:100%; height:auto`。
+
+**形のボキャブラリ ── 立方体だけにしない（重要）**: 立方体/スラブの反復は「箱ばっかり」で単調・安っぽく見える。**意味に合った多様なアイソメ形**を使い分ける（すべてグレー3トーン線画＋主役のみ青）:
+
+| 形 | 作り方の要点 | 何を表すか |
+|---|---|---|
+| プラットフォーム/スラブ | 薄い大きな箱＋天面に淡いグリッド線 | 土台・共通基盤 |
+| 円柱（DB ドラム） | 天面だ円＋側面＋前面の半だ円リッジ2本 | データ・データストア・マート |
+| モニタ（スタンド付き画面） | 傾いた平行四辺形の画面＋薄い奥行き面＋棒グラフ＋スタンド | 可視化・ダッシュボード |
+| 折れ線グラフ | 平らなタイル（ダイヤ）＋上昇するポリライン＋点 | 解析・モデリング |
+| 虫眼鏡 | 円＋柄。中に小さな上昇マーク | 考察・裏取り・レビュー |
+| 書類/重ね書類 | 立った平行四辺形＋本文線。重ねてナレッジ、★で正本 | 設計書・観点ファイル・ナレッジ |
+| ゲージ（半円メーター） | 半円アーク＋針＋中心点 | 検証・運用監視 |
+| チェック付き書類 | 書類＋✓ | 要件・指標・チェックリスト |
+
+1 つの図、および 1 つの帯（4 工程など）の中で **同じ形を反復させない**。工程フローの帯は各ステップを別々の形（書類→円柱→グラフ→虫眼鏡 等）にすると、下の詳細フローと対応しつつ記憶に残る。下記キューブのレシピは「土台」や数合わせの汎用ブロックに留め、主役・各ノードは上表の形から選ぶ。
+
+**アイソメ立体（箱）の作り方（再利用できる座標レシピ）**: 箱は「天面ダイヤ＋左面＋右面」の 3 パスで描く。天面中心 `(cx,cy)`・半幅 `W`・ダイヤ半高 `Hd=W/2`・高さ `H` とすると:
+```
+天面: M cx,(cy-Hd) L (cx+W),cy L cx,(cy+Hd) L (cx-W),cy Z      ← fill #FBFBFA
+左面: M (cx-W),cy L cx,(cy+Hd) L cx,(cy+Hd+H) L (cx-W),(cy+H) Z ← fill #E7E7E4
+右面: M (cx+W),cy L cx,(cy+Hd) L cx,(cy+Hd+H) L (cx+W),(cy+H) Z ← fill #D5D5D1
+```
+主役は同じ式で fill を `#EAF1FF / #C9D8F5 / #AFC4EF`・stroke を `#002FA7` に。
+
+**HTML（主役カードに入れる「共通基盤＋主役キーストーン＋2タワー」型 — 最小例）**:
+```html
+<!-- デッキ冒頭の隠し <defs> に 1 度だけ -->
+<filter id="iso-shadow" x="-40%" y="-40%" width="180%" height="190%"><feGaussianBlur stdDeviation="7"/></filter>
+
+<div class="card" style="flex:1.3; display:flex; flex-direction:column;">
+  <div class="cap">共有の構造 ── 土台の上に主役が立つ</div>
+  <svg viewBox="0 0 820 470" preserveAspectRatio="xMidYMid meet" style="width:100%; flex:1; min-height:0;" aria-hidden="true">
+    <ellipse cx="410" cy="452" rx="296" ry="17" fill="#2F3135" opacity="0.13" filter="url(#iso-shadow)"/>
+    <!-- 土台スラブ（薄い大ブロック・グレー3面） -->
+    <path d="M410,148 L698,280 L410,412 L122,280 Z" fill="#FBFBFA" stroke="#6F7175" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M122,280 L410,412 L410,442 L122,310 Z" fill="#E7E7E4" stroke="#6F7175" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M698,280 L410,412 L410,442 L698,310 Z" fill="#D5D5D1" stroke="#6F7175" stroke-width="1.4" stroke-linejoin="round"/>
+    <!-- 主役キーストーン（青・1図1ノード） -->
+    <path d="M410,171 L494,210 L410,249 L326,210 Z" fill="#EAF1FF" stroke="#002FA7" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M326,210 L410,249 L410,305 L326,266 Z" fill="#C9D8F5" stroke="#002FA7" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M494,210 L410,249 L410,305 L494,266 Z" fill="#AFC4EF" stroke="#002FA7" stroke-width="1.7" stroke-linejoin="round"/>
+    <!-- 左右のタワー・小ディテール・横書きラベルは用途に応じて追加（虫眼鏡=分析, モニタ=可視化 等） -->
+    <text x="410" y="392" text-anchor="middle" font-size="15" font-weight="700" fill="#111111">共通基盤</text>
+  </svg>
+</div>
+```
+
+**バリエーション（同じキットで展開）**:
+- **章マップの帯**: 4 工程を「昇る 4 ステップ」の小さなアイソメ立方体で表し、境界に ✓ のソフトゲート・破線コネクタを置く。重心側（例: ②データ）を青に。`width:100%` の横長帯（viewBox ~1500×195）で top-message と詳細フローの間に挟む（抽象の絵＋下に具体フロー）。
+- **循環ループ**: 破線のアイソメだ円を軌道に、3 ノードのアイソメ立方体を環状配置＋時計回りの青矢印で「育てる/回す」を表す。直線矢印＋「↺」より「ループ」が伝わる。中心の正本ノードを青に。
+- **表紙ヒーロー**: 上記スラブ＋主役＋2タワーを縮約し、タイトル脇の右カラムに大きく配置（ラベルは省きトーンセッターに徹する）。
+
+**カスタマイズポイント**:
+- 「土台＝共通基盤、その上に主役・枝分かれ」を一目で見せたいとき最適（チップ列や ▲ 矢印の置き換え）。
+- 立体の数を増やしすぎない（3〜5 ブロック）。情報は隣接カード／下の詳細フローへ。
+- グレー＋青 1 点を厳守。色や陰影を足したくなったら、立体を 1 つ大きくする方向で解決する。
+
+---
+
+## Pattern 14: question-decision(議論ページ)
+
+**用途**: 定例・部会・レビュー会など「その場で決める」資料の【議論】ページ定型。問い・選択肢・推奨案・判断基準・「この場で決めたいこと」を 1 枚に収め、議論の発散を防ぐ。SKILL.md「ページ役割設計（議論駆動デッキ）」とセットで使う。
+
+**設計原則**:
+- **1 問い 1 ページ**。複数の問いがあるならページを分ける
+- **選択肢は 2〜3 個**。4 個以上あるなら事前に絞ってから出す（網羅比較は Appendix の【参考】ページ＝Pattern 03 comparison-table へ）
+- **判断基準は 3 つまで**。判断に効かない背景情報はこのページに置かない
+- 推奨案には Klein Blue 枠＋「推奨」バッジ（本命シグナルの規律と整合）
+- 末尾の `.qd-ask` 帯に「この場で決めたいこと」を 1 文で書く。持ち帰りになる場合の決め方（誰が・いつまでに）も添えると議論が締まる
+
+### 役割バッジ（デッキ共通コンポーネント）
+
+議論駆動デッキでは全スライド右上に役割バッジを付ける。`<section class="slide role-discuss">` のように slide 要素に役割クラスを与える。
+
+```css
+/* ページ役割バッジ（議論駆動デッキ）: スライド右上に役割と時間目安を表示 */
+.role-badge { position: absolute; top: 62px; right: 70px; display: flex; align-items: center; gap: 10px; }
+.role-badge .tag { font-size: 14px; font-weight: 700; letter-spacing: 0.12em; padding: 6px 16px; border: 1.5px solid var(--border-soft); }
+.role-badge .time { font-size: 13px; font-weight: 600; color: var(--pebble); }
+.role-report    .role-badge .tag { background: var(--snow); color: var(--stone); }
+.role-confirm   .role-badge .tag { background: var(--brand-blue-soft); border-color: var(--brand-blue-soft); color: var(--brand-klein); }
+.role-discuss   .role-badge .tag { background: var(--brand-klein); border-color: var(--brand-klein); color: var(--white); }
+.role-reference .role-badge .tag { background: var(--white); color: var(--pebble); }
+```
+
+```html
+<!-- 各スライドの .slide-eyebrow の直前に置く -->
+<div class="role-badge"><span class="tag">議論</span><span class="time">10 分</span></div>
+```
+
+【報告】= `role-report`、【確認】= `role-confirm`、【議論】= `role-discuss`、【参考】= `role-reference`。議論バッジだけ Klein Blue 塗り（このデッキの主役ページであることを示す）。
+
+### 議論ページ本体
+
+```css
+.qd-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; }
+.qd-option { border: 1.5px solid var(--border-soft); background: var(--white); padding: 28px 30px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.qd-option.recommended { border: 2px solid var(--brand-klein); }
+.qd-reco { position: absolute; top: -14px; left: 26px; background: var(--brand-klein); color: var(--white); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; padding: 4px 14px; }
+.qd-name { font-size: 21px; font-weight: 700; color: var(--ink); }
+.qd-sum { font-size: 16px; color: var(--stone); line-height: 1.7; }
+.qd-points { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 16px; color: var(--stone); }
+.qd-points li { padding-left: 26px; position: relative; }
+.qd-points li.pro::before { content: "○"; position: absolute; left: 0; color: var(--brand-klein); font-weight: 700; }
+.qd-points li.con::before { content: "△"; position: absolute; left: 0; color: var(--pebble); font-weight: 700; }
+.qd-criteria { margin-top: 24px; display: flex; align-items: center; gap: 14px; }
+.qd-criteria .chip { font-size: 15px; font-weight: 600; color: var(--stone); background: var(--snow); padding: 7px 16px; }
+.qd-ask { margin-top: 20px; border-left: 4px solid var(--brand-klein); background: var(--brand-blue-soft); padding: 14px 20px; font-size: 17px; font-weight: 600; color: var(--ink); }
+.qd-ask .label-inline { color: var(--brand-klein); font-weight: 700; margin-right: 10px; letter-spacing: 0.08em; }
+```
+
+```html
+<section class="slide role-discuss" id="s4">
+  <div class="role-badge"><span class="tag">議論</span><span class="time">10 分</span></div>
+  <div class="slide-eyebrow">04 / DISCUSSION 1</div>
+  <h1 class="slide-title">ハンズオンの開催形式</h1>
+  <div class="title-rule"></div>
+  <p class="top-message">
+    <span class="accent">Q1.</span> ハンズオンは 1 回 90 分で通すか、2 回 × 45 分に分けるか。
+  </p>
+
+  <div class="body">
+    <div class="qd-options">
+      <div class="qd-option recommended">
+        <span class="qd-reco">推奨</span>
+        <div class="qd-name">案 A: 1 回 90 分で通す</div>
+        <p class="qd-sum">準備〜レビュー〜commit までを 1 セッションで体験し、業務の一連の流れとして定着させる。</p>
+        <ul class="qd-points">
+          <li class="pro">流れが途切れず、当日中に「動いた」体験まで到達できる</li>
+          <li class="pro">日程調整が 1 回で済む</li>
+          <li class="con">90 分の拘束。途中離脱者へのフォローが必要</li>
+        </ul>
+      </div>
+      <div class="qd-option">
+        <div class="qd-name">案 B: 2 回 × 45 分に分ける</div>
+        <p class="qd-sum">第 1 回で環境準備と基本操作、第 2 回でレビュー実践に分けて負荷を下げる。</p>
+        <ul class="qd-points">
+          <li class="pro">1 回あたりの拘束が短く参加しやすい</li>
+          <li class="con">間が空くと第 1 回の内容を忘れる。環境トラブルの再発リスク</li>
+        </ul>
+      </div>
+    </div>
+    <div class="qd-criteria">
+      <span class="label">判断基準</span>
+      <span class="chip">参加者の拘束時間</span>
+      <span class="chip">体験の定着度</span>
+      <span class="chip">日程調整コスト</span>
+    </div>
+    <div class="qd-ask"><span class="label-inline">この場で決めたいこと</span>案 A / B の選択。持ち帰る場合は、誰がいつまでに決めるかをこの場で確定する。</div>
+  </div>
+
+  <div class="footer">
+    <span class="left">資料名 | サブタイトル</span>
+    <span>04 / 08</span>
+  </div>
+</section>
+```
+
+### 表紙の「本日の問い」リスト（議論駆動デッキの表紙部品）
+
+表紙（または 2 枚目）に本日の問いを 2〜3 個宣言し、議論が逸れたときのアンカーにする。各問いは【議論】ページと 1:1 対応させ、ページ番号を添える。
+
+```css
+.today-questions { margin-top: 40px; display: flex; flex-direction: column; gap: 16px; max-width: 1100px; }
+.today-questions .tq { display: grid; grid-template-columns: 64px 1fr 90px; align-items: center; gap: 18px; border: 1.5px solid var(--border-soft); background: var(--white); padding: 18px 24px; }
+.today-questions .tq-no { font-size: 22px; font-weight: 800; color: var(--brand-klein); }
+.today-questions .tq-text { font-size: 19px; font-weight: 600; color: var(--ink); }
+.today-questions .tq-page { font-size: 14px; color: var(--pebble); text-align: right; }
+```
+
+```html
+<div class="today-questions">
+  <div class="tq"><span class="tq-no">Q1</span><span class="tq-text">ハンズオンは 1 回 90 分か、2 回 × 45 分か</span><span class="tq-page">→ p.4</span></div>
+  <div class="tq"><span class="tq-no">Q2</span><span class="tq-text">対象テンプレートは最小版で開始してよいか</span><span class="tq-page">→ p.5</span></div>
+</div>
+```
+
+**カスタマイズポイント**:
+- 選択肢 3 個なら `.qd-options` を `repeat(3, 1fr)` に。カード内の文字量を減らして補う
+- 「やる / やらない」型の問いなら選択肢カード 2 枚（実施案 / 見送り案）で、見送り案にも誠実に利点を書く
+- 推奨を出さずフラットに問う場合は `.recommended` と `.qd-reco` を外す（ただし「推進リードとしての推奨はどちらか」を聞かれたら答えられるよう準備しておく）
+
+---
+
 ## パターン組み合わせの推奨
 
 8枚構成の場合の典型的なパターン配置:
@@ -720,3 +1048,17 @@ continova v1スライドで使える10種類のパターン。各パターンは
 | 8 | 10 phased-roadmap | ロードマップと議論項目 |
 
 これは標準形であり、内容に応じて入れ替え可能。ただし「冒頭に目的、末尾に議論項目」は変えない。
+
+**議論駆動デッキ（定例・部会）の場合**（SKILL.md「ページ役割設計」参照）:
+
+| Slide | 役割 | パターン | 内容例 |
+|---|---|---|---|
+| 1 | 表紙 | 14 today-questions | 本日の問い 2〜3 個の宣言 |
+| 2 | 【報告】 | 06 / 08 | 前回からの進捗（3 点以内） |
+| 3 | 【確認】 | 02 / 11 | 前提・解釈の合意 |
+| 4 | 【議論】 | **14 question-decision** | 問い 1（1 問い 1 ページ） |
+| 5 | 【議論】 | **14 question-decision** | 問い 2 |
+| 6 | まとめ | 10 | 決定事項＋持ち帰り論点＋次アクション |
+| A1〜 | 【参考】 | 03 / 05 / 09 | 網羅情報（高密度可）。本編から「詳細は Appendix N」で参照 |
+
+Pattern 11(concept-schematic)・12(visual-band)は任意の補助ビジュアル。カード・表が続いて視覚的に単調なときに、各スライドの主役オブジェクトを保ったまま追加して概念図・変化の見取り図を与える。詰め込みすぎると逆効果なので、効くスライド(仕組み説明・目的の AS-IS→TO-BE など)に絞る。

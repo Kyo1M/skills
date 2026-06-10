@@ -15,3 +15,9 @@ scratch/
 .env.*
 *.token
 *.key
+
+# Project-private skills (vaccinechoice_HH 等の限定公開スキル)
+vac-*/
+
+# check-slides.mjs の依存（初回 npm install で生成）
+node_modules/

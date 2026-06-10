@@ -19,6 +19,13 @@
     --white: #FFFFFF;
     --success: #10B981;
     --warning: #F59E0B;
+    /* アイソメ概念図(Pattern 13)の面トーン。グレー陰影は「形」の情報設計であり装飾ではない。
+       主役ノードだけ Klein Blue 系(--iso-key-*)を使い、第2ブランドカラーは増やさない。 */
+    --iso-top: #FBFBFA;   /* 天面(明) */
+    --iso-left: #E7E7E4;  /* 左面(中) */
+    --iso-right: #D5D5D1; /* 右面(暗) */
+    --iso-line: #6F7175;  /* 輪郭(= pebble) */
+    --iso-key-top: #EAF1FF; --iso-key-left: #C9D8F5; --iso-key-right: #AFC4EF;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,6 +34,8 @@
     background: #E8E8E6;
     font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
     color: var(--ink);
+    font-size: 16px;         /* 本文の既定。投影前提で 15-17px 帯。密度の高いスライドのみ 15px まで下げる */
+    line-height: 1.6;
     padding: 40px 0;
     -webkit-font-smoothing: antialiased;
   }
@@ -47,17 +56,14 @@
     padding: 58px 70px 38px 70px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.08);
     transform-origin: top center;
-    transform: scale(min(1, calc((100vw - 80px) / 1672)));
-    margin-bottom: calc((1 - min(1, (100vw - 80px) / 1672)) * -941px);
-  }
-
-  @media (min-width: 1752px) {
-    .slide { transform: none; margin-bottom: 0; }
+    /* 縮小は末尾の scale スクリプトが inline で設定する（全ブラウザ互換）。
+       CSS calc の length÷length=number は新しめの Chromium/Safari/Firefox 限定のため使わない。
+       JS 無効時は原寸 1672×941 で表示され横スクロールするが、内容はクリップされない。 */
   }
 
   /* Title block */
   .slide-eyebrow {
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 0.18em;
     color: var(--pebble);
     text-transform: uppercase;
@@ -79,7 +85,7 @@
     margin: 22px 0 22px 0;
   }
   .top-message {
-    font-size: 22px;
+    font-size: 26px;
     line-height: 1.55;
     color: var(--stone);
     font-weight: 500;
@@ -105,7 +111,7 @@
     padding-top: 12px;
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--pebble);
     letter-spacing: 0.05em;
   }
@@ -113,7 +119,7 @@
 
   /* Section label utility */
   .label {
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--pebble);
@@ -124,6 +130,24 @@
   .diagram { display: block; width: 100%; height: auto; }
   text { font-family: "Hiragino Sans", "Noto Sans JP", sans-serif; }
 
+  /* 線アイコン（意味を補う用途）。詳細は references/design-system.md「線アイコンシステム」。
+     アイコンは <defs> に <symbol id="ic-..." viewBox="0 0 24 24"> で定義し <use href="#ic-..."/> で参照。
+     symbol の path には stroke/fill を付けず、下記 .ic から currentColor を継承させる。 */
+  .ic { width:20px; height:20px; flex:none; fill:none; stroke:currentColor;
+        stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle; }
+  .ic-title { width:32px; height:32px; vertical-align:-5px; margin-right:13px; color:var(--brand-klein); }
+
+  /* ページ役割バッジ（議論駆動デッキ）。<section class="slide role-discuss"> のように
+     役割クラスを slide に与え、.slide-eyebrow の直前に .role-badge を置く。
+     詳細は references/slide-patterns.md Pattern 14。議論バッジだけ Klein Blue 塗り。 */
+  .role-badge { position: absolute; top: 62px; right: 70px; display: flex; align-items: center; gap: 10px; }
+  .role-badge .tag { font-size: 14px; font-weight: 700; letter-spacing: 0.12em; padding: 6px 16px; border: 1.5px solid var(--border-soft); }
+  .role-badge .time { font-size: 13px; font-weight: 600; color: var(--pebble); }
+  .role-report    .role-badge .tag { background: var(--snow); color: var(--stone); }
+  .role-confirm   .role-badge .tag { background: var(--brand-blue-soft); border-color: var(--brand-blue-soft); color: var(--brand-klein); }
+  .role-discuss   .role-badge .tag { background: var(--brand-klein); border-color: var(--brand-klein); color: var(--white); }
+  .role-reference .role-badge .tag { background: var(--white); color: var(--pebble); }
+
   /* ======================================================== */
   /* スライドパターンごとの追加CSSは、slide-patterns.mdから        */
   /* 必要なものをここに追加していく                                  */
@@ -133,6 +157,17 @@
 <body>
 
 <div class="deck">
+
+<!-- 共通 SVG 定義: 矢印 marker と線アイコン symbol。詳細は references/design-system.md -->
+<svg width="0" height="0" style="position:absolute;"><defs>
+  <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#002FA7"/></marker>
+  <!-- アイソメ概念図(Pattern 13)のソフト接地影。淡いだ円に filter="url(#iso-shadow)" で使う(opacity 0.12 前後) -->
+  <filter id="iso-shadow" x="-40%" y="-40%" width="180%" height="190%"><feGaussianBlur stdDeviation="7"/></filter>
+  <!-- 線アイコン例（意味と 1:1 で必要分だけ追加。path には stroke/fill を付けず .ic から継承） -->
+  <symbol id="ic-database" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6 V18 c0 1.66 3.13 3 7 3 s7 -1.34 7 -3 V6"/><path d="M5 12 c0 1.66 3.13 3 7 3 s7 -1.34 7 -3"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M4 4 V20 H20"/><path d="M7 15 L11 10 L14 13 L19 6"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M14.8 14.8 L20 20"/></symbol>
+</defs></svg>
 
 <!-- ============================================================
 SLIDE 1: [スライドタイトル]
@@ -180,6 +215,24 @@ SLIDE 2: [次のスライドタイトル]
 -->
 
 </div>
+
+<script>
+/* 固定キャンバス(1672×941)をビューポート幅に合わせて縮小（全ブラウザ互換）。
+   JS が無効でも原寸表示されるだけで内容はクリップされない。 */
+(function () {
+  var W = 1672, H = 941, M = 80;
+  function fit() {
+    var s = Math.min(1, (document.documentElement.clientWidth - M) / W);
+    var slides = document.getElementsByClassName('slide');
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].style.transform = 'scale(' + s + ')';
+      slides[i].style.marginBottom = (s - 1) * H + 'px';
+    }
+  }
+  fit();
+  window.addEventListener('resize', fit);
+})();
+</script>
 
 </body>
 </html>
