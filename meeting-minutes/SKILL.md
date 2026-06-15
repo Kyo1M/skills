@@ -1,68 +1,88 @@
 ---
 name: meeting-minutes
-description: project-context-template リポジトリ専用の議事録作成スキル。docs/minutes/_drafts/ の議事メモから対話を通じて内容を補完し、docs/minutes/ の正式議事録 + docs/decisions/ / tasks/ への派生抽出までを一気通貫で行う。「議事録を作成」「議事録化して」「議事メモを整えて」「ミーティングメモをまとめて」等のリクエスト時に起動。
+description: 議事メモ（壁打ち/面談/会議メモ）から、対象リポジトリの規約に従って正式な議事録を作成し、決定事項とアクションを派生抽出する規約駆動スキル。出力先・命名・frontmatter スキーマ・lint・git 運用は、その repo の CLAUDE.md / AGENTS.md から読み取って適応する（特定のディレクトリ構造をハードコードしない）。「議事録を作成」「議事録化して」「議事メモを整えて」「ミーティングメモをまとめて」等のリクエスト時に起動。
 ---
 
-# meeting-minutes — project-context 議事録作成スキル
+# meeting-minutes — 規約駆動の議事録作成スキル
 
-`project-context-template`（および同テンプレから生成されたコンテキストリポジトリ）専用の議事録作成スキル。`_drafts/` の議事メモを整形して `docs/minutes/` 配下に正式議事録を生成し、決定事項とアクションアイテムを派生抽出する。
+任意のリポジトリで、その repo の規約（出力先・命名・frontmatter・派生先・lint・git 運用）に従って議事録を作成し、決定事項とアクションアイテムを派生抽出する。
 
-## 前提
+**設計原則: 構造をハードコードしない。** 対象リポジトリの契約ファイル（`CLAUDE.md` / `AGENTS.md`）から規約を読み取り、「議事録プロファイル」を組み立ててから動く。これにより、`docs/minutes/` 系（project-context-template）でも `notes/meetings/` 系（事業 HQ など）でも同じスキルで動作する。
 
-このスキルは **次の規約を持つリポジトリでのみ動作** する想定:
-
-- `AGENTS.md` がリポジトリルートに存在
-- `docs/minutes/_drafts/` と `docs/minutes/` ディレクトリ構造
-- ファイル命名規約 `yyyymmdd_<kebab-slug>.md`
-- frontmatter スキーマ（`type: minutes` / `title` / `date` / `status` / `topics` / `attendees` / `meeting_type` / `derived_from` 等）
-- 「Git 運用ルール」（main 直接編集禁止、ブランチ運用、コミットメッセージ確認）
-
-判定方法: cwd の `AGENTS.md` を読み、ヘッダや本文に "project-context" や上記ディレクトリ構造に関する記述があるかで判定する。当てはまらない場合は「このスキルは project-context-template 規約のリポジトリ専用です」と明示して中断する。
+> 旧 `meeting-minutes-drafter`（kyo1M-business 専用）はこのスキルに統合された。HQ では Step 0 が HQ の規約（`notes/meetings/`・`YYYY-MM-DD-slug`・簡易スキーマ）を読み取って従来通り動作する。
 
 ## ワークフロー全体
 
 ```
-Step 1: ブランチ確認・切替
+Step 0: 規約ディスカバリ（議事録プロファイルの構築）  ← 必ず最初
    ↓
-Step 2: 入力収集（_drafts のメモ + 任意で transcript）
+Step 1: ブランチ確認・切替（git 運用が規約にあるときのみ）
+   ↓
+Step 2: 入力収集（drafts / メモパス / 貼り付け）
    ↓
 Step 3: 内容分析 + 対話質問（2〜3 ラウンド）
    ↓
-Step 4: 正式議事録の生成（docs/minutes/yyyymmdd_<slug>.md）
+Step 4: 正式議事録の生成（プロファイルの出力先・命名・スキーマで）
    ↓
-Step 5: 決定事項の派生抽出ドラフト（docs/decisions/）
+Step 5: 決定事項の派生抽出ドラフト（決定先がある場合）
    ↓
-Step 6: アクションアイテムの派生抽出ドラフト（tasks/ or GitHub Issues 提案）
+Step 6: アクションの派生（タスク先 or 議事録内表 + 任意 Issue）
    ↓
-Step 7: lint + コミットメッセージ案 → ユーザー確認 → commit
+Step 7: lint（コマンドがある場合）+ コミットメッセージ案 → 確認 → commit
    ↓
 Step 8: push 提案
 ```
 
 ---
 
-## Step 1: ブランチ確認・切替
+## Step 0: 規約ディスカバリ（最初に必ず実行）
+
+対象リポジトリの規約を読み取り、以降の全 Step が参照する「議事録プロファイル」を組み立てる。
+
+1. ルートの `CLAUDE.md` と `AGENTS.md`（存在する方／両方）を Read する。`llms.txt` があれば併読。
+2. 以下を抽出する。**規約に明示があればそれに従う → 無ければディレクトリを probe → それでも不明ならユーザーに確認**（推測で書かない）。
+
+| プロファイル項目 | 取得元 / 既定の探索 |
+|---|---|
+| 議事録の出力先 | 規約の「リポジトリ構造」記述。無ければ `notes/meetings/` か `docs/minutes/` の存在を probe |
+| 走り書きの入力元 | `docs/minutes/_drafts/` 等が規約/実在すれば使う。無ければユーザーにメモのパス or 貼り付けを依頼 |
+| ファイル命名 | 規約の命名ルール（`YYYY-MM-DD-<slug>` / `yyyymmdd_<slug>` 等）。無ければ既存ファイル名から推定して確認 |
+| frontmatter スキーマ | 規約の「frontmatter スキーマ」節（議事録の `type` 値、`status` 語彙、必須/任意フィールド、配列の書式） |
+| 決定の派生先 | `docs/decisions/` の存在/規約（雛形があれば従う）。無ければ派生は議事録内「決定事項」節に留める |
+| タスクの派生先 | `tasks/` の存在/規約。無ければアクションは議事録内の表 + 任意で GitHub Issue 提案 |
+| lint | 規約の検証コマンド（例: `npm run lint --prefix scripts`）。無ければスキップ |
+| git 運用 | 規約のブランチ命名・コミット規約。無ければ現ブランチで作業し commit は確認制 |
+| contact プロファイル | `notes/contacts/` 等の人物プロファイル置き場があればリンク対象にする |
+
+3. 組み立てたプロファイルを 1〜2 行でユーザーに提示し、ズレがあれば直してもらってから先へ進む。
+
+例（事業 HQ の場合）: 「出力先 `notes/meetings/`、命名 `YYYY-MM-DD-<slug>`、`type: meeting`、決定は `docs/decisions/` へ ADR-lite 派生、lint あり、で進めます」
+
+---
+
+## Step 1: ブランチ確認・切替（git 運用が規約にあるときのみ）
+
+規約にブランチ命名がある場合のみ実施。無ければこの Step はスキップして現ブランチで作業する。
 
 ```bash
 git rev-parse --abbrev-ref HEAD
 ```
 
-- `main` 上にいる場合: `git pull --ff-only` を実行し、`minutes/<yyyymmdd>-<slug>` 形式のブランチ名を提案。`<slug>` は対象議事メモのスラグを流用。
-  - 例: 入力が `docs/minutes/_drafts/20260517_onboarding-kickoff-memo.md` → ブランチ `minutes/20260517-onboarding-kickoff`
-  - `git checkout -b minutes/<yyyymmdd>-<slug>`
-- `main` 以外のブランチにいる場合: そのまま続行。
+- `main` 上で、規約にブランチ運用がある場合: `git pull --ff-only` の後、規約の命名（例 `minutes/<yyyymmdd>-<slug>`）でブランチを提案・作成。
+- `main` 以外、または規約にブランチ運用が無い場合: そのまま続行。
 
 ## Step 2: 入力収集
 
-1. `docs/minutes/_drafts/*.md` をリストアップ
-2. ユーザーが対象を明示していなければ、選んでもらう（複数候補あり時）
-3. 対象メモを Read
-4. 同じスラグ + `-transcript.txt` または `-transcript.md` が `_drafts/` にあれば併読
-5. `recording:` パスがあれば本文に注記（再生は行わない）
+1. プロファイルに drafts 置き場があれば、その中の対象メモをリストアップしてユーザーに選んでもらう。
+2. drafts が無い repo では、ユーザーにメモのパス（例 `notes/meetings/` 配下の走り書き）か、本文の貼り付けを依頼する。
+3. 対象メモを Read。同じスラグ + transcript ファイルがあれば併読。`recording:` パスは本文に注記のみ（再生しない）。
 
 ## Step 3: 内容分析と対話質問
 
-メモ内容を以下の観点で分析し、**対話質問でユーザーから補完情報を引き出す**。一度に 3〜4 項目、合計 2〜3 ラウンドが目安。
+メモを分析し、**対話質問でユーザーから補完情報を引き出す**。一度に 3〜4 項目、合計 2〜3 ラウンドが目安。
+
+### まず押さえる最小事実
+- 日時（開始/終了）、場所/ツール、参加者（氏名・所属）、議事録作成者、1 行の目的
 
 ### 質問の観点
 
@@ -70,7 +90,6 @@ git rev-parse --abbrev-ref HEAD
 - 「〇〇という結論になった理由・背景は？」
 - 「他に出た意見や反論はありましたか？」
 - 「〇〇さんの反応はどうでしたか？」
-- 「この議題で特に議論が盛り上がった点は？」
 
 **決定事項の明確化**
 - 「これは決定事項ですか？それとも検討中ですか？」
@@ -79,229 +98,98 @@ git rev-parse --abbrev-ref HEAD
 
 **文脈・前提**
 - 「『〇〇の件』など曖昧な記述の具体化」
-- 「この話の発端・きっかけは？」
-- 「前回からの続きの話ですか？新規の話題ですか？」
+- 「この話の発端・きっかけは？前回からの続きですか？」
 
 **アクションの確認**
-- 「担当者と期限は決まっていますか？」
-- 「このタスクの完了条件は何ですか？」
-- 「他に宿題として残ったことはありますか？」
+- 「担当者と期限は決まっていますか？」「このタスクの完了条件は？」
+- 「他に宿題として残ったことは？」「紹介・引き合わせの依頼や申し出は？」
 
 **抜け漏れの確認**
-- 「他に話した議題はありましたか？」
-- 「メモに残っていないが印象に残っている発言はありますか？」
+- 「他に話した議題は？」「メモに無いが印象に残っている発言は？」
 
 ### 進め方
-
-- 重要な議題から順に深堀り
-- 「覚えていない」「特にない」も有効な回答として受け入れる
-- 尋問にならないよう配慮、各ラウンドで「ありがとうございます。続けて〜」のように受ける
-
-### 質問例
-
-```
-いくつか確認させてください:
-
-1. トライブ分析で「原体験を入れてほしい」という話がありましたが、富岡さんはどのように回答されましたか？対応する方向ですか？
-2. 「10 個という数に意味はない」という指摘に対して、具体的にどう見直す方向になりましたか？
-3. POS レジの不具合について、いつ頃から発生していた問題ですか？影響範囲などの話はありましたか？
-4. 他に話した議題や、印象に残っているやりとりはありますか？
-```
+- 重要な議題から順に深堀り。「覚えていない」「特にない」も有効な回答として受ける。
+- 尋問にならないよう、各ラウンドで「ありがとうございます。続けて〜」のように受ける。
 
 ## Step 4: 正式議事録の生成
 
-パス: `docs/minutes/yyyymmdd_<slug>.md`
+プロファイルの **出力先・命名・frontmatter スキーマ** に従って生成する。
 
 ### frontmatter
+プロファイルの議事録スキーマに合わせる。例:
+- project-context 系: `type: minutes` / `title` / `date` / `status: active` / `topics` / `attendees` / `meeting_type` / `derived_from`
+- 事業 HQ 系: `type: meeting` / `title` / `created` / `updated` / `status: draft` / `date` / `participants` / `tags`
 
-```yaml
----
-type: minutes
-title: <日本語タイトル>
-date: YYYY-MM-DD
-status: active
-topics: [<推測 or ユーザー確認>]
-tags: []
-derived_from: [docs/minutes/_drafts/yyyymmdd_<slug>-memo.md]
-related: []
-attendees: [<名前1>, <名前2>, ...]
-meeting_type: kickoff | review | sync | retrospective | external | adhoc
-# recording: <_drafts/...>     # 任意
-# transcript: <_drafts/...>    # 任意
----
-```
+不明項目は推測で埋めず、`要確認` / 空欄で残し本文末尾に注記する。
 
-不明な項目:
-- `attendees:` が不明 → `["要確認"]` で残し本文末尾に「※ 参加者: 要確認」と注記
-- `meeting_type:` が不明 → `adhoc` で仮置き、本文に「※ meeting_type 要確認」
-- `topics:` が不明 → 議題から推測してユーザー確認
-
-### 本文セクション構成
+### 本文セクション構成（既存テンプレがあれば優先）
 
 ```markdown
 # <日本語タイトル>
 
 ## 要約
+[3〜5 文。主な議題と結論、重要な決定、全体の方向性]
 
-[3〜5 文で要点をまとめる。主な議題と結論、重要な決定事項、全体の方向性]
-
-## 議事メモ（詳細）
-
+## 議事内容（詳細）
 ### <議題1>
-
-- [元のメモを構造化]
-- [質問で得た補足情報]
-
+- [元のメモを構造化] + [質問で得た補足]
 ### <議題2>
-
 - ...
 
-## ネクストアクション
+## 決定事項
+- [合意・確定したもの。検討中は含めない]
 
+## ネクストアクション
 | 担当者 | アクション | 期限 |
 |--------|-----------|------|
-| 〇〇 | [タスク内容] | YYYY-MM-DD |
-| 未定 | [タスク内容] | 未定 |
+| 〇〇 | [内容] | YYYY-MM-DD |
 
-## 次回予定（任意）
-
-- 日時: YYYY-MM-DD HH:MM
-- 議題: ...
+## 要確認事項
+- [残った質問]
 ```
 
-不明な箇所は空欄や「未定」「要確認」のまま残す。
+- 元メモの内容は**削除せず**、補足を追記して充実させる。
+- contact プロファイル置き場がある repo では、自分以外の参加者のプロファイルにリンクし、無ければドラフト作成（または `contact-profile-drafter` 等へ委譲）。
 
 ## Step 5: 決定事項の派生抽出
 
-議事録の中から **決定事項を検出** し、`docs/decisions/yyyymmdd_<slug>.md` 形式でドラフトを **提案**（commit 前にユーザーレビュー）。
+プロファイルに決定の派生先（例 `docs/decisions/`）がある場合のみ。無ければ議事録内の「決定事項」節に留める。
 
-### 判定基準
+- **判定基準**: 「決まった」「採用する」「これでいく」等の合意・確定表現。検討中は対象外。
+- 派生先の雛形（例 `docs/decisions/README.md`）に従い、命名・frontmatter・本文構成（Context / Decision / Consequences / Alternatives 等）を合わせる。
+- `derived_from: [<この議事録のパス>]` を必ず入れ、出所を辿れるようにする。
+- **作成前に一覧を提示し、ユーザー確認を取ってからドラフト化**。複数決定があれば複数ファイル。
 
-「決まった」「採用する」「これでいく」等の合意・確定表現を含む箇所を候補とする。検討中のものは対象外。
+## Step 6: アクションの派生
 
-### ファイル雛形
+ネクストアクション表の各行を振り分ける。
 
-パス例: `docs/decisions/20260517_onboarding-tech-stack.md`
-
-```markdown
----
-type: decision
-title: <決定の日本語タイトル>
-date: YYYY-MM-DD
-status: active
-topics: [<議事録と同じ topics>]
-tags: []
-derived_from: [docs/minutes/yyyymmdd_<slug>.md]
-related: []
-drivers: []
-alternatives_considered: []
----
-
-# <決定の日本語タイトル>
-
-## Context
-（なぜ判断が必要になったか、背景）
-
-## Decision
-（何を決めたか）
-
-## Consequences
-（この判断によって生じる帰結）
-
-## Alternatives Considered
-（検討した別案と却下理由）
-```
-
-複数の決定があれば複数ファイルを作る。**作成前にユーザーに「以下を decisions/ ドラフトとして作成して良いですか？」と一覧を提示し確認を取る。**
-
-## Step 6: アクションアイテムの派生抽出
-
-ネクストアクション表の各行を以下の基準で振り分け:
-
-### `tasks/` ファイル化（重い/議論を伴う）
-
-判定基準:
-- 1 日以上かかる
-- 複数人が関与する
-- 設計判断や調査を含む
-
-パス例: `tasks/20260517_setup-nextjs-foundation.md`
-
-```markdown
----
-type: task
-title: <タスクの日本語タイトル>
-date: YYYY-MM-DD
-status: todo
-topics: [<議事録と同じ topics>]
-tags: []
-derived_from: [docs/minutes/yyyymmdd_<slug>.md]
-related: []
-assignee: <名前 or "未定">
-due: YYYY-MM-DD
-# priority: high | mid | low
-# parent_topic: <slug>
----
-
-# <タスクの日本語タイトル>
-
-## 目的
-## 完了条件
-## メモ
-```
-
-### GitHub Issues 登録を提案（細粒度の日常タスク）
-
-- 「メール送る」「ライセンス更新」「設定変える」等の単純タスク
-- `gh issue create` のドラフトコマンドを提示して、ユーザーが実行する形にする
-
-両カテゴリも、**作成/提案前に一覧を提示してユーザー確認**。
+- **タスク先がある repo（例 `tasks/`）**: 重い/議論を伴う/複数日規模のものを派生先の雛形に従ってファイル化（`assignee` / `due` 等を埋める）。`derived_from` を入れる。
+- **タスク先が無い repo**: アクションは議事録内の表に残す。細粒度の日常タスクは `gh issue create` のドラフトコマンドを提示してユーザーに委ねる（任意）。
+- いずれも**作成/提案前に一覧提示 → ユーザー確認**。
 
 ## Step 7: lint + commit
 
 ### lint
+プロファイルに lint コマンドがあれば実行。失敗したら frontmatter を直してから次へ。
 
 ```bash
-npm run lint --prefix scripts
+npm run lint --prefix scripts   # 例。実コマンドはプロファイルに従う
 ```
-
-失敗したら frontmatter を修正してから次へ。
 
 ### コミットメッセージ案
-
-`git status` / `git diff --cached` を確認し、以下フォーマットで案を提示してユーザー確認を取る。
-
-```
-[minutes] Add <title> (YYYY-MM-DD)
-
-derived_from:
-  - docs/minutes/_drafts/yyyymmdd_<slug>-memo.md
-
-新規ファイル:
-  - docs/minutes/yyyymmdd_<slug>.md
-  - docs/decisions/yyyymmdd_<decision-slug>.md (派生)
-  - tasks/yyyymmdd_<task-slug>.md (派生)
-```
-
-ユーザー承認後に `git commit`。
+`git status` / `git diff` を確認し、repo のコミット規約（例: 日本語 Conventional Commits、または `[minutes] ...` 形式）に合わせた案を提示。**ユーザー承認後に commit**。新規/派生ファイル一覧と `derived_from` を案に含める。
 
 ## Step 8: push 提案
 
-最初の commit:
-
-```bash
-git push -u origin minutes/<yyyymmdd>-<slug>
-```
-
-ユーザーに「main にマージしますか？ PR を作りますか？」と確認し、明示的依頼があるまでマージしない。
+ブランチ運用がある場合のみ、push と「main にマージ / PR 作成しますか？」を確認。**明示的依頼があるまでマージしない**。
 
 ---
 
 ## 注意事項
 
-- 質問は「会話を思い出してもらう」ためのもの。尋問にならないよう配慮
-- 元のメモの内容は **削除せず**、補足情報を追記する形で充実させる
-- 不明な項目は空欄（`______`）または「要確認」と記載
-- 担当者・期限が未定のアクションも表に含め「未定」と記載
-- 決定事項・タスクの **派生抽出は必ず人間レビュー必須**。AI が勝手に decisions/ や tasks/ を確定 commit しない
-- 派生抽出に確信が持てない場合は、議事録ファイルの末尾に「派生候補（要確認）」セクションを設け、ユーザーに振り分けを委ねるオプションもとる
+- 規約は repo ごとに違う。**Step 0 を飛ばして特定構造を前提にしない。** 不明点は probe → 確認の順で潰す。
+- 質問は「会話を思い出してもらう」ため。尋問にならないよう配慮。
+- 元メモは削除せず追記で充実させる。不明項目は空欄 / `要確認`。担当者・期限未定のアクションも「未定」で表に含める。
+- **決定・タスクの派生抽出は必ず人間レビュー必須**。AI が勝手に decisions/ や tasks/ を確定 commit しない。
+- 派生に確信が持てない場合は、議事録末尾に「派生候補（要確認）」節を設けてユーザーに振り分けを委ねる。
