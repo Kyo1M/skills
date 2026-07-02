@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.daily-log</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/murakamikyouichi/.claude/skills/daily-log/daily-cron.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>23</integer>
+        <key>Minute</key>
+        <integer>55</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/Users/murakamikyouichi/Daily/.cache/cron.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/murakamikyouichi/Daily/.cache/cron.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/murakamikyouichi/.local/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:/Applications/cmux.app/Contents/Resources/bin</string>
+        <key>HOME</key>
+        <string>/Users/murakamikyouichi</string>
+    </dict>
+</dict>
+</plist>
