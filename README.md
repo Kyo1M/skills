@@ -44,11 +44,22 @@ Claude Code を再起動して認識を確認したら、リポジトリ側で `
 
 `~/.claude/skills/gog` は第三者製(steipete/gogcli 由来)のため本リポジトリでは管理しない。
 
-## スキル間の使い分け(資料作成パイプライン)
+## スキル間の使い分け(2 レーン)
+
+**資料作成レーン**:
 
 ```
-grill-me(壁打ち・論点整理) → deck-outline(構成 md) → html-slide-deck / Claude Design(実装) → deck-critique(批評)
+(論点が固まっていなければ) grill-me → deck-outline(構成 md) → html-slide-deck / Claude Design(実装) → deck-critique(批評)
 ```
+
+**設計・実装レーン**:
+
+```
+軽い壁打ちなら最初から superpowers:brainstorming → docs/superpowers/specs/ に設計書 → writing-plans → 実装
+深掘りが要るときは grill-me(論点整理 md)→ brainstorming に接続
+```
+
+使い分けの目安: 前提を疑ってほしい・論点がまだ散らかっている → grill-me。作るものの輪郭があり設計書を作って実装まで進めたい → brainstorming。既存のプラン・設計書の精査 → grill-me(プラン精査モード)。
 
 書き方原則の正本は `deck-outline/references/writing-principles.md`。要約はグローバル `~/.claude/CLAUDE.md` に常設。新しい書き方フィードバックは両方に反映する。
 
