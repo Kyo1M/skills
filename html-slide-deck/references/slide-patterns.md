@@ -23,7 +23,7 @@ continova v1スライドで使える14種類のパターン。各パターンは
 | 11 | concept-schematic | 仕組み・系を1枚の手書きSVG模式図で | 概念・設計パート |
 | 12 | visual-band | 変化・遷移を表す補助スリム帯 | 任意(単調さの緩和) |
 | 13 | isometric-concept | 節目スライドの主役アイソメ概念図(グレー3トーン＋青1ノード) | 表紙・章マップ・全体像・運用 |
-| 14 | question-decision | 議論ページの定型(問い・選択肢・推奨・判断基準・決めたいこと) | 議論駆動デッキの【議論】ページ |
+| 14 | question-decision | 議論ページの定型(方針(たたき)と判断材料。聞きたいことは Top message 末尾に改行で添える) | 議論駆動デッキの【議論】ページ |
 
 ---
 
@@ -909,14 +909,14 @@ continova v1スライドで使える14種類のパターン。各パターンは
 
 ## Pattern 14: question-decision(議論ページ)
 
-**用途**: 定例・部会・レビュー会など「その場で決める」資料の【議論】ページ定型。問い・選択肢・推奨案・判断基準・「この場で決めたいこと」を 1 枚に収め、議論の発散を防ぐ。SKILL.md「ページ役割設計（議論駆動デッキ）」とセットで使う。
+**用途**: 定例・部会・レビュー会など「その場で決める」資料の【議論】ページ定型。方針（たたき）と判断材料を 1 枚に収めて議論の発散を防ぎ、聞きたいことは Top message の末尾に改行して添える。SKILL.md「ページ役割設計（議論駆動デッキ）」とセットで使う。
 
 **設計原則**:
-- **1 問い 1 ページ**。複数の問いがあるならページを分ける
+- **1 論点 1 ページ**。複数の論点があるならページを分ける
 - **選択肢は 2〜3 個**。4 個以上あるなら事前に絞ってから出す（網羅比較は Appendix の【参考】ページ＝Pattern 03 comparison-table へ）
 - **判断基準は 3 つまで**。判断に効かない背景情報はこのページに置かない
 - 推奨案には Klein Blue 枠＋「推奨」バッジ（本命シグナルの規律と整合）
-- 末尾の `.qd-ask` 帯に「この場で決めたいこと」を 1 文で書く。持ち帰りになる場合の決め方（誰が・いつまでに）も添えると議論が締まる
+- 聞きたいことは独立した帯にせず、Top message の末尾に `<br>` で改行して 1〜2 文で添える（2026-07-09 改訂: 毎ページに「この場で決めたいこと」帯が並ぶとしつこいという FB を受け、`.qd-ask` 帯を廃止）。持ち帰りになった論点の決め方（誰が・いつまでに）はまとめページのパーキングロットで扱う
 
 ### 役割バッジ（デッキ共通コンポーネント）
 
@@ -955,8 +955,6 @@ continova v1スライドで使える14種類のパターン。各パターンは
 .qd-points li.con::before { content: "△"; position: absolute; left: 0; color: var(--pebble); font-weight: 700; }
 .qd-criteria { margin-top: 24px; display: flex; align-items: center; gap: 14px; }
 .qd-criteria .chip { font-size: 15px; font-weight: 600; color: var(--stone); background: var(--snow); padding: 7px 16px; }
-.qd-ask { margin-top: 20px; border-left: 4px solid var(--brand-klein); background: var(--brand-blue-soft); padding: 14px 20px; font-size: 17px; font-weight: 600; color: var(--ink); }
-.qd-ask .label-inline { color: var(--brand-klein); font-weight: 700; margin-right: 10px; letter-spacing: 0.08em; }
 ```
 
 ```html
@@ -966,7 +964,8 @@ continova v1スライドで使える14種類のパターン。各パターンは
   <h1 class="slide-title">ハンズオンの開催形式</h1>
   <div class="title-rule"></div>
   <p class="top-message">
-    <span class="accent">Q1.</span> ハンズオンは 1 回 90 分で通すか、2 回 × 45 分に分けるか。
+    <span class="accent">Q1.</span> ハンズオンは 1 回 90 分で通すか、2 回 × 45 分に分けるか。<br>
+    案 A（90 分で通す）を推奨としつつ、本日はどちらで進めるかをこの場で決めたいと考えています。
   </p>
 
   <div class="body">
@@ -996,7 +995,6 @@ continova v1スライドで使える14種類のパターン。各パターンは
       <span class="chip">体験の定着度</span>
       <span class="chip">日程調整コスト</span>
     </div>
-    <div class="qd-ask"><span class="label-inline">この場で決めたいこと</span>案 A / B の選択。持ち帰る場合は、誰がいつまでに決めるかをこの場で確定する。</div>
   </div>
 
   <div class="footer">
