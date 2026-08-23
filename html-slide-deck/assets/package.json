@@ -3,8 +3,12 @@
   "private": true,
   "type": "module",
   "version": "0.0.0",
-  "description": "check-slides.mjs (はみ出し・内側クリップ・小フォント検査) の依存。初回のみ npm install を実行する。",
+  "description": "check-slides.mjs（はみ出し・footer 衝突・内側クリップ・フォント下限・禁止記号と発表者ノートの残存を検査）と render-previews.mjs（見本 PNG の書き出し）の依存。初回のみ npm install を実行する。",
   "dependencies": {
     "playwright-core": "^1.49.0"
+  },
+  "scripts": {
+    "check": "node check-slides.mjs",
+    "previews": "node render-previews.mjs"
   }
 }

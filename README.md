@@ -27,8 +27,8 @@ Claude Code を再起動して認識を確認したら、リポジトリ側で `
 |-------|------|
 | [grill-me](./grill-me/SKILL.md) | 批判的壁打ち。前提を疑い・論点ツリーを整理し・ヌケモレと反証を指摘する。アイデア壁打ちモードとプラン精査モードの 2 モード。終了時に論点整理 md を残す |
 | [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。書き方原則の正本は `deck-outline/references/writing-principles.md` |
-| [html-slide-deck](./html-slide-deck/SKILL.md) | 議論用 HTML+SVG スライド作成。continova v1 デザインシステム・14 パターン・10 観点セルフレビュー。deck-outline の構成 md を入力に Phase 3 から始める |
-| [deck-critique](./deck-critique/SKILL.md) | 資料(構成 md / 完成 HTML)を作成とは別の目で批評・推敲する。ストーリー一貫性・日本語の自然さ・1 ページ 1 決定・元メモからの脱落を検査し、指摘リスト+修正案を返す(勝手に直さない) |
+| [html-slide-deck](./html-slide-deck/SKILL.md) | 事業用スライド DS（白地・明朝タイトル・Klein Blue、1920×1080）で `.dc.html`（deck-stage・Claude Design 互換）を生成。20 型・アイコン対応表・機械チェック（はみ出し／フォント下限／`──`／発表者ノート／アイコン密度）・セルフレビュー。deck-outline の構成 md を入力に Phase 3 から。ルール正本は `html-slide-deck/references/design-system.md`（Claude Design 側 CLAUDE.md は `claude-design-rules.md` から派生）。旧 continova v1 は `references/legacy/` |
+| [deck-critique](./deck-critique/SKILL.md) | 資料(構成 md / 完成 `.dc.html`)を作成とは別の目で批評・推敲する。ストーリー一貫性・日本語の自然さ・1 ページ 1 決定・元メモからの脱落・ビジュアル(アイコン密度・`──`・発表者ノート)を検査し、指摘リスト+修正案を返す(勝手に直さない) |
 | [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md から出力先・命名・スキーマを読み取って適応し、決定事項・タスクの派生抽出まで行う |
 | [spec-to-readable-html](./spec-to-readable-html/SKILL.md) | 仕様書 Markdown を要約・図解つきの可読 HTML に変換する |
 | [article-pipeline](./article-pipeline/SKILL.md) | note・Zenn 記事を企画→公開準備の 7 フェーズで伴走する。`writing-articles` リポジトリ専用 |
@@ -49,7 +49,7 @@ Claude Code を再起動して認識を確認したら、リポジトリ側で `
 **資料作成レーン**:
 
 ```
-(論点が固まっていなければ) grill-me → deck-outline(構成 md) → html-slide-deck / Claude Design(実装) → deck-critique(批評)
+(論点が固まっていなければ) grill-me → deck-outline(構成 md) → html-slide-deck(`.dc.html` 実装) → deck-critique(批評) → pptx が要れば `.dc.html` を Claude Design に持ち込む
 ```
 
 **設計・実装レーン**:
