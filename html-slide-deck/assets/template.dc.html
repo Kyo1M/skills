@@ -1,0 +1,579 @@
+<!-- html-slide-deck v2 base template (事業用スライド DS / C案 Editorial). 正本: Claude Design export 2026-08-23. 複製して使う。data-speaker-notes は使わない -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#000; }
+  a { color:#002FA7; } a:hover { color:#1D6CFF; }
+</style>
+</helmet>
+
+<!-- 共通アイコンスプライト(意味と1:1の線アイコン)。各スライドから <use href="#ic-..."/> で参照 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M14.8 14.8 L20 20"></path></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"></circle><path d="M12 3.2 V6 M12 18 V20.8 M3.2 12 H6 M18 12 H20.8 M5.6 5.6 L7.6 7.6 M16.4 16.4 L18.4 18.4 M18.4 5.6 L16.4 7.6 M7.6 16.4 L5.6 18.4"></path></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M4 4 V20 H20"></path><path d="M7 15 L11 10 L14 13 L19 6"></path></symbol>
+  <symbol id="ic-spark" viewBox="0 0 24 24"><path d="M12 3 L13.7 9.1 L20 12 L13.7 14.9 L12 21 L10.3 14.9 L4 12 L10.3 9.1 Z"></path></symbol>
+  <symbol id="ic-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"></circle><circle cx="12" cy="12" r="3.6"></circle></symbol>
+  <symbol id="ic-layers" viewBox="0 0 24 24"><path d="M12 3.5 L20.5 8 L12 12.5 L3.5 8 Z"></path><path d="M3.5 12 L12 16.5 L20.5 12"></path><path d="M3.5 16 L12 20.5 L20.5 16"></path></symbol>
+  <symbol id="ic-flow" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"></circle><circle cx="5" cy="18" r="2"></circle><circle cx="19" cy="12" r="2"></circle><path d="M7 6 H12 a5 5 0 0 1 5 5 M7 18 H12 a5 5 0 0 0 5 -5"></path></symbol>
+  <symbol id="ic-doc" viewBox="0 0 24 24"><path d="M6.5 3 H14 L18.5 7.5 V21 H6.5 Z"></path><path d="M14 3 V7.5 H18.5"></path><path d="M9.5 13 H15 M9.5 16.5 H15"></path></symbol>
+  <symbol id="ic-people" viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="3"></circle><circle cx="16.5" cy="9.2" r="2.4"></circle><path d="M3.5 20 c0 -3.4 2.6 -5.6 5 -5.6 s5 2.2 5 5.6"></path><path d="M14.5 20 c0 -2.6 0.9 -4.3 2.8 -5"></path></symbol>
+  <symbol id="ic-image" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><circle cx="8.5" cy="10" r="1.8"></circle><path d="M3 17 L9 12 L13 15 L17 11 L21 15"></path></symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="1.5"></rect><path d="M3.5 9.5 H20.5 M8 3 V6.5 M16 3 V6.5"></path></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24"><path d="M4.5 12.5 L10 18 L19.5 6.5"></path></symbol>
+  <symbol id="ic-book" viewBox="0 0 24 24"><path d="M12 5.5 C10 3.9 7 3.6 4 4.2 V19 c3 -0.6 6 -0.3 8 1.3 c2 -1.6 5 -1.9 8 -1.3 V4.2 c-3 -0.6 -6 -0.3 -8 1.3 Z"></path><path d="M12 5.5 V20.3"></path></symbol>
+  <symbol id="ic-code" viewBox="0 0 24 24"><path d="M9 7.5 L4.5 12 L9 16.5 M15 7.5 L19.5 12 L15 16.5"></path></symbol>
+  <symbol id="ic-loop" viewBox="0 0 24 24"><path d="M5 12 a7 7 0 0 1 12 -4.6 M17 3.4 V7.4 H13"></path><path d="M19 12 a7 7 0 0 1 -12 4.6 M7 20.6 V16.6 H11"></path></symbol>
+  <symbol id="ic-flag" viewBox="0 0 24 24"><path d="M6 21 V4"></path><path d="M6 5 H17.5 L15 8.5 L17.5 12 H6"></path></symbol>
+  <symbol id="ic-branch" viewBox="0 0 24 24"><circle cx="7" cy="6" r="2.4"></circle><circle cx="7" cy="18" r="2.4"></circle><circle cx="17" cy="9" r="2.4"></circle><path d="M7 8.4 V15.6"></path><path d="M17 11.4 a6 6 0 0 1 -7.6 4.6"></path></symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24"><path d="M4 5.5 H20 V16.5 H10 L6 20 V16.5 H4 Z"></path><path d="M8.5 10 H15.5"></path></symbol>
+</defs></svg>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <!-- ============ 01 表紙 ============ -->
+  <section data-label="表紙" data-screen-label="01" style="background:#FFFFFF; box-sizing:border-box; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex;">
+    <div style="width:600px; flex:none; border-right:1px solid #D8D6D0; padding:104px 72px; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:56px; height:56px; background:#002FA7;"></div>
+        <div style="font-size:26px; letter-spacing:0.2em; font-weight:700; color:#111; margin-top:34px; line-height:1.5;">AI ADOPTION<br>PARTNER</div>
+      </div>
+      <div style="font-size:26px; color:#6F7175; line-height:1.7;">株式会社◯◯<br>2026.06 ── Confidential</div>
+    </div>
+    <div style="flex:1; padding:104px 100px; display:flex; flex-direction:column; justify-content:center;">
+      <div style="font-size:26px; letter-spacing:0.22em; font-weight:600; color:#002FA7; margin-bottom:34px;">SERVICE PROPOSAL ── 2026</div>
+      <h1 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:106px; font-weight:600; line-height:1.2; color:#111; margin:0;">AI活用を<br>成果に変える</h1>
+      <div style="width:96px; height:5px; background:#002FA7; margin:48px 0 40px;"></div>
+      <div style="font-size:38px; color:#2F3135; font-weight:500; line-height:1.5;">現場に定着するAI活用支援プログラムのご提案</div>
+    </div>
+  </section>
+
+  <!-- ============ 02 目次 ============ -->
+  <section data-label="目次" data-screen-label="02" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">Agenda / 本日の内容</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">目次</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0 56px;"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:36px 80px;">
+      <div style="display:grid; grid-template-columns:90px 1fr; gap:28px; align-items:baseline; border-top:1px solid #D8D6D0; padding-top:24px;"><div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:52px; color:#002FA7; font-weight:600;">01</div><div><div style="font-size:34px; font-weight:700;">課題認識</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">AI活用が成果に届かない要因</div></div></div>
+      <div style="display:grid; grid-template-columns:90px 1fr; gap:28px; align-items:baseline; border-top:1px solid #D8D6D0; padding-top:24px;"><div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:52px; color:#002FA7; font-weight:600;">02</div><div><div style="font-size:34px; font-weight:700;">提供価値</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">定着まで支える3つの軸</div></div></div>
+      <div style="display:grid; grid-template-columns:90px 1fr; gap:28px; align-items:baseline; border-top:1px solid #D8D6D0; padding-top:24px;"><div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:52px; color:#002FA7; font-weight:600;">03</div><div><div style="font-size:34px; font-weight:700;">進め方</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">選択肢・体制・スケジュール</div></div></div>
+      <div style="display:grid; grid-template-columns:90px 1fr; gap:28px; align-items:baseline; border-top:1px solid #D8D6D0; padding-top:24px;"><div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:52px; color:#002FA7; font-weight:600;">04</div><div><div style="font-size:34px; font-weight:700;">期待効果</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">想定される成果とKPI</div></div></div>
+      <div style="display:grid; grid-template-columns:90px 1fr; gap:28px; align-items:baseline; border-top:1px solid #D8D6D0; padding-top:24px;"><div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:52px; color:#002FA7; font-weight:600;">05</div><div><div style="font-size:34px; font-weight:700;">ロードマップ</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">フェーズ別の全体像</div></div></div>
+      <div style="display:grid; grid-template-columns:90px 1fr; gap:28px; align-items:baseline; border-top:1px solid #D8D6D0; padding-top:24px;"><div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:52px; color:#002FA7; font-weight:600;">06</div><div><div style="font-size:34px; font-weight:700;">ご相談事項</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">本日決めたいこと</div></div></div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>02 / 18</span></div>
+  </section>
+
+  <!-- ============ 03 自己紹介 ============ -->
+  <section data-label="自己紹介" data-screen-label="03" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">Introduction / 自己紹介</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">自己紹介</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0 52px;"></div>
+    <div style="display:grid; grid-template-columns:440px 1fr; gap:72px; align-items:center;">
+      <div style="width:440px; height:520px; border:2px dashed #B7B7B7; border-radius:6px; background:#FAFAF8; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#A9AAAD;">
+        <svg viewBox="0 0 24 24" style="width:64px;height:64px;fill:none;stroke:#A9AAAD;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-image"></use></svg>
+        <div style="font-size:26px; font-weight:700; color:#6F7175;">写真</div>
+        <div style="font-size:22px; color:#A9AAAD;">後で差し替え</div>
+      </div>
+      <div>
+        <div style="font-size:28px; color:#6F7175; font-weight:500;">所属・肩書き</div>
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:72px; font-weight:700; color:#111; margin:8px 0 6px;">（氏名）</div>
+        <div style="font-size:28px; color:#002FA7; font-weight:700;">（役割・専門領域）</div>
+        <div style="width:56px; height:3px; background:#D8D6D0; margin:34px 0;"></div>
+        <div style="font-size:24px; letter-spacing:0.1em; color:#6F7175; font-weight:700; margin-bottom:18px;">経歴・ひとこと</div>
+        <div style="font-size:30px; line-height:2.0; color:#2F3135;">・（経歴1行目をここに）<br>・（経歴2行目をここに）<br>・（本日伝えたいこと・ひとこと）</div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>03 / 18</span></div>
+  </section>
+
+  <!-- ============ 04 章扉 ============ -->
+  <section data-label="章扉" data-screen-label="04" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:420px; font-weight:600; color:#E7E5DF; line-height:0.78; position:absolute; right:80px; top:120px;">01</div>
+    <div style="position:absolute; top:50%; left:96px; transform:translateY(-50%);">
+      <div style="font-size:26px; letter-spacing:0.24em; font-weight:600; color:#002FA7;">SECTION 01</div>
+      <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:96px; font-weight:600; color:#111; margin:24px 0 0;">課題認識</h2>
+      <div style="width:96px; height:5px; background:#002FA7; margin:40px 0;"></div>
+      <div style="font-size:36px; color:#2F3135; font-weight:500; line-height:1.5; max-width:1000px;">AI導入が「ツールを入れただけ」で止まり、<br>成果に結びつかない要因を整理します。</div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>04 / 18</span></div>
+  </section>
+
+  <!-- ============ 05 現状と目指す姿 + 画像枠 ============ -->
+  <section data-label="現状と目指す姿" data-screen-label="05" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase; position:relative;">01 / 課題認識</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0; position:relative;">現状と目指す姿</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 44px; position:relative;">多くの現場で AI は「試したが定着しない」状態にあります。鍵は<span style="color:#002FA7; font-weight:700;">業務フローへの組み込み</span>です。</p>
+    <div style="display:grid; grid-template-columns:1fr 1.15fr; gap:60px; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; gap:24px;">
+        <div style="background:#F4F2EE; border-left:5px solid #B7B7B7; padding:28px 34px;">
+          <div style="font-size:24px; font-weight:700; color:#6F7175; letter-spacing:0.06em; margin-bottom:14px;">現状 ── AS-IS</div>
+          <div style="font-size:28px; line-height:1.7; color:#2F3135;">ツール導入が目的化し、一部の人だけが使う。属人化したまま効果が見えない。</div>
+        </div>
+        <div style="background:#F4F2EE; border-left:5px solid #002FA7; padding:28px 34px;">
+          <div style="font-size:24px; font-weight:700; color:#002FA7; letter-spacing:0.06em; margin-bottom:14px;">目指す姿 ── TO-BE</div>
+          <div style="font-size:28px; line-height:1.7; color:#2F3135;">日々の業務フローに AI が組み込まれ、誰でも同じ品質で意思決定できる。</div>
+        </div>
+      </div>
+      <div style="border:2px dashed #B7B7B7; border-radius:6px; background:#FAFAF8; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; color:#6F7175; padding:40px; min-height:480px;">
+        <svg viewBox="0 0 24 24" style="width:64px;height:64px;fill:none;stroke:#A9AAAD;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-image"></use></svg>
+        <div style="font-size:30px; font-weight:700; color:#6F7175;">イメージ画像</div>
+        <div style="font-size:26px; color:#A9AAAD; text-align:center; line-height:1.6; max-width:560px;">業務フローのBefore/After図、または<br>プロダクト画面のスクリーンショットを配置</div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>05 / 18</span></div>
+  </section>
+
+  <!-- ============ 06 提供価値 3軸 ============ -->
+  <section data-label="提供価値" data-screen-label="06" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">02 / 提供価値</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0; position:relative;">定着まで支える3つの軸</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 52px; position:relative;">ツール導入で終わらせず、<span style="color:#002FA7; font-weight:700;">意思決定の質が変わる</span>ところまで伴走します。</p>
+    <div style="display:flex; flex-direction:column; gap:26px;">
+      <div style="display:grid; grid-template-columns:72px 360px 1fr; gap:40px; align-items:center; padding:22px 40px; border-left:4px solid #D8D6D0;">
+        <svg viewBox="0 0 24 24" style="width:60px;height:60px;fill:none;stroke:#111;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-search"></use></svg>
+        <div><div style="font-size:36px; font-weight:700;">見極める</div><div style="font-size:24px; letter-spacing:0.08em; color:#6F7175; margin-top:4px;">DIAGNOSE</div></div>
+        <div style="font-size:29px; line-height:1.55; color:#2F3135;">業務とデータの現状を棚卸しし、効果が出る適用領域を特定する</div>
+      </div>
+      <div style="display:grid; grid-template-columns:72px 360px 1fr; gap:40px; align-items:center; background:#EAF1FF; padding:24px 40px; border-left:5px solid #002FA7;">
+        <svg viewBox="0 0 24 24" style="width:60px;height:60px;fill:none;stroke:#002FA7;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-gear"></use></svg>
+        <div><div style="font-size:36px; font-weight:700; color:#002FA7;">仕組み化する</div><div style="font-size:24px; letter-spacing:0.08em; color:#002FA7; margin-top:4px;">EMBED ── 核となる支援</div></div>
+        <div style="font-size:29px; line-height:1.55; color:#2F3135;">業務フローに AI を組み込み、運用ルールとレビュー観点を整備する</div>
+      </div>
+      <div style="display:grid; grid-template-columns:72px 360px 1fr; gap:40px; align-items:center; padding:22px 40px; border-left:4px solid #D8D6D0;">
+        <svg viewBox="0 0 24 24" style="width:60px;height:60px;fill:none;stroke:#111;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-chart"></use></svg>
+        <div><div style="font-size:36px; font-weight:700;">定着させる</div><div style="font-size:24px; letter-spacing:0.08em; color:#6F7175; margin-top:4px;">SUSTAIN</div></div>
+        <div style="font-size:29px; line-height:1.55; color:#2F3135;">効果を数値で可視化し、自社だけで回せる体制をつくる</div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>06 / 18</span></div>
+  </section>
+
+  <!-- ============ 07 進め方の選択肢(比較表) ============ -->
+  <section data-label="進め方の選択肢" data-screen-label="07" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">03 / 進め方</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">進め方の選択肢</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 44px;">目的と体制に応じて3つの型から選べます。まずは<span style="color:#002FA7; font-weight:700;">伴走支援</span>を推奨します。</p>
+    <div style="background:#F4F2EE;">
+      <div style="display:grid; grid-template-columns:340px 1fr 220px 220px; gap:0; border-bottom:2px solid #111; font-size:24px; letter-spacing:0.06em; color:#6F7175; font-weight:700;">
+        <div style="padding:22px 32px;">選択肢</div><div style="padding:22px 24px;">概要</div><div style="padding:22px 24px;">期間</div><div style="padding:22px 24px;">評価</div>
+      </div>
+      <div style="display:grid; grid-template-columns:340px 1fr 220px 220px; gap:0; border-bottom:1px solid #DDD; align-items:center;">
+        <div style="padding:30px 32px; font-size:30px; font-weight:700;">スポット支援</div><div style="padding:30px 24px; font-size:27px; color:#2F3135; line-height:1.5;">特定の業務に絞って短期で試す</div><div style="padding:30px 24px; font-size:27px; color:#2F3135;">1〜2ヶ月</div><div style="padding:30px 24px;"><span style="font-size:23px; font-weight:700; color:#6F7175; border:1px solid #B7B7B7; padding:6px 16px;">△ 部分的</span></div>
+      </div>
+      <div style="display:grid; grid-template-columns:340px 1fr 220px 220px; gap:0; border-bottom:1px solid #DDD; align-items:center; background:#EAF1FF; border-left:5px solid #002FA7;">
+        <div style="padding:30px 28px; font-size:30px; font-weight:700; color:#002FA7;">伴走支援<div style="font-size:22px; color:#002FA7; font-weight:500; margin-top:4px;">推奨</div></div><div style="padding:30px 24px; font-size:27px; color:#2F3135; line-height:1.5;">診断から定着まで継続的に伴走する</div><div style="padding:30px 24px; font-size:27px; color:#2F3135;">3〜6ヶ月</div><div style="padding:30px 24px;"><span style="font-size:23px; font-weight:700; color:#fff; background:#002FA7; padding:6px 16px;">◎ 推奨</span></div>
+      </div>
+      <div style="display:grid; grid-template-columns:340px 1fr 220px 220px; gap:0; align-items:center;">
+        <div style="padding:30px 32px; font-size:30px; font-weight:700;">内製化研修</div><div style="padding:30px 24px; font-size:27px; color:#2F3135; line-height:1.5;">自社チームの育成に主眼を置く</div><div style="padding:30px 24px; font-size:27px; color:#2F3135;">2〜4ヶ月</div><div style="padding:30px 24px;"><span style="font-size:23px; font-weight:700; color:#2F3135; border:1px solid #B7B7B7; padding:6px 16px;">○ 条件付き</span></div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>07 / 18</span></div>
+  </section>
+
+  <!-- ============ 08 4ステップ ============ -->
+  <section data-label="4ステップ" data-screen-label="08" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">03 / 進め方</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">導入から定着までの4ステップ</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 60px;">現状把握から自走まで、<span style="color:#002FA7; font-weight:700;">3〜6ヶ月</span>で段階的に進めます。</p>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:28px;">
+      <div style="background:#FFFFFF; border:1px solid #D8D6D0; border-top:3px solid #002FA7; padding:34px 32px;">
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:26px; font-weight:700; color:#002FA7; letter-spacing:0.1em;">STEP 01</div>
+        <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:none;stroke:#111;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round; margin:24px 0 18px;"><use href="#ic-search"></use></svg>
+        <div style="font-size:32px; font-weight:700; margin-bottom:12px;">現状把握</div>
+        <div style="font-size:26px; line-height:1.6; color:#6F7175;">業務とデータを棚卸しし、適用領域を見極める</div>
+      </div>
+      <div style="background:#FFFFFF; border:1px solid #D8D6D0; border-top:3px solid #002FA7; padding:34px 32px;">
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:26px; font-weight:700; color:#002FA7; letter-spacing:0.1em;">STEP 02</div>
+        <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:none;stroke:#111;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round; margin:24px 0 18px;"><use href="#ic-layers"></use></svg>
+        <div style="font-size:32px; font-weight:700; margin-bottom:12px;">PoC設計</div>
+        <div style="font-size:26px; line-height:1.6; color:#6F7175;">小さく試し、効果と運用上の論点を確かめる</div>
+      </div>
+      <div style="background:#FFFFFF; border:1px solid #D8D6D0; border-top:3px solid #002FA7; padding:34px 32px;">
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:26px; font-weight:700; color:#002FA7; letter-spacing:0.1em;">STEP 03</div>
+        <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:none;stroke:#111;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round; margin:24px 0 18px;"><use href="#ic-gear"></use></svg>
+        <div style="font-size:32px; font-weight:700; margin-bottom:12px;">仕組み化</div>
+        <div style="font-size:26px; line-height:1.6; color:#6F7175;">業務フローへ組み込み、運用ルールを整える</div>
+      </div>
+      <div style="background:#FFFFFF; border:1px solid #D8D6D0; border-top:3px solid #002FA7; padding:34px 32px;">
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:26px; font-weight:700; color:#002FA7; letter-spacing:0.1em;">STEP 04</div>
+        <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:none;stroke:#111;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round; margin:24px 0 18px;"><use href="#ic-chart"></use></svg>
+        <div style="font-size:32px; font-weight:700; margin-bottom:12px;">定着・自走</div>
+        <div style="font-size:26px; line-height:1.6; color:#6F7175;">効果を可視化し、自社だけで回せる状態へ</div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>08 / 18</span></div>
+  </section>
+
+  <!-- ============ 09 推進体制(新規) ============ -->
+  <section data-label="推進体制" data-screen-label="09" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">03 / 進め方</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">推進体制</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 52px;">貴社と当社の役割を対にして、<span style="color:#002FA7; font-weight:700;">意思決定から実務まで</span>詰まらない体制を組みます。</p>
+    <div style="display:grid; grid-template-columns:1fr 220px 1fr; gap:0; align-items:stretch;">
+      <div style="border:1px solid #D8D6D0;">
+        <div style="background:#F4F2EE; padding:20px 32px; display:flex; align-items:baseline; gap:18px;"><span style="font-size:30px; font-weight:700;">貴社</span><span style="font-size:22px; letter-spacing:0.12em; color:#6F7175; font-weight:600;">CLIENT</span></div>
+        <div style="padding:26px 32px;"><div style="font-size:30px; font-weight:700;">プロジェクトオーナー</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">意思決定・推進判断</div></div>
+        <div style="padding:26px 32px; border-top:1px solid #E6E4DE;"><div style="font-size:30px; font-weight:700;">業務部門リード</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">要件整理・現場との調整</div></div>
+        <div style="padding:26px 32px; border-top:1px solid #E6E4DE;"><div style="font-size:30px; font-weight:700;">現場メンバー</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">日々の運用・フィードバック</div></div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:0 24px;">
+        <div style="width:100%; border-top:2px dashed #B7B7B7;"></div>
+        <div style="font-size:24px; font-weight:600; color:#2F3135; background:#F4F2EE; padding:8px 20px; white-space:nowrap;">週次定例</div>
+        <div style="font-size:24px; font-weight:600; color:#2F3135; background:#F4F2EE; padding:8px 20px; white-space:nowrap;">随時レビュー</div>
+        <div style="width:100%; border-top:2px dashed #B7B7B7;"></div>
+      </div>
+      <div style="border:1px solid #D8D6D0;">
+        <div style="background:#EAF1FF; padding:20px 32px; display:flex; align-items:baseline; gap:18px;"><span style="font-size:30px; font-weight:700; color:#002FA7;">当社 ── 支援チーム</span><span style="font-size:22px; letter-spacing:0.12em; color:#002FA7; font-weight:600;">PARTNER</span></div>
+        <div style="padding:26px 32px;"><div style="font-size:30px; font-weight:700;">プロジェクト責任者</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">全体設計・品質責任</div></div>
+        <div style="padding:26px 32px; border-top:1px solid #E6E4DE;"><div style="font-size:30px; font-weight:700;">AI活用コンサルタント</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">業務設計・定着支援</div></div>
+        <div style="padding:26px 32px; border-top:1px solid #E6E4DE;"><div style="font-size:30px; font-weight:700;">データエンジニア</div><div style="font-size:24px; color:#6F7175; margin-top:6px;">実装・データ整備</div></div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>09 / 18</span></div>
+  </section>
+
+  <!-- ============ 10 スケジュール(新規) ============ -->
+  <section data-label="スケジュール" data-screen-label="10" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">03 / 進め方</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">全体スケジュール</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 52px;"><span style="color:#002FA7; font-weight:700;">最初の2ヶ月</span>で現状把握とPoCを終え、以降を仕組み化と定着に充てます。</p>
+    <div>
+      <div style="display:grid; grid-template-columns:280px repeat(6,1fr); border-bottom:2px solid #111; font-size:24px; color:#6F7175; font-weight:700;">
+        <div style="padding:14px 0;"></div>
+        <div style="padding:14px 0 14px 18px; border-left:1px solid #E6E4DE;">1ヶ月目</div>
+        <div style="padding:14px 0 14px 18px; border-left:1px solid #E6E4DE;">2ヶ月目</div>
+        <div style="padding:14px 0 14px 18px; border-left:1px solid #E6E4DE;">3ヶ月目</div>
+        <div style="padding:14px 0 14px 18px; border-left:1px solid #E6E4DE;">4ヶ月目</div>
+        <div style="padding:14px 0 14px 18px; border-left:1px solid #E6E4DE;">5ヶ月目</div>
+        <div style="padding:14px 0 14px 18px; border-left:1px solid #E6E4DE;">6ヶ月目</div>
+      </div>
+      <div style="display:grid; grid-template-columns:280px repeat(6,1fr); align-items:center; border-bottom:1px solid #E6E4DE; height:96px;">
+        <div style="font-size:28px; font-weight:700;">現状把握・PoC</div>
+        <div style="grid-column:2/4; height:52px; background:#002FA7; color:#fff; font-size:24px; font-weight:700; display:flex; align-items:center; padding-left:20px; margin-right:12px;">Phase 1 ── 現在地</div>
+      </div>
+      <div style="display:grid; grid-template-columns:280px repeat(6,1fr); align-items:center; border-bottom:1px solid #E6E4DE; height:96px;">
+        <div style="font-size:28px; font-weight:700;">仕組み化</div>
+        <div style="grid-column:4/6; height:52px; background:#F4F2EE; border:1px solid #D8D6D0; box-sizing:border-box; color:#2F3135; font-size:24px; font-weight:600; display:flex; align-items:center; padding-left:20px; margin-right:12px;">Phase 2</div>
+      </div>
+      <div style="display:grid; grid-template-columns:280px repeat(6,1fr); align-items:center; border-bottom:1px solid #E6E4DE; height:96px;">
+        <div style="font-size:28px; font-weight:700;">展開</div>
+        <div style="grid-column:5/7; height:52px; background:#F4F2EE; border:1px solid #D8D6D0; box-sizing:border-box; color:#2F3135; font-size:24px; font-weight:600; display:flex; align-items:center; padding-left:20px; margin-right:12px;">Phase 3</div>
+      </div>
+      <div style="display:grid; grid-template-columns:280px repeat(6,1fr); align-items:center; border-bottom:1px solid #E6E4DE; height:96px;">
+        <div style="font-size:28px; font-weight:700;">定着・自走</div>
+        <div style="grid-column:6/8; height:52px; background:#F4F2EE; border:1px solid #D8D6D0; box-sizing:border-box; color:#2F3135; font-size:24px; font-weight:600; display:flex; align-items:center; padding-left:20px;">Phase 4</div>
+      </div>
+      <div style="display:grid; grid-template-columns:280px repeat(6,1fr); align-items:center; height:88px;">
+        <div style="font-size:24px; color:#6F7175; font-weight:700;">マイルストーン</div>
+        <div style="grid-column:2; display:flex; align-items:center; gap:14px;"><div style="width:16px; height:16px; background:#002FA7; transform:rotate(45deg); flex:none;"></div><span style="font-size:24px; color:#2F3135; font-weight:600;">キックオフ</span></div>
+        <div style="grid-column:4; display:flex; align-items:center; gap:14px;"><div style="width:16px; height:16px; background:#002FA7; transform:rotate(45deg); flex:none;"></div><span style="font-size:24px; color:#2F3135; font-weight:600;">中間報告</span></div>
+        <div style="grid-column:7; display:flex; align-items:center; gap:14px;"><div style="width:16px; height:16px; background:#002FA7; transform:rotate(45deg); flex:none;"></div><span style="font-size:24px; color:#2F3135; font-weight:600;">最終報告</span></div>
+      </div>
+    </div>
+    <div style="font-size:24px; color:#A9AAAD; margin-top:32px;">※ 期間はプレースホルダです。案件の規模・体制に合わせて調整してください。</div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>10 / 18</span></div>
+  </section>
+
+  <!-- ============ 10b ガントスケジュール(タスク×週・トラック別・新規) ============ -->
+  <section data-label="ガントスケジュール" data-screen-label="10b" style="background:#FFFFFF; box-sizing:border-box; padding:52px 88px 100px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center; position:relative;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">03 / 進め方</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:56px; font-weight:600; color:#111; margin:12px 0 0;">タスクスケジュール ── 2 トラック</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:20px 0 20px;"></div>
+    <p style="font-size:30px; line-height:1.5; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 26px;">タスクを<span style="color:#002FA7; font-weight:700;">構築</span>と<span style="color:#002FA7; font-weight:700;">展開</span>の 2 トラックに分け、対応予定の期間を帯で示します。</p>
+    <div style="display:flex; align-items:center; gap:28px; margin-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#002FA7; border-radius:3px;"></span><span style="font-size:24px; font-weight:700; color:#2F3135;">構築</span></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#6E8FD6; border-radius:3px;"></span><span style="font-size:24px; font-weight:700; color:#2F3135;">展開</span></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#1F8A5B; border-radius:3px;"></span><span style="font-size:24px; font-weight:700; color:#2F3135;">実施済み</span></div>
+    </div>
+    <div style="border:1px solid #D8D6D0;">
+      <div style="display:flex; border-bottom:1px solid #E6E4DE;">
+        <div style="width:400px; flex:none; background:#F4F2EE; border-right:1px solid #E6E4DE;"></div>
+        <div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr);">
+          <div style="grid-column:1/4; text-align:center; padding:10px 0; background:#EAF1FF; border-right:1px solid #E6E4DE; font-size:24px; font-weight:700; color:#002FA7; letter-spacing:0.04em;">1 ヶ月目</div>
+          <div style="grid-column:4/7; text-align:center; padding:10px 0; background:#F4F2EE; font-size:24px; font-weight:700; color:#6F7175; letter-spacing:0.04em;">2 ヶ月目</div>
+        </div>
+      </div>
+      <div style="display:flex; border-bottom:2px solid #111;">
+        <div style="width:400px; flex:none; padding:10px 24px; background:#F4F2EE; border-right:1px solid #E6E4DE; font-size:22px; font-weight:700; letter-spacing:0.04em; color:#6F7175;">タスク ／ トラック</div>
+        <div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); background:#FBFAF8;">
+          <div style="text-align:center; padding:9px 0; font-size:22px; font-weight:700; color:#002FA7;">第1週<div style="font-size:16px; font-weight:700; color:#fff; background:#002FA7; display:inline-block; padding:1px 9px; margin-top:2px; letter-spacing:0.06em;">今週</div></div>
+          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第2週</div>
+          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第3週</div>
+          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第4週</div>
+          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第5週</div>
+          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第6週</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div style="position:absolute; left:400px; right:0; top:0; bottom:0; display:grid; grid-template-columns:repeat(6,1fr); pointer-events:none;">
+          <div></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:#EAF1FF; border-bottom:1px solid #E6E4DE; padding:7px 24px;"><span style="width:6px; height:20px; background:#002FA7;"></span><span style="font-size:22px; font-weight:700; color:#002FA7; letter-spacing:0.06em;">構築 ── 仕組みづくり</span></div>
+        <div style="display:flex; align-items:center; border-bottom:1px solid #F1F0EC; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク A</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div style="grid-column:1/3; height:32px; background:#002FA7; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:20px; font-weight:700;">〜第2週</div></div></div>
+        <div style="display:flex; align-items:center; border-bottom:1px solid #F1F0EC; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク B</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div style="grid-column:2/4; height:32px; background:#002FA7; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:20px; font-weight:700;">〜第3週</div></div></div>
+        <div style="display:flex; align-items:center; border-bottom:1px solid #E6E4DE; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク C</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div style="grid-column:4/5; height:32px; background:#002FA7; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:20px; font-weight:700;">第4週</div></div></div>
+        <div style="display:flex; align-items:center; gap:12px; background:#EEF2FA; border-bottom:1px solid #E6E4DE; border-top:1px solid #E6E4DE; padding:7px 24px;"><span style="width:6px; height:20px; background:#6E8FD6;"></span><span style="font-size:22px; font-weight:700; color:#3D5BA0; letter-spacing:0.06em;">展開 ── 現場での適用</span></div>
+        <div style="display:flex; align-items:center; border-bottom:1px solid #F1F0EC; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク D</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div style="grid-column:1/2; height:32px; background:#1F8A5B; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; font-weight:700;">✓ 済</div></div></div>
+        <div style="display:flex; align-items:center; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク E</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div style="grid-column:3/7; height:32px; background:#6E8FD6; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:20px; font-weight:700;">第3週〜</div></div></div>
+      </div>
+    </div>
+    <div style="font-size:24px; color:#A9AAAD; margin-top:24px;">※ タスク名・週数・帯の位置（grid-column の a/b）はプレースホルダです。案件に合わせて差し替えてください。</div>
+    <div style="position:absolute; left:88px; right:88px; bottom:44px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:18px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>10b / 18</span></div>
+  </section>
+
+  <!-- ============ 11 期待効果 KPI ============ -->
+  <section data-label="期待効果" data-screen-label="11" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">04 / 期待効果</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0; position:relative;">期待される効果</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 64px; position:relative;">定型業務の削減と意思決定の高速化を、<span style="color:#002FA7; font-weight:700;">数値で追える</span>形にします。</p>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:48px;">
+      <div style="border-top:3px solid #002FA7; padding-top:32px;">
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:130px; font-weight:600; color:#002FA7; line-height:1;">▲XX<span style="font-size:60px;">%</span></div>
+        <div style="font-size:32px; font-weight:700; margin-top:20px;">定型業務の作業時間</div>
+        <div style="font-size:26px; color:#6F7175; margin-top:8px; line-height:1.6;">繰り返し作業を AI に任せ、人は判断に集中</div>
+      </div>
+      <div style="border-top:3px solid #002FA7; padding-top:32px;">
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:130px; font-weight:600; color:#002FA7; line-height:1;">X.X<span style="font-size:60px;">倍</span></div>
+        <div style="font-size:32px; font-weight:700; margin-top:20px;">意思決定のスピード</div>
+        <div style="font-size:26px; color:#6F7175; margin-top:8px; line-height:1.6;">必要な情報を即座に揃え、検討を短縮</div>
+      </div>
+      <div style="border-top:3px solid #002FA7; padding-top:32px;">
+        <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:130px; font-weight:600; color:#002FA7; line-height:1;">+XX<span style="font-size:60px;">%</span></div>
+        <div style="font-size:32px; font-weight:700; margin-top:20px;">施策の実行件数</div>
+        <div style="font-size:26px; color:#6F7175; margin-top:8px; line-height:1.6;">企画から実行までのハードルを下げる</div>
+      </div>
+    </div>
+    <div style="font-size:24px; color:#A9AAAD; margin-top:48px; position:relative;">※ 数値はプレースホルダです。導入実績・目標値に差し替えてご利用ください。</div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>11 / 18</span></div>
+  </section>
+
+  <!-- ============ 12 ロードマップ ============ -->
+  <section data-label="ロードマップ" data-screen-label="12" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">05 / ロードマップ</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">全体ロードマップ</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 60px;">まずは<span style="color:#002FA7; font-weight:700;">Phase 1 の現状把握とPoC</span>から着手します。</p>
+    <div style="position:relative; margin-top:20px;">
+      <div style="position:absolute; top:18px; left:0; right:0; height:2px; background:#D8D6D0;"></div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:36px; position:relative;">
+        <div>
+          <div style="width:36px; height:36px; border-radius:50%; background:#002FA7; border:4px solid #F6F5F2; box-shadow:0 0 0 2px #002FA7;"></div>
+          <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:24px; font-weight:700; color:#002FA7; letter-spacing:0.1em; margin-top:24px;">PHASE 1 ── 現在地</div>
+          <div style="font-size:32px; font-weight:700; margin:10px 0;">現状把握・PoC</div>
+          <div style="font-size:25px; line-height:1.6; color:#6F7175;">適用領域の特定と小さな実証</div>
+          <div style="font-size:24px; color:#002FA7; margin-top:14px; font-weight:600;">成果物：適用ロードマップ</div>
+        </div>
+        <div>
+          <div style="width:36px; height:36px; border-radius:50%; background:#F4F2EE; border:3px solid #B7B7B7;"></div>
+          <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:24px; font-weight:700; color:#6F7175; letter-spacing:0.1em; margin-top:24px;">PHASE 2</div>
+          <div style="font-size:32px; font-weight:700; margin:10px 0;">仕組み化</div>
+          <div style="font-size:25px; line-height:1.6; color:#6F7175;">業務フローへの組み込みと整備</div>
+          <div style="font-size:24px; color:#6F7175; margin-top:14px; font-weight:600;">成果物：運用ルール一式</div>
+        </div>
+        <div>
+          <div style="width:36px; height:36px; border-radius:50%; background:#F4F2EE; border:3px solid #B7B7B7;"></div>
+          <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:24px; font-weight:700; color:#6F7175; letter-spacing:0.1em; margin-top:24px;">PHASE 3</div>
+          <div style="font-size:32px; font-weight:700; margin:10px 0;">展開</div>
+          <div style="font-size:25px; line-height:1.6; color:#6F7175;">対象業務・部門の段階的拡大</div>
+          <div style="font-size:24px; color:#6F7175; margin-top:14px; font-weight:600;">成果物：横展開プラン</div>
+        </div>
+        <div>
+          <div style="width:36px; height:36px; border-radius:50%; background:#F4F2EE; border:3px solid #B7B7B7;"></div>
+          <div style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:24px; font-weight:700; color:#6F7175; letter-spacing:0.1em; margin-top:24px;">PHASE 4</div>
+          <div style="font-size:32px; font-weight:700; margin:10px 0;">自走</div>
+          <div style="font-size:25px; line-height:1.6; color:#6F7175;">自社内製での継続改善</div>
+          <div style="font-size:24px; color:#6F7175; margin-top:14px; font-weight:600;">成果物：内製化体制</div>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>12 / 18</span></div>
+  </section>
+
+  <!-- ============ 13 進捗報告(定例・新規) ============ -->
+  <section data-label="進捗報告" data-screen-label="13" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="position:absolute; top:60px; right:96px; font-size:24px; font-weight:700; letter-spacing:0.1em; padding:8px 22px; border:1.5px solid #D8D6D0; background:#F4F2EE; color:#2F3135;">報告</div>
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">定例 / 報告</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">これまでの進捗</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 48px;">前回定例で決めた3件は、いずれも<span style="color:#002FA7; font-weight:700;">反映済み</span>です。</p>
+    <div style="border:1px solid #D8D6D0;">
+      <div style="display:grid; grid-template-columns:520px 80px 1fr; gap:0; align-items:center; padding:30px 40px;">
+        <div style="font-size:29px; font-weight:700;">運用ルールの初版承認</div>
+        <div style="font-size:28px; color:#A9AAAD; text-align:center;">→</div>
+        <div style="display:flex; align-items:center; gap:16px;"><svg viewBox="0 0 24 24" style="width:30px;height:30px;flex:none;fill:none;stroke:#002FA7;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-check"></use></svg><span style="font-size:27px; color:#2F3135; line-height:1.5;">ガイドラインに反映し、全員へ共有済み</span></div>
+      </div>
+      <div style="display:grid; grid-template-columns:520px 80px 1fr; gap:0; align-items:center; padding:30px 40px; border-top:1px solid #E6E4DE;">
+        <div style="font-size:29px; font-weight:700;">対象業務の選定（案A）</div>
+        <div style="font-size:28px; color:#A9AAAD; text-align:center;">→</div>
+        <div style="display:flex; align-items:center; gap:16px;"><svg viewBox="0 0 24 24" style="width:30px;height:30px;flex:none;fill:none;stroke:#002FA7;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-check"></use></svg><span style="font-size:27px; color:#2F3135; line-height:1.5;">問い合わせ対応を対象に PoC を準備中</span></div>
+      </div>
+      <div style="display:grid; grid-template-columns:520px 80px 1fr; gap:0; align-items:center; padding:30px 40px; border-top:1px solid #E6E4DE;">
+        <div style="font-size:29px; font-weight:700;">推進体制の確定</div>
+        <div style="font-size:28px; color:#A9AAAD; text-align:center;">→</div>
+        <div style="display:flex; align-items:center; gap:16px;"><svg viewBox="0 0 24 24" style="width:30px;height:30px;flex:none;fill:none;stroke:#002FA7;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-check"></use></svg><span style="font-size:27px; color:#2F3135; line-height:1.5;">キックオフを MM/DD に実施</span></div>
+      </div>
+    </div>
+    <div style="font-size:28px; color:#2F3135; line-height:1.6; margin-top:40px;"><strong style="color:#111;">本日 ──</strong> PoC の評価基準について、確認1件とご相談1件をお諮りします。</div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>13 / 18</span></div>
+  </section>
+
+  <!-- ============ 14 確認事項(定例・新規) ============ -->
+  <section data-label="確認事項" data-screen-label="14" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="position:absolute; top:60px; right:96px; font-size:24px; font-weight:700; letter-spacing:0.1em; padding:8px 22px; border:2px solid #002FA7; background:#FFFFFF; color:#002FA7;">確認</div>
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">定例 / 確認</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">確認事項</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 48px;">大きな判断は不要です。<span style="color:#002FA7; font-weight:700;">方向性に相違がないか</span>のみご確認ください。</p>
+    <div style="display:flex; flex-direction:column;">
+      <div style="padding:30px 0;">
+        <div style="font-size:31px; font-weight:700; line-height:1.6;"><span style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:38px; color:#002FA7;">1.</span>　PoC の評価は「作業時間」と「利用率」の2指標で行う<br><span style="font-size:25px; color:#6F7175; font-weight:400;">詳細な指標定義は付録に掲載しています</span></div>
+      </div>
+      <div style="padding:30px 0; border-top:1px solid #E6E4DE;">
+        <div style="font-size:31px; font-weight:700; line-height:1.6;"><span style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:38px; color:#002FA7;">2.</span>　レビューは週次定例の場でまとめて実施する<br><span style="font-size:25px; color:#6F7175; font-weight:400;">緊急の場合のみ、チャットで随時ご相談ください</span></div>
+      </div>
+    </div>
+    <div style="border-left:5px solid #002FA7; background:#EAF1FF; padding:22px 30px; font-size:29px; font-weight:600; color:#111; margin-top:36px;">ご異議がなければ、この方針で進めます。</div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>14 / 18</span></div>
+  </section>
+
+  <!-- ============ 15 ご相談(議論ページ) ============ -->
+  <section data-label="ご相談事項" data-screen-label="15" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="position:absolute; top:64px; right:96px; display:flex; align-items:center; gap:14px;"><span style="font-size:24px; font-weight:700; letter-spacing:0.12em; padding:8px 22px; background:#002FA7; color:#fff;">議論</span><span style="font-size:24px; font-weight:600; color:#6F7175;">10分</span></div>
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">06 / ご相談事項</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">本日ご相談したいこと</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 40px;"><span style="color:#002FA7; font-weight:700;">Q.</span> 最初の対象業務をどの領域から始めるか。</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:44px; margin-bottom:36px;">
+      <div style="background:#F4F2EE; border:2px solid #002FA7; padding:34px 38px; position:relative;">
+        <div style="position:absolute; top:-18px; left:30px; font-size:22px; font-weight:700; color:#fff; background:#002FA7; padding:6px 18px; letter-spacing:0.08em;">推奨</div>
+        <div style="font-size:34px; font-weight:700; color:#002FA7; margin-bottom:14px;">案A：問い合わせ対応から</div>
+        <div style="font-size:28px; line-height:1.6; color:#2F3135;">効果が見えやすく、関わる人数も多い。短期間で成功体験をつくれる。</div>
+      </div>
+      <div style="background:#F4F2EE; border:1px solid #DDD; padding:34px 38px;">
+        <div style="font-size:34px; font-weight:700; margin-bottom:14px;">案B：レポート作成から</div>
+        <div style="font-size:28px; line-height:1.6; color:#2F3135;">定型度が高く着手しやすい一方、効果が一部門に閉じやすい。</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:18px; margin-bottom:30px;"><span style="font-size:24px; letter-spacing:0.1em; color:#6F7175; font-weight:700;">判断基準</span><span style="font-size:26px; font-weight:600; color:#2F3135; background:#F4F2EE; padding:8px 20px;">効果の見えやすさ</span><span style="font-size:26px; font-weight:600; color:#2F3135; background:#F4F2EE; padding:8px 20px;">関わる人数</span><span style="font-size:26px; font-weight:600; color:#2F3135; background:#F4F2EE; padding:8px 20px;">着手のしやすさ</span></div>
+    <div style="border-left:5px solid #002FA7; background:#EAF1FF; padding:22px 30px; font-size:30px; font-weight:600; color:#111;"><span style="color:#002FA7; font-weight:700; margin-right:14px; letter-spacing:0.06em;">決めたいこと</span>案A / 案Bの選択。持ち帰る場合は担当と期限をこの場で決める。</div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>15 / 18</span></div>
+  </section>
+
+  <!-- ============ 16 まとめと次のステップ ============ -->
+  <section data-label="まとめ" data-screen-label="16" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">Summary / まとめ</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">まとめと次のステップ</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0 52px;"></div>
+    <div style="display:grid; grid-template-columns:1.1fr 1fr; gap:72px;">
+      <div>
+        <div style="font-size:26px; letter-spacing:0.1em; font-weight:700; color:#002FA7; margin-bottom:28px;">本日のポイント</div>
+        <div style="font-size:30px; line-height:2.1; color:#2F3135;"><span style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; color:#002FA7; font-weight:700;">1.</span>　成果の鍵は導入ではなく<strong>業務フローへの定着</strong><br><span style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; color:#002FA7; font-weight:700;">2.</span>　見極め・仕組み化・定着の<strong>3軸で伴走</strong>する<br><span style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; color:#002FA7; font-weight:700;">3.</span>　まずは<strong>Phase 1 のPoC</strong>から小さく始める</div>
+      </div>
+      <div>
+        <div style="border-left:4px solid #002FA7; padding:6px 0 6px 28px; margin-bottom:30px;">
+          <div style="font-size:26px; letter-spacing:0.08em; font-weight:700; color:#002FA7; margin-bottom:18px;">次のアクション</div>
+          <div style="font-size:28px; line-height:1.9; color:#2F3135;">・対象業務の決定（案A / 案B）<br>・キックオフ日程の調整<br>・現状ヒアリングの準備</div>
+        </div>
+        <div style="border-left:4px solid #D8D6D0; padding:6px 0 6px 28px;">
+          <div style="font-size:26px; letter-spacing:0.08em; font-weight:700; color:#6F7175; margin-bottom:18px;">持ち帰り論点</div>
+          <div style="font-size:28px; line-height:1.9; color:#2F3135;">・社内データの取り扱い範囲<br>・関係部門の巻き込み方</div>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>16 / 18</span></div>
+  </section>
+
+  <!-- ============ 17 付録・早見表(新規) ============ -->
+  <section data-label="付録 早見表" data-screen-label="17" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
+    <div style="position:absolute; top:60px; right:96px; font-size:24px; font-weight:700; letter-spacing:0.1em; padding:8px 22px; border:1.5px solid #D8D6D0; background:#F4F2EE; color:#6F7175;">参考</div>
+    <div style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">Appendix / 付録</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">早見表</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
+    <p style="font-size:32px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 48px;">迷ったときに引く1枚です。本編では触れません。</p>
+    <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:80px; align-items:start;">
+      <div>
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:#002FA7;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-book"></use></svg><span style="font-size:24px; letter-spacing:0.1em; color:#6F7175; font-weight:700;">用語の早見表</span></div>
+        <div style="display:grid; grid-template-columns:280px 1fr; gap:0 32px; align-items:center; padding:22px 0; border-bottom:1px solid #E6E4DE;"><div style="font-size:27px; font-weight:700;">PoC</div><div style="font-size:25px; color:#2F3135; line-height:1.55;">小さく試して効果と論点を確かめる実証</div></div>
+        <div style="display:grid; grid-template-columns:280px 1fr; gap:0 32px; align-items:center; padding:22px 0; border-bottom:1px solid #E6E4DE;"><div style="font-size:27px; font-weight:700;">伴走支援</div><div style="font-size:25px; color:#2F3135; line-height:1.55;">診断から定着まで継続して支援する進め方</div></div>
+        <div style="display:grid; grid-template-columns:280px 1fr; gap:0 32px; align-items:center; padding:22px 0; border-bottom:1px solid #E6E4DE;"><div style="font-size:27px; font-weight:700;">仕組み化</div><div style="font-size:25px; color:#2F3135; line-height:1.55;">業務フローへの組み込みとルールの整備</div></div>
+        <div style="display:grid; grid-template-columns:280px 1fr; gap:0 32px; align-items:center; padding:22px 0; border-bottom:1px solid #E6E4DE;"><div style="font-size:27px; font-weight:700;">定着</div><div style="font-size:25px; color:#2F3135; line-height:1.55;">支援なしでも現場で使われ続ける状態</div></div>
+        <div style="display:grid; grid-template-columns:280px 1fr; gap:0 32px; align-items:center; padding:22px 0;"><div style="font-size:27px; font-weight:700;">自走</div><div style="font-size:25px; color:#2F3135; line-height:1.55;">自社だけで改善を回せる体制</div></div>
+      </div>
+      <div>
+        <div style="font-size:24px; letter-spacing:0.1em; color:#6F7175; font-weight:700; margin-bottom:26px;">迷ったときのコツ</div>
+        <div style="font-size:26px; line-height:2.1; color:#2F3135;">・判断に迷ったら「効果の見えやすさ」を優先する<br>・用語の解釈が割れたら、この頁の定義に合わせる<br>・資料にない論点は、まとめの持ち帰り論点へ送る<br>・数値は出典を確認してから引用する</div>
+      </div>
+    </div>
+    <div style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>17 / 18</span></div>
+  </section>
+
+  <!-- ============ 18 お問い合わせ(裏表紙) ============ -->
+  <section data-label="お問い合わせ" data-screen-label="18" style="background:#FFFFFF; box-sizing:border-box; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex;">
+    <div style="width:600px; flex:none; border-right:1px solid #D8D6D0; padding:104px 72px; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:56px; height:56px; background:#002FA7;"></div>
+        <div style="font-size:26px; letter-spacing:0.2em; font-weight:700; color:#111; margin-top:34px; line-height:1.5;">AI ADOPTION<br>PARTNER</div>
+      </div>
+      <div style="font-size:26px; color:#6F7175; line-height:1.7;">Thank you</div>
+    </div>
+    <div style="flex:1; padding:104px 100px; display:flex; flex-direction:column; justify-content:center;">
+      <div style="font-size:26px; letter-spacing:0.22em; font-weight:600; color:#002FA7; margin-bottom:34px;">CONTACT</div>
+      <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:88px; font-weight:600; line-height:1.25; color:#111; margin:0;">お気軽に<br>ご相談ください</h2>
+      <div style="width:96px; height:5px; background:#002FA7; margin:48px 0 40px;"></div>
+      <div style="font-size:32px; color:#2F3135; line-height:1.9;">株式会社◯◯　AI Adoption Partner<br>担当：◯◯　◯◯<br>contact@example.com　/　000-0000-0000</div>
+    </div>
+  </section>
+
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;footerTitle&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;フッター&quot;, &quot;description&quot;: &quot;全スライドのフッター左の資料名を一括で差し替え(空なら各スライドの記載のまま)&quot;}, &quot;pageNumbers&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;フッター&quot;, &quot;description&quot;: &quot;ページ番号 NN / TT をスライドの増減に合わせて自動で振り直す&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this._boot(); }
+  componentDidUpdate() { this._apply(); }
+  componentWillUnmount() { clearTimeout(this._t); if (this._mo) this._mo.disconnect(); }
+  _boot() {
+    const stage = document.querySelector('deck-stage');
+    if (!stage) { this._t = setTimeout(() => this._boot(), 250); return; }
+    this._stage = stage;
+    this._apply();
+    // スライドの追加・削除・複製時に振り直す(番号の書き換え自体は子孫なので発火しない)
+    this._mo = new MutationObserver(() => this._apply());
+    this._mo.observe(stage, { childList: true });
+    stage.addEventListener('slidechange', () => this._apply());
+  }
+  _apply() {
+    const stage = this._stage; if (!stage) return;
+    const secs = Array.from(stage.querySelectorAll('section[data-label]')).filter(s => !s.hasAttribute('data-deck-skip'));
+    const total = secs.length, pad = n => String(n).padStart(2, '0');
+    secs.forEach((s, i) => {
+      if (this.props.pageNumbers ?? true) {
+        s.querySelectorAll('[data-page]').forEach(el => { el.textContent = pad(i + 1) + ' / ' + pad(total); });
+      }
+      const t = this.props.footerTitle;
+      if (t) s.querySelectorAll('[data-footer-title]').forEach(el => { el.textContent = t; });
+    });
+  }
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

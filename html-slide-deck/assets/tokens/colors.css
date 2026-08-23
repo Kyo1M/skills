@@ -1,0 +1,37 @@
+:root {
+  /* シグナル ── Klein Blue は推奨・本命・キー数値にだけ使う */
+  --klein: #002FA7;
+  --blue-soft: #EAF1FF;   /* 淡ブルー地: 強調カードの見出し帯・確認帯 */
+  --blue-mid: #C9D8F5;    /* 図中の中間トーン */
+
+  /* テキスト */
+  --ink: #111111;         /* タイトル */
+  --body: #2F3135;        /* 本文 */
+  --note: #6F7175;        /* 注釈・ラベル・フッター */
+  --muted: #A9AAAD;       /* 非アクティブ・プレースホルダ */
+
+  /* 面・地 */
+  --paper: #FFFFFF;       /* 白背景版のスライド地 */
+  --offwhite: #F6F5F2;    /* オフホワイト版のスライド地 */
+  --panel: #F4F2EE;       /* 淡ベージュパネル(白地の上のカード) */
+  --slot-bg: #FAFAF8;     /* 画像差し込み枠の地 */
+  --chapter-num: #E7E5DF; /* 章扉の大きな章番号 */
+
+  /* 罫線 */
+  --line: #D8D6D0;        /* 標準罫線 */
+  --line-soft: #E6E4DE;   /* 箇条書きの区切りなど弱い罫線 */
+  --line-dash: #B7B7B7;   /* 画像枠の破線 */
+
+  /* 注意・補足(トップメッセージ直下の警告帯) */
+  --warn-bg: #FFF4D7;
+  --warn-text: #7A5200;
+  --warn-line: #A66A00;
+
+  /* セマンティックエイリアス */
+  --signal: var(--klein);
+  --surface-slide: var(--paper);
+  --surface-card: var(--panel);
+  --text-title: var(--ink);
+  --text-body: var(--body);
+  --text-note: var(--note);
+}

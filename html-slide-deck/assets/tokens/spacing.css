@@ -1,0 +1,19 @@
+:root {
+  /* スライドキャンバス */
+  --slide-w: 1920px;
+  --slide-h: 1080px;
+
+  /* 本文スライドの標準パディング(天地中央寄せ+下に footer 分の余白) */
+  --slide-pad-top: 56px;
+  --slide-pad-x: 96px;
+  --slide-pad-bottom: 104px;
+
+  /* アクセント */
+  --rule-w: 72px;          /* タイトル下のルール線(表紙は96px) */
+  --rule-h: 4px;
+  --accent-border: 5px;    /* 強調カードの左罫線 */
+
+  /* フッター */
+  --footer-bottom: 48px;
+  --footer-gap: 20px;      /* 罫線と文字の間 */
+}
