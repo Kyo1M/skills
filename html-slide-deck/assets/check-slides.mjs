@@ -12,7 +12,8 @@
  *   FAIL 3. フォント下限 … 本文 24px・補助 22px（data-role="caption" / footer 配下）・kicker 18px（data-role="kicker"）
  *   FAIL 4. 禁止ダッシュの残存 … `──`(U+2500 の 2 連以上) / `―`(U+2015) / `—`(U+2014)
  *   FAIL 5. data-speaker-notes の残存
- *   WARN 6. 1 枚にアイコン（<use href="#ic-…">）7 個以上
+ *   WARN 6. 1 枚にアイコン（<use href="#ic-…">）5 個以上（置き場は見出し帯カードの見出しだけ。
+ *              置き場そのものの妥当性はセルフレビューで見る）
  *   WARN 7. 1 枚に塗りボックス（白・透明・#F6F5F2 以外の地、面積 40,000px² 以上）4 個以上
  *   WARN 8. 絵文字・アイコンフォント
  *
@@ -49,7 +50,7 @@ const LIMITS = {
   FONT_BODY: 24,
   FONT_CAPTION: 22,
   FONT_KICKER: 18,
-  ICON_MAX: 6, // 7 個以上で WARN
+  ICON_MAX: 4, // 5 個以上で WARN（見出し帯カードの見出しだけに置く）
   FILL_MIN_AREA: 40000,
   FILL_MAX: 3, // 4 個以上で WARN
 };
@@ -525,7 +526,7 @@ try {
     }
     for (const n of r.notes) fails.push(`FAIL data-speaker-notes の残存: ${n}`);
     if (r.iconCount > LIMITS.ICON_MAX) {
-      warns.push(`WARN アイコン過多: ${r.iconCount} 個（${LIMITS.ICON_MAX + 1} 個以上）${r.icons.join(' ')}`);
+      warns.push(`WARN アイコン過多: ${r.iconCount} 個（${LIMITS.ICON_MAX + 1} 個以上）。見出し帯カードの見出しだけに置く ${r.icons.join(' ')}`);
     }
     if (r.fills.length > LIMITS.FILL_MAX) {
       warns.push(`WARN 塗りボックス過多: ${r.fills.length} 個（${LIMITS.FILL_MAX + 1} 個以上）\n        ` + r.fills.slice(0, 6).join('\n        '));

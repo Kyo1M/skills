@@ -316,44 +316,47 @@
   <section data-label="ガントスケジュール" data-screen-label="10b" style="background:#FFFFFF; box-sizing:border-box; padding:52px 88px 100px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center; position:relative;">
     <div data-role="kicker" style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">03 / 進め方</div>
     <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:56px; font-weight:600; color:#111; margin:12px 0 0;">タスクスケジュール</h2>
-    <div style="width:72px; height:4px; background:#002FA7; margin:20px 0 20px;"></div>
+    <div style="width:72px; height:4px; background:#002FA7; margin:20px 0;"></div>
     <p style="font-size:30px; line-height:1.5; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 26px;">タスクを<span style="color:#002FA7; font-weight:700;">構築</span>と<span style="color:#002FA7; font-weight:700;">展開</span>の 2 トラックに分け、対応予定の期間を帯で示します。</p>
     <div style="display:flex; align-items:center; gap:28px; margin-bottom:16px;">
-      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#002FA7; border-radius:3px;"></span><span style="font-size:24px; font-weight:700; color:#2F3135;">構築</span></div>
-      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#6E8FD6; border-radius:3px;"></span><span style="font-size:24px; font-weight:700; color:#2F3135;">展開</span></div>
-      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#1F8A5B; border-radius:3px;"></span><span style="font-size:24px; font-weight:700; color:#2F3135;">実施済み</span></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#002FA7;"></span><span data-role="caption" style="font-size:24px; font-weight:700; color:#2F3135;">構築</span></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#6E8FD6;"></span><span data-role="caption" style="font-size:24px; font-weight:700; color:#2F3135;">展開</span></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="width:34px; height:15px; background:#1F8A5B;"></span><span data-role="caption" style="font-size:24px; font-weight:700; color:#2F3135;">実施済み</span></div>
     </div>
-    <div style="border:1px solid #D8D6D0;">
-      <div style="display:flex; border-bottom:1px solid #E6E4DE;">
-        <div style="width:400px; flex:none; background:#F4F2EE; border-right:1px solid #E6E4DE;"></div>
-        <div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr);">
-          <div style="grid-column:1/4; text-align:center; padding:10px 0; background:#EAF1FF; border-right:1px solid #E6E4DE; font-size:24px; font-weight:700; color:#002FA7; letter-spacing:0.04em;">1 ヶ月目</div>
-          <div style="grid-column:4/7; text-align:center; padding:10px 0; background:#F4F2EE; font-size:24px; font-weight:700; color:#6F7175; letter-spacing:0.04em;">2 ヶ月目</div>
-        </div>
+    <!-- ガントは全体を 1 つの grid で組む。行ごとの flex ＋入れ子 grid にしない（縦線がずれる） -->
+    <div style="position:relative; border:1px solid #D8D6D0;">
+      <div style="display:grid; grid-template-columns:400px repeat(6,1fr); align-items:stretch;">
+      <div style="background:#F4F2EE; border-right:1px solid #E6E4DE;"></div>
+      <div data-role="caption" style="grid-column:2/5; text-align:center; padding:6px 0; background:#EAF1FF; border-right:1px solid #E6E4DE; font-size:24px; font-weight:700; color:#002FA7; line-height:1.25;">1 ヶ月目</div>
+      <div data-role="caption" style="grid-column:5/8; text-align:center; padding:6px 0; background:#F4F2EE; font-size:24px; font-weight:700; color:#6F7175; line-height:1.25;">2 ヶ月目</div>
+      <div data-role="caption" style="padding:5px 24px; background:#F4F2EE; border-right:1px solid #E6E4DE; border-bottom:2px solid #111; font-size:22px; font-weight:700; letter-spacing:0.04em; color:#6F7175; line-height:1.25;">タスク ／ トラック</div>
+      <div data-role="caption" style="text-align:center; padding:5px 0; background:#FBFAF8; border-bottom:2px solid #111; font-size:22px; font-weight:700; color:#002FA7; line-height:1.25;">第1週<span data-role="kicker" style="font-size:19px; font-weight:700; color:#fff; background:#002FA7; padding:0 8px; margin-left:6px; letter-spacing:0.06em;">今週</span></div>
+      <div data-role="caption" style="text-align:center; padding:5px 0; background:#FBFAF8; border-bottom:2px solid #111; border-left:1px solid #EDECE8; font-size:22px; color:#6F7175; line-height:1.25;">第2週</div>
+      <div data-role="caption" style="text-align:center; padding:5px 0; background:#FBFAF8; border-bottom:2px solid #111; border-left:1px solid #EDECE8; font-size:22px; color:#6F7175; line-height:1.25;">第3週</div>
+      <div data-role="caption" style="text-align:center; padding:5px 0; background:#FBFAF8; border-bottom:2px solid #111; border-left:1px solid #EDECE8; font-size:22px; color:#6F7175; line-height:1.25;">第4週</div>
+      <div data-role="caption" style="text-align:center; padding:5px 0; background:#FBFAF8; border-bottom:2px solid #111; border-left:1px solid #EDECE8; font-size:22px; color:#6F7175; line-height:1.25;">第5週</div>
+      <div data-role="caption" style="text-align:center; padding:5px 0; background:#FBFAF8; border-bottom:2px solid #111; border-left:1px solid #EDECE8; font-size:22px; color:#6F7175; line-height:1.25;">第6週</div>
+      <div data-role="caption" style="grid-column:1/-1; background:#EAF1FF; border-bottom:1px solid #E6E4DE; padding:4px 24px; font-size:22px; font-weight:700; color:#002FA7; letter-spacing:0.06em; line-height:1.25;">構築／仕組みづくり</div>
+      <div style="padding:7px 24px; border-bottom:1px solid #F1F0EC; font-size:26px; font-weight:700; color:#111; line-height:1.25; white-space:nowrap;">タスク A</div>
+      <div style="grid-column:2/4; border-bottom:1px solid #F1F0EC; display:flex; align-items:center;"><div data-role="caption" style="flex:1; margin:0 3px; height:30px; background:#002FA7; display:flex; align-items:center; justify-content:flex-end; padding:0 12px; color:#fff; font-size:22px; font-weight:700; line-height:1.25;">〜第2週</div></div>
+      <div style="grid-column:4/8; border-bottom:1px solid #F1F0EC;"></div>
+      <div style="padding:7px 24px; border-bottom:1px solid #F1F0EC; font-size:26px; font-weight:700; color:#111; line-height:1.25; white-space:nowrap;">タスク B</div>
+      <div style="grid-column:3/5; border-bottom:1px solid #F1F0EC; display:flex; align-items:center;"><div data-role="caption" style="flex:1; margin:0 3px; height:30px; background:#002FA7; display:flex; align-items:center; justify-content:flex-end; padding:0 12px; color:#fff; font-size:22px; font-weight:700; line-height:1.25;">〜第3週</div></div>
+      <div style="grid-column:2/3; border-bottom:1px solid #F1F0EC;"></div>
+      <div style="grid-column:5/8; border-bottom:1px solid #F1F0EC;"></div>
+      <div style="padding:7px 24px; border-bottom:1px solid #F1F0EC; font-size:26px; font-weight:700; color:#111; line-height:1.25; white-space:nowrap;">タスク C</div>
+      <div style="grid-column:5/6; border-bottom:1px solid #F1F0EC; display:flex; align-items:center;"><div data-role="caption" style="flex:1; margin:0 3px; height:30px; background:#002FA7; display:flex; align-items:center; justify-content:center; padding:0 12px; color:#fff; font-size:22px; font-weight:700; line-height:1.25;">第4週</div></div>
+      <div style="grid-column:2/5; border-bottom:1px solid #F1F0EC;"></div>
+      <div style="grid-column:6/8; border-bottom:1px solid #F1F0EC;"></div>
+      <div data-role="caption" style="grid-column:1/-1; background:#F4F2EE; border-bottom:1px solid #E6E4DE; padding:4px 24px; font-size:22px; font-weight:700; color:#2F3135; letter-spacing:0.06em; line-height:1.25;">展開／現場での適用</div>
+      <div style="padding:7px 24px; border-bottom:1px solid #F1F0EC; font-size:26px; font-weight:700; color:#111; line-height:1.25; white-space:nowrap;">タスク D</div>
+      <div style="grid-column:2/3; border-bottom:1px solid #F1F0EC; display:flex; align-items:center;"><div data-role="caption" style="flex:1; margin:0 3px; height:30px; background:#1F8A5B; display:flex; align-items:center; justify-content:center; padding:0 12px; color:#fff; font-size:22px; font-weight:700; line-height:1.25;">✓ 済</div></div>
+      <div style="grid-column:3/8; border-bottom:1px solid #F1F0EC;"></div>
+      <div style="padding:7px 24px; font-size:26px; font-weight:700; color:#111; line-height:1.25; white-space:nowrap;">タスク E</div>
+      <div style="grid-column:4/8; display:flex; align-items:center;"><div data-role="caption" style="flex:1; margin:0 3px; height:30px; background:#6E8FD6; display:flex; align-items:center; justify-content:flex-end; padding:0 12px; color:#fff; font-size:22px; font-weight:700; line-height:1.25;">第3週〜</div></div>
+      <div style="grid-column:2/4;"></div>
       </div>
-      <div style="display:flex; border-bottom:2px solid #111;">
-        <div data-role="caption" style="width:400px; flex:none; padding:10px 24px; background:#F4F2EE; border-right:1px solid #E6E4DE; font-size:22px; font-weight:700; letter-spacing:0.04em; color:#6F7175;">タスク ／ トラック</div>
-        <div data-role="caption" style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); background:#FBFAF8;">
-          <div style="text-align:center; padding:9px 0; font-size:22px; font-weight:700; color:#002FA7;">第1週<div data-role="kicker" style="font-size:20px; font-weight:700; color:#fff; background:#002FA7; display:inline-block; padding:1px 9px; margin-top:2px; letter-spacing:0.06em;">今週</div></div>
-          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第2週</div>
-          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第3週</div>
-          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第4週</div>
-          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第5週</div>
-          <div style="text-align:center; padding:9px 0; font-size:22px; color:#6F7175; border-left:1px solid #EDECE8;">第6週</div>
-        </div>
-      </div>
-      <div style="position:relative;">
-        <div style="position:absolute; left:400px; right:0; top:0; bottom:0; display:grid; grid-template-columns:repeat(6,1fr); pointer-events:none;">
-          <div></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; background:#EAF1FF; border-bottom:1px solid #E6E4DE; padding:7px 24px;"><span style="width:6px; height:20px; background:#002FA7;"></span><span data-role="caption" style="font-size:22px; font-weight:700; color:#002FA7; letter-spacing:0.06em;">構築／仕組みづくり</span></div>
-        <div style="display:flex; align-items:center; border-bottom:1px solid #F1F0EC; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク A</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div data-role="caption" style="grid-column:1/3; height:32px; background:#002FA7; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:22px; font-weight:700;">〜第2週</div></div></div>
-        <div style="display:flex; align-items:center; border-bottom:1px solid #F1F0EC; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク B</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div data-role="caption" style="grid-column:2/4; height:32px; background:#002FA7; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:22px; font-weight:700;">〜第3週</div></div></div>
-        <div style="display:flex; align-items:center; border-bottom:1px solid #E6E4DE; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク C</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div data-role="caption" style="grid-column:4/5; height:32px; background:#002FA7; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:22px; font-weight:700;">第4週</div></div></div>
-        <div style="display:flex; align-items:center; gap:12px; background:#EEF2FA; border-bottom:1px solid #E6E4DE; border-top:1px solid #E6E4DE; padding:7px 24px;"><span style="width:6px; height:20px; background:#6E8FD6;"></span><span data-role="caption" style="font-size:22px; font-weight:700; color:#3D5BA0; letter-spacing:0.06em;">展開／現場での適用</span></div>
-        <div style="display:flex; align-items:center; border-bottom:1px solid #F1F0EC; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク D</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div data-role="caption" style="grid-column:1/2; height:32px; background:#1F8A5B; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:700;">✓ 済</div></div></div>
-        <div style="display:flex; align-items:center; min-height:60px;"><div style="width:400px; flex:none; padding:0 24px; font-size:26px; font-weight:700; color:#111;">タスク E</div><div style="flex:1; display:grid; grid-template-columns:repeat(6,1fr); padding:0 4px;"><div data-role="caption" style="grid-column:3/7; height:32px; background:#6E8FD6; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; color:#fff; font-size:22px; font-weight:700;">第3週〜</div></div></div>
-      </div>
+      <div style="position:absolute; inset:0; display:grid; grid-template-columns:400px repeat(6,1fr); pointer-events:none;"><div></div><div></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div><div style="border-left:1px solid #EFEEEA;"></div></div>
     </div>
     <div data-role="caption" style="font-size:24px; color:#A9AAAD; margin-top:16px;">※ タスク名・週数・帯の位置（grid-column の a/b）はプレースホルダです。案件に合わせて差し替えてください。</div>
     <div data-role="caption" style="position:absolute; left:88px; right:88px; bottom:44px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:18px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>10b / 20</span></div>
@@ -429,30 +432,32 @@
   </section>
 
   <!-- ============ 13 進捗報告(定例・新規) ============ -->
-  <section data-label="進捗報告" data-screen-label="13" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center;">
-    <div data-role="badge" style="position:absolute; top:60px; right:96px; font-size:24px; font-weight:700; letter-spacing:0.1em; padding:8px 22px; border:1.5px solid #D8D6D0; background:#F4F2EE; color:#2F3135;">報告</div>
-    <div data-role="kicker" style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">定例 / 報告</div>
-    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:64px; font-weight:600; color:#111; margin:16px 0 0;">これまでの進捗</h2>
-    <div style="width:72px; height:4px; background:#002FA7; margin:28px 0;"></div>
-    <p style="font-size:36px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 48px;">前回定例で決めた3件は、いずれも<span style="color:#002FA7; font-weight:700;">反映済み</span>です。</p>
-    <div style="border:1px solid #D8D6D0;">
-      <div style="display:grid; grid-template-columns:520px 80px 1fr; gap:0; align-items:center; padding:30px 40px;">
-        <div style="font-size:29px; font-weight:700;">運用ルールの初版承認</div>
-        <div style="font-size:28px; color:#A9AAAD; text-align:center;">→</div>
-        <div style="display:flex; align-items:center; gap:16px;"><svg viewBox="0 0 24 24" style="width:30px;height:30px;flex:none;fill:none;stroke:#002FA7;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-check"></use></svg><span style="font-size:27px; color:#2F3135; line-height:1.5;">ガイドラインに反映し、全員へ共有済み</span></div>
+  <section data-label="振り返り" data-screen-label="13" style="background:#FFFFFF; box-sizing:border-box; padding:56px 96px 104px; font-family:'Meiryo UI','Hiragino Sans','Yu Gothic',sans-serif; color:#111; display:flex; flex-direction:column; justify-content:center; position:relative;">
+    <div data-role="badge" style="position:absolute; top:56px; right:96px; font-size:23px; font-weight:700; letter-spacing:0.1em; padding:8px 22px; border:1.5px solid #D8D6D0; background:#F4F2EE; color:#2F3135;">報告</div>
+    <div data-role="kicker" style="font-size:24px; letter-spacing:0.18em; font-weight:600; color:#6F7175; text-transform:uppercase;">REVIEW</div>
+    <h2 style="font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif; font-size:60px; font-weight:600; color:#111; margin:14px 0 0;">前回の振り返りと今週の動き</h2>
+    <div style="width:72px; height:4px; background:#002FA7; margin:22px 0;"></div>
+    <p style="font-size:33px; line-height:1.55; color:#2F3135; font-weight:500; text-wrap:pretty; margin:0 0 36px;">前回決めた 3 件はいずれも反映済みで、今週は PoC の準備まで進みました。実物は画面でご覧いただきます。</p>
+    <!-- 左右 2 カラムの箇条書き。表にしない。「使った時間」の欄は置かない -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px;">
+      <div>
+        <div style="font-size:28px; font-weight:700; color:#002FA7; letter-spacing:0.06em; margin-bottom:16px;">前回の振り返り</div>
+        <div style="font-size:27px; line-height:1.7; color:#2F3135;">
+          ・<b>運用ルールの初版承認</b>：ガイドラインに反映し、全員へ共有済み<br>
+          ・<b>対象業務の選定（案 A）</b>：問い合わせ対応を対象に決定<br>
+          ・<b>推進体制の確定</b>：担当と定例の頻度を合意<br>
+          ・その場で出たアクション：権限申請〔済／未〕
+        </div>
       </div>
-      <div style="display:grid; grid-template-columns:520px 80px 1fr; gap:0; align-items:center; padding:30px 40px; border-top:1px solid #E6E4DE;">
-        <div style="font-size:29px; font-weight:700;">対象業務の選定（案A）</div>
-        <div style="font-size:28px; color:#A9AAAD; text-align:center;">→</div>
-        <div style="display:flex; align-items:center; gap:16px;"><svg viewBox="0 0 24 24" style="width:30px;height:30px;flex:none;fill:none;stroke:#002FA7;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-check"></use></svg><span style="font-size:27px; color:#2F3135; line-height:1.5;">問い合わせ対応を対象に PoC を準備中</span></div>
-      </div>
-      <div style="display:grid; grid-template-columns:520px 80px 1fr; gap:0; align-items:center; padding:30px 40px; border-top:1px solid #E6E4DE;">
-        <div style="font-size:29px; font-weight:700;">推進体制の確定</div>
-        <div style="font-size:28px; color:#A9AAAD; text-align:center;">→</div>
-        <div style="display:flex; align-items:center; gap:16px;"><svg viewBox="0 0 24 24" style="width:30px;height:30px;flex:none;fill:none;stroke:#002FA7;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><use href="#ic-check"></use></svg><span style="font-size:27px; color:#2F3135; line-height:1.5;">キックオフを MM/DD に実施</span></div>
+      <div style="border-left:1px solid #E6E4DE; padding-left:48px;">
+        <div style="font-size:28px; font-weight:700; color:#111; letter-spacing:0.06em; margin-bottom:16px;">今週実施したこと</div>
+        <div style="font-size:27px; line-height:1.7; color:#2F3135;">
+          ・PoC のサンプルデータと期待値を作成し、ローカルで単体テストを実施（テスト出力を投影）<br>
+          ・△△さんへハンズオンを実施し、提出からレビューまでを一巡（PR 一覧を投影）<br>
+          ・□□案件のリポジトリを確認し、運用支援を継続
+        </div>
       </div>
     </div>
-    <div style="font-size:28px; color:#2F3135; line-height:1.6; margin-top:40px;"><strong style="color:#111;">本日：</strong>PoC の評価基準について、確認1件とご相談1件をお諮りします。</div>
     <div data-role="caption" style="position:absolute; left:96px; right:96px; bottom:48px; display:flex; justify-content:space-between; border-top:1px solid #D8D6D0; padding-top:20px; font-size:24px; color:#6F7175;"><span data-footer-title>AI活用支援プログラム ご提案</span><span data-page>13 / 20</span></div>
   </section>
 
