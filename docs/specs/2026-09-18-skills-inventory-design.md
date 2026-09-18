@@ -40,7 +40,7 @@ Claude Code が `.agents/skills` を読む記述は公式文書に無く、セ�
 | 系統 | 正本 | 入るもの |
 |---|---|---|
 | Skills リポジトリ（`~/Developer/Skills`、GitHub Kyo1M/skills） | git 管理 | どのリポジトリでも使う自作スキル。一般 10 件に加え、Codex 専用の自作 2 件（business-slide-writing、gemini-ja-proofread）を移す |
-| 各業務・案件リポジトリ | その repo | その repo の規約に依存するもの。kyo1M-business の業務 9 件 + interview-prep-drafter、vaccinechoice_HH の vac-* 8 件（git 管理しない、後述） |
+| 各業務・案件リポジトリ | その repo | その repo の規約に依存するもの。kyo1M-business の業務 8 件 + interview-prep-drafter（meeting-minutes 削除後）、vaccinechoice_HH の vac-* 8 件（git 管理しない、後述） |
 
 Skills リポジトリに業務・案件スキルの実体を置かない。`~/.codex/skills` と claude.ai に自作の実体を置かない。
 
@@ -136,7 +136,7 @@ kyo1M-business の CLAUDE.md に「議事録の作り方」の箇条書きを足
 ~/.codex/skills/                        .system だけ
 
 ~/Developer/kyo1M-business/
-├── .agents/skills/<業務 9 件 + interview-prep-drafter>/   実体（git）。meeting-minutes は無し
+├── .agents/skills/<業務 8 件 + interview-prep-drafter>/   実体（git）。meeting-minutes は無し
 └── .claude/skills/<同名>  → ../../.agents/skills/<同名>   symlink（git）
 
 ~/Developer/vaccinechoice_HH/
