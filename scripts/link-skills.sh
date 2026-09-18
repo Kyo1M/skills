@@ -9,7 +9,7 @@ SKILLS_DIR="${SKILLS_DIR:-$HOME/Developer/Skills}"
 CLAUDE_SKILLS_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 AGENTS_SKILLS_DIR="${AGENTS_SKILLS_DIR:-$HOME/.agents/skills}"
 CODEX_SKILLS_DIR="${CODEX_SKILLS_DIR:-$HOME/.codex/skills}"
-REPO_DIR="${REPO_DIR:-$PWD}"
+REPO_DIR="${REPO_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 NON_SKILL_DIRS="archive docs scripts node_modules"
 
 realpath_py() { python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$1"; }

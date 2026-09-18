@@ -14,9 +14,11 @@ HTML の数字を通常テキストでコピーしても自動番号にはなら
 - プログラムで生成する場合は、各ページの番号専用テキストボックスに `SlideNumber` と命名する。通常の数字や本文の参照番号を検索して一括置換しない。
 - 使用する出力ライブラリがフィールドを保持できない場合は、PPTX の最終エクスポートと再掲ページの組み込みを終えてから次の変換を行う。数字だけの専用テキストボックスを対象とし、配置・段落書式・文字書式を維持する。
 
+`$SKILL_DIR` は html-slide-deck の SKILL.md があるディレクトリ（symlink 経由でも同じ）。
+
 ```bash
-python3 ~/.claude/skills/html-slide-deck/scripts/pptx-slide-numbers.py draft.pptx --output final.pptx --skip-slide 1
-python3 ~/.claude/skills/html-slide-deck/scripts/pptx-slide-numbers.py final.pptx --skip-slide 1
+python3 "$SKILL_DIR/scripts/pptx-slide-numbers.py" draft.pptx --output final.pptx --skip-slide 1
+python3 "$SKILL_DIR/scripts/pptx-slide-numbers.py" final.pptx --skip-slide 1
 ```
 
 `--skip-slide 1` は表紙に番号欄を置かない場合だけ付ける。指定はスライド順での位置であり、枚数からは除かれない。出力先は新しいファイルにする。入力は変更しない。フィールド化のあとに別ライブラリで再エクスポートすると通常テキストに戻る場合があるため、納品する最終バイナリで再検査する。
