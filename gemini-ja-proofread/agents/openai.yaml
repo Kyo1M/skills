@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gemini日本語校正"
+  short_description: "Geminiによる日本語校正と、共通・個別の文章ルールの反映"
+  default_prompt: "$gemini-ja-proofread で、この資料を共通ルールと今回の指示に沿って校正してください。"

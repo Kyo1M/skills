@@ -1,0 +1,4 @@
+interface:
+  display_name: "業務スライドの文章設計"
+  short_description: "読者の判断に必要な内容を選び、具体的な日本語で構成・初稿を書く"
+  default_prompt: "$business-slide-writing を使って、共有事項と相談事項が伝わるスライドの初稿を作成してください。"
