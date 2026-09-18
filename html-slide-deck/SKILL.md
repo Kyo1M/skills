@@ -15,6 +15,10 @@ description: ビジネス・コンサル向けの定例・提案・議論・報�
 - 機械チェック（はみ出し・フォント下限・禁止表記・発表者ノート・アイコン密度）で提示前に潰す
 - 生成した `.dc.html` をそのまま Claude Design に持ち込んで pptx 化できる
 
+## 初稿で適用する文章ルール
+
+日本語の業務スライドは、構成・実文言を書き始める前に `~/.codex/skills/business-slide-writing/references/principles.md` を読む。共有する対象と相談事項を先に定め、概要には利用状況・機能・作業を載せる。管理履歴を機械的に転載せず、指定された内容・必要な制約は維持する。表や役割欄は対象と作業が分かる自然な名詞句を使える。共通ルールは文章と情報選択に適用し、過去の担当・日程・状態を引き継ぐ根拠にしない。
+
 ## ワークフロー
 
 ```
@@ -72,7 +76,7 @@ Phase 5: セルフレビュー（references/self-review-checklist.md）→ 提�
 2. 使わない `<section>` を削り、使う型の `<section>` を複製して順に並べる。`data-label`（スライド名）と `data-screen-label`（連番）を振る。**`data-speaker-notes` は付けない。**
 3. 各 `<section>` の中身を構成 md の実文言で差し替える。**ボディ項目を落とさない**。箇条書きは 1 テキストボックス（1 div に `<br>` 区切り）。見出しが要る箇条書きは「太字見出し行＋本文」か「見出し：本文」。`──` を使わない。
 4. アイコンは `<svg width="32" height="32" style="color:#2F3135"><use href="#ic-…"/></svg>`。スプライト（`<defs>`）はテンプレートに全種入っている。使わなかった `<symbol>` は残してよい。
-5. footer の `<span data-footer-title>` に資料名、`<span data-page>` はそのまま（runtime が振り直す）。役割バッジを右上に。
+5. footer の `<span data-footer-title>` に資料名、`<span data-page>` はそのまま（runtime が振り直す）。役割バッジを右上に。 **フッターに作成日は表示しない。**
 6. スタイルは inline のまま（class 依存にしない。PPTX 化は inline を解決する）。
 7. runtime（`support.js`・`deck-stage.js`）を出力ディレクトリに同名で置く（`assets/runtime/` からコピー。repo では `docs/deliverables/` 直下に 1 組だけ置き git 管理）。
 8. 機械チェック:
@@ -89,6 +93,10 @@ Phase 5: セルフレビュー（references/self-review-checklist.md）→ 提�
 ### 出力契約（`.dc.html` の構造）
 
 テンプレートと同じ並びを保つ: `<script src="./support.js">` → `<x-dc>` → `<helmet>`（Google Fonts・最小 style）→ アイコンスプライト `<svg><defs><symbol id="ic-…">` → `<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">` → `<section data-label data-screen-label style>` × N → `</x-import></x-dc>` → `<script type="text/x-dc" data-dc-script>`（ページ番号・資料名の振り直し）。footer の `data-footer-title` / `data-page` は必ず残す。`data-deck-skip` は付録区切り等に使ってよい。
+
+### PowerPoint の自動ページ番号
+
+PPTX を出力・再掲する際は [automatic-slide-numbers.md](references/automatic-slide-numbers.md) を読む。HTML の `[data-page]` に加えて、PPTX は標準のスライド番号フィールドを使う。固定テキストのまま渡さず、最終エクスポート後にも保持を確認する。
 
 ### HTML タグ開閉の検証（任意）
 
