@@ -16,16 +16,16 @@ Geminiを指定された校正では、実際に指定モデルを呼び出す�
 
 ## 業務スライドの場合
 
-構成・初稿からの改善は `business-slide-writing` と併用する。校正時は `../business-slide-writing/references/principles.md`（同じ置き場の business-slide-writing）を読み、スクリプトに `--rules` で渡す。現在の依頼の追加ルールも別の `--rules` で渡せる。原稿にない具体的な事実・担当を補わず、承認済みの内容の削除・構成変更は語句の校正と分けて提案する。
+構成・初稿からの改善は `business-slide-writing` と併用する。校正時は `$SKILL_DIR/../business-slide-writing/references/principles.md`（同じ置き場の business-slide-writing）を読み、スクリプトに `--rules` で渡す。現在の依頼の追加ルールも別の `--rules` で渡せる。原稿にない具体的な事実・担当を補わず、承認済みの内容の削除・構成変更は語句の校正と分けて提案する。
 
 ## 実行
 
 1. 編集対象から本文を抽出し、一時JSONに保存する。入力は `[{"id":"一意な位置ID","text":"全文"}]`、または `[{"slide":1,"items":[...]}]`。見出し・本文・前後の段落の順序を保持する。実際のページ折り返しを文末と誤認しない。画像内文字は別途抽出していなければ対象外と説明する。PPTX等の編集・描画は利用可能な資料編集スキルに従う。
 2. キーは `GEMINI_API_KEY`、または `~/.gemini/dxb-review.env` から読む。このファイル名でも他プロジェクトで再利用できる。値をチャット・ログ・リポジトリへ出さない。キーの再設定は既存設定が使えない場合だけ案内する。
-3. 空の一時出力ディレクトリを指定して実行する。Python標準ライブラリのみで動く。
+3. 空の一時出力ディレクトリを指定して実行する。Python標準ライブラリのみで動く。`$SKILL_DIR` はこの SKILL.md があるディレクトリ（Claude Code は起動時に示される Base directory、Codex はスキル一覧の file パスの親）。symlink 経由でも同じ。
 
 ```bash
-python3 ../gemini-ja-proofread/scripts/review.py \
+python3 "$SKILL_DIR/scripts/review.py" \
   --input /absolute/private/input.json \
   --output-dir /absolute/private/review-result \
   --rules /absolute/private/current-request.txt
