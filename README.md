@@ -43,7 +43,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [deck-critique](./deck-critique/SKILL.md) | 資料（構成 md / 完成 `.dc.html`）を作成とは別の目で批評・推敲する。指摘リスト+修正案を返す（勝手に直さない） |
 | [business-slide-writing](./business-slide-writing/SKILL.md) | 日本語の業務スライドの構成・初稿・リライトで、共有する対象と相談事項を明確にし、作業・利用状況を適切な粒度で書く。文章ルールは `references/principles.md`。deck-outline / html-slide-deck が初稿前に参照する |
 | [gemini-ja-proofread](./gemini-ja-proofread/SKILL.md) | Gemini API で日本語の校正案を作り、ユーザーの文章ルール（`references/preferences.md`）を適用して差分を確認する。`scripts/review.py` |
-| [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記・前回からの進捗（GitHub Issue は読むだけ。`references/github-issue-sync.md`）・タスク登録の下書き・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
+| [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記と会議で報告された着手・完了の反映・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う（ID・状態・確認項目はガイドに従う。GitHub Issue 連携を定める repo では前回からの進捗とタスク登録の下書きも。Issue は読むだけ、`references/github-issue-sync.md`）。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
 | [task-breakdown](./task-breakdown/SKILL.md) | 規約駆動のタスク整理。Issue 番号・議事録の行・自由記述を入口に壁打ちで要件ファイル（目的・背景・やること・完了条件・判断の観点・制約・未確定事項）を作り、台帳の詳細列にリンクする。Issue 入口ではファイルと Issue 側の食い違いを表で見せる。起票はしない |
 | [task-issue](./task-issue/SKILL.md) | 規約駆動の起票。議事録の下書き・要件ファイル・自由記述から登録計画を見せ、承認後に GitHub Issue 作成 → Sub-issue → Project 取り込み → 台帳の書き戻し（`references/gh-commands.md`）。gh が無い・ツールが Issue でない repo は貼れる文面だけ出す |
 | [spec-to-readable-html](./spec-to-readable-html/SKILL.md) | 仕様書 Markdown を要約・図解つきの可読 HTML に変換する |
