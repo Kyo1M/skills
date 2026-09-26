@@ -44,6 +44,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [business-slide-writing](./business-slide-writing/SKILL.md) | 日本語の業務スライドの構成・初稿・リライトで、共有する対象と相談事項を明確にし、作業・利用状況を適切な粒度で書く。文章ルールは `references/principles.md`。deck-outline / html-slide-deck が初稿前に参照する |
 | [gemini-ja-proofread](./gemini-ja-proofread/SKILL.md) | Gemini API で日本語の校正案を作り、ユーザーの文章ルール（`references/preferences.md`）を適用して差分を確認する。`scripts/review.py` |
 | [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記と会議で報告された着手・完了の反映・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う（ID・状態・確認項目はガイドに従う。GitHub Issue 連携を定める repo では前回からの進捗とタスク登録の下書きも。Issue は読むだけ、`references/github-issue-sync.md`）。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
+| [table-definition](./table-definition/SKILL.md) | 規約駆動のテーブル定義整理。定義書（Excel・DDL・ヘッダ）や口頭説明から 1 論理テーブル 1 YAML（粒度・キー・列・関係・注意点）と wiki「データ」表を作る。置き場が無い repo では `docs/tables/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/table-schema.md` |
 | [spec-to-readable-html](./spec-to-readable-html/SKILL.md) | 仕様書 Markdown を要約・図解つきの可読 HTML に変換する |
 | [article-pipeline](./article-pipeline/SKILL.md) | note・Zenn 記事を企画→公開準備の 7 フェーズで伴走する。`writing-articles` リポジトリ専用 |
 | [empirical-prompt-tuning](./empirical-prompt-tuning/SKILL.md) | skill やプロンプトを実行者に実際に動かして両面評価（成功・失敗）で反復改善する。新規 skill を数回実戦投入したらこれで改善する |
