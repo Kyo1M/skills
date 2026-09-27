@@ -89,7 +89,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 深掘りが要るときは grill-me（論点整理 md）→ brainstorming に接続
 ```
 
-書き方原則の正本は `deck-outline/references/writing-principles.md`。要約はグローバル `~/.claude/CLAUDE.md` に常設。新しい書き方フィードバックは両方に反映する。
+書き方原則の正本は `deck-outline/references/writing-principles.md`（ルールと理由）。原則ごとの実例と経緯は `deck-outline/references/tone-examples.md`。要約はグローバル `~/.claude/CLAUDE.md` に常設。新しい書き方フィードバックは 3 か所に反映する。
 
 ## 注意
 
