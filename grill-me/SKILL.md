@@ -58,6 +58,6 @@ description: アイデア・プラン・構想を批判的に壁打ちするス�
 ## 他スキルとの連携
 
 - 壁打ちの結論が「資料を作る」なら → `deck-outline`(論点整理 md がそのまま入力素材になる)
-- 壁打ちの結論が「実装する」なら → superpowers:brainstorming / writing-plans(設計と実装計画へ)。論点整理 md を brainstorming の入力として渡す
-- **軽い壁打ちで設計書を作って実装まで進める前提**なら、本スキルを経由せず最初から superpowers:brainstorming でよい。本スキルは「前提を疑う・論点を散らかった状態から整理する・批判的に深掘りする」に特化している
-- 書き方・構成の推敲観点は `deck-outline/references/writing-principles.md` の原則 11 点と整合させる
+- 壁打ちの結論が「実装する」なら → brainstorming / writing-plans(設計と実装計画へ)。論点整理 md を brainstorming の入力として渡す
+- **軽い壁打ちで設計書を作って実装まで進める前提**なら、本スキルを経由せず最初から brainstorming でよい。本スキルは「前提を疑う・論点を散らかった状態から整理する・批判的に深掘りする」に特化している
+- 書き方・構成の推敲観点は `deck-outline/references/writing-principles.md` の原則と整合させる

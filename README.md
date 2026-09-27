@@ -85,7 +85,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 **設計・実装レーン**:
 
 ```
-軽い壁打ちなら最初から superpowers:brainstorming → docs/superpowers/specs/ に設計書 → writing-plans → 実装
+軽い壁打ちなら最初から brainstorming → docs/superpowers/specs/ に設計書 → writing-plans → 実装
 深掘りが要るときは grill-me（論点整理 md）→ brainstorming に接続
 ```
 
