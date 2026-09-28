@@ -49,7 +49,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [article-pipeline](./article-pipeline/SKILL.md) | note・Zenn 記事を企画→公開準備の 7 フェーズで伴走する。`writing-articles` リポジトリ専用 |
 | [empirical-prompt-tuning](./empirical-prompt-tuning/SKILL.md) | skill やプロンプトを実行者に実際に動かして両面評価（成功・失敗）で反復改善する。新規 skill を数回実戦投入したらこれで改善する |
 | [daily-log](./daily-log/SKILL.md) | 当日の Claude Code / Codex / Linear 活動を `~/Daily/` に保存する。launchd の plist はマシン固有の絶対パスを含むため移植時は要書き換え |
-| [worklog](./worklog/SKILL.md) | Claude Code / Codex のログからプロジェクト・案件ごとの稼働時間をバーで見せ、作業内容を要約する。数字は `worklog` CLI(`~/Developer/project-manager`)が出し、skill は素材を読んで要約・稼働報告の下書きを書く |
+| [worklog](./worklog/SKILL.md) | Claude Code / Codex のログからプロジェクト・案件ごとの稼働時間をバーで見せ、作業内容を要約する。数字は `worklog` CLI(`~/Developer/claude-worklog`、GitHub Kyo1M/claude-worklog)が出し、skill は素材を読んで要約・稼働報告の下書きを書く |
 | [continova-business-card](./continova-business-card/SKILL.md) | continova 名刺を HTML → Chrome PDF で出力する。continova-hp プロジェクト専用 |
 
 ## リポジトリ管理の業務・案件スキル（場所だけ記す）
