@@ -71,7 +71,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 ## claude.ai 専用
 
-なし。2026-09-29 の点検で、自作 7 件（brutal-advisor、hypothesis-map、html-slide-deck、kpi-structure、meeting-minutes、note-writing-assistant、project-overview）が claude.ai 側で有効のまま `synced/` に同期されていたため、claude.ai での無効化を依頼中（TODO: 無効化後に `--check` の duplicate がゼロになったことを確認する）。ローカルに無かった 3 件の控えは `archive/claude-ai-skills/`。
+なし。自作 7 件（brutal-advisor、hypothesis-map、html-slide-deck、kpi-structure、meeting-minutes、note-writing-assistant、project-overview）は claude.ai 側で無効化済み（2026-09-29、`synced/` から消えたことを `--check` で確認）。ローカルに無かった 3 件の控えは `archive/claude-ai-skills/`。
 
 ## スキル間の使い分け（2 レーン）
 
