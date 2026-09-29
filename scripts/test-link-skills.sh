@@ -39,6 +39,15 @@ echo "$out" | grep -q 'duplicate.*alpha'   || fail "同名の別実体 未検出
 echo "$out" | grep -q 'readme.*delta'      || fail "README 漏れ 未検出: $out"
 echo "$out" | grep -q 'gamma' && fail "repo の symlink 対を重複と誤検出: $out"
 
+# 3b. check: claude.ai から同期された同名 skill（~/.claude/skills/synced/<bucket>/<name>）を検出する
+mkdir -p "$CLAUDE_SKILLS_DIR/synced/bucket1/beta" "$CLAUDE_SKILLS_DIR/synced/bucket1/docs"
+echo y > "$CLAUDE_SKILLS_DIR/synced/bucket1/beta/SKILL.md"; echo y > "$CLAUDE_SKILLS_DIR/synced/bucket1/docs/SKILL.md"
+out="$("$HERE/link-skills.sh" --check 2>&1)" && fail "同期された同名 skill で --check が 0"
+echo "$out" | grep -q 'duplicate.*beta' || fail "同期された同名 skill 未検出: $out"
+echo "$out" | grep -q 'claude.ai' || fail "同期元の案内なし: $out"
+echo "$out" | grep -q 'duplicate.*docs' && fail "同名でない同期 skill を誤検出: $out"
+rm -rf "$CLAUDE_SKILLS_DIR/synced"
+
 # 4. link: 既存の実体ディレクトリは上書きしない
 mkdir -p "$CLAUDE_SKILLS_DIR/delta"; echo z > "$CLAUDE_SKILLS_DIR/delta/SKILL.md"
 out="$("$HERE/link-skills.sh" 2>&1)" || true

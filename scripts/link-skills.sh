@@ -2,6 +2,7 @@
 # Skills 直下のスキルを ~/.claude/skills と ~/.agents/skills に symlink で配る。
 #   link-skills.sh          symlink を張る（既存の実体は上書きせず skip として報告）
 #   link-skills.sh --check  壊れた symlink / 未配置 / 同名の別実体 / README 管理表との食い違いを報告し、あれば exit 1
+#                           同名の別実体には claude.ai から同期された skill（~/.claude/skills/synced/<bucket>/<name>）も含める
 # 置き場は環境変数で差し替え可: SKILLS_DIR CLAUDE_SKILLS_DIR AGENTS_SKILLS_DIR CODEX_SKILLS_DIR REPO_DIR
 set -euo pipefail
 
@@ -64,9 +65,9 @@ do_check() {
       fi
     done
   done
-  # 3. 同名が別の実体を指す（symlink 対は同一実体なので対象外）
+  # 3. 同名が別の実体を指す（symlink 対は同一実体なので対象外）。claude.ai の同期先も含める
   local tmp; tmp="$(mktemp)"
-  for target in "$CLAUDE_SKILLS_DIR" "$AGENTS_SKILLS_DIR" "$CODEX_SKILLS_DIR" "$REPO_DIR/.claude/skills" "$REPO_DIR/.agents/skills" "$REPO_DIR/.codex/skills"; do
+  for target in "$CLAUDE_SKILLS_DIR" "$AGENTS_SKILLS_DIR" "$CODEX_SKILLS_DIR" "$REPO_DIR/.claude/skills" "$REPO_DIR/.agents/skills" "$REPO_DIR/.codex/skills" "$CLAUDE_SKILLS_DIR"/synced/*; do
     [ -d "$target" ] || continue
     for l in "$target"/*/; do
       [ -e "$l" ] || continue
@@ -79,7 +80,7 @@ do_check() {
   for name in $(cut -f1 "$tmp" | sort -u); do
     if [ "$(grep "^$name$TAB" "$tmp" | cut -f2 | sort -u | wc -l | tr -d ' ')" -gt 1 ]; then
       echo "duplicate $name が別々の実体で複数の置き場にある:"
-      grep "^$name$TAB" "$tmp" | awk -F'\t' '{print "           " $3 " -> " $2}'
+      grep "^$name$TAB" "$tmp" | awk -F'\t' '{note = ($3 ~ /\/synced\//) ? "（claude.ai から同期。claude.ai 側で無効化する）" : ""; print "           " $3 " -> " $2 note}'
       findings=$((findings+1))
     fi
   done
