@@ -13,8 +13,9 @@
 
 - Claude Code は `~/.claude/skills/`、Codex は `~/.agents/skills/` を読む。どちらにも実体を置かず、`scripts/link-skills.sh` が張る symlink だけを置く。`~/.codex/skills/` は Codex 側で非推奨なので使わない。
 - 同じ名前の skill は 1 つの実装だけ。リポジトリごとの違いは、そのリポジトリの CLAUDE.md / AGENTS.md に書き、skill が規約として読む。
-- claude.ai には自作 skill を置かない。スマホや Chrome から使いたい skill が出たら、このリポジトリの正本を上げ直し、下の「claude.ai 専用」に記す。
+- claude.ai には自作 skill を置かない。claude.ai で有効な skill は `~/.claude/skills/synced/` に同期され、Claude Code に `anthropic-skills:<name>` として見える（Anthropic 製の docx・pptx 等もここに入る）。自作を上げると同名の別実体になるので、スマホや Chrome から使いたい skill が出たら、このリポジトリの正本を上げ直したうえで下の「claude.ai 専用」に記す。
 - skill が見えないときは symlink 切れを疑う: `scripts/link-skills.sh --check`
+- 使わなくなった skill は `archive/` へ `git mv` する（symlink の対象外。退避理由は `archive/README.md`）。
 
 ## 新規スキル追加手順
 
@@ -29,12 +30,13 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 ## 定期点検
 
-月初の weekly-review の前に `scripts/link-skills.sh --check` を 1 回走らせ、壊れたリンク・未配置・同名の別実体・管理表との食い違いをゼロにする。
+月初の weekly-review の前に `scripts/link-skills.sh --check` を 1 回走らせ、壊れたリンク・未配置・同名の別実体（claude.ai から同期された同名 skill を含む）・管理表との食い違いをゼロにする。
 
 ## 管理対象スキル（Skills リポジトリ管理）
 
 | skill | 説明 |
 |-------|------|
+| [brutal-advisor](./brutal-advisor/SKILL.md) | 事業案・計画・意思決定への率直な批判的フィードバック。事実・推論・未確認を分け、弱い前提と改善の優先順位を根拠付きで一度に返す（往復の壁打ちと論点整理 md は grill-me） |
 | [grill-me](./grill-me/SKILL.md) | 批判的壁打ち。前提を疑い・論点ツリーを整理し・ヌケモレと反証を指摘する。アイデア壁打ちモードとプラン精査モードの 2 モード。終了時に論点整理 md を残す |
 | [brainstorming](./brainstorming/SKILL.md) | 対話で要件と設計を固め、`docs/superpowers/specs/` に設計書を書いて writing-plans へ渡す。superpowers 6.4.1（MIT、Jesse Vincent）から取り込み、他の superpowers skill への参照を外した |
 | [writing-plans](./writing-plans/SKILL.md) | 設計書から実装計画を作り、実行方法（サブエージェント／このセッション）を選んでもらう。superpowers 6.4.1（MIT）から取り込み |
@@ -45,18 +47,16 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [gemini-ja-proofread](./gemini-ja-proofread/SKILL.md) | Gemini API で日本語の校正案を作り、ユーザーの文章ルール（`references/preferences.md`）を適用して差分を確認する。`scripts/review.py` |
 | [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記と会議で報告された着手・完了の反映・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う（ID・状態・確認項目はガイドに従う。GitHub Issue 連携を定める repo では前回からの進捗とタスク登録の下書きも。Issue は読むだけ、`references/github-issue-sync.md`）。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
 | [table-definition](./table-definition/SKILL.md) | 規約駆動のテーブル定義整理。定義書（Excel・DDL・ヘッダ）や口頭説明から 1 論理テーブル 1 YAML（粒度・キー・列・関係・注意点）と wiki「データ」表を作る。置き場が無い repo では `docs/tables/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/table-schema.md` |
-| [spec-to-readable-html](./spec-to-readable-html/SKILL.md) | 仕様書 Markdown を要約・図解つきの可読 HTML に変換する |
-| [article-pipeline](./article-pipeline/SKILL.md) | note・Zenn 記事を企画→公開準備の 7 フェーズで伴走する。`writing-articles` リポジトリ専用 |
-| [empirical-prompt-tuning](./empirical-prompt-tuning/SKILL.md) | skill やプロンプトを実行者に実際に動かして両面評価（成功・失敗）で反復改善する。新規 skill を数回実戦投入したらこれで改善する |
 | [daily-log](./daily-log/SKILL.md) | 当日の Claude Code / Codex / Linear 活動を `~/Daily/` に保存する。launchd の plist はマシン固有の絶対パスを含むため移植時は要書き換え |
 | [worklog](./worklog/SKILL.md) | Claude Code / Codex のログからプロジェクト・案件ごとの稼働時間をバーで見せ、作業内容を要約する。数字は `worklog` CLI(`~/Developer/claude-worklog`、GitHub Kyo1M/claude-worklog)が出し、skill は素材を読んで要約・稼働報告の下書きを書く |
-| [continova-business-card](./continova-business-card/SKILL.md) | continova 名刺を HTML → Chrome PDF で出力する。continova-hp プロジェクト専用 |
 
 ## リポジトリ管理の業務・案件スキル（場所だけ記す）
 
 | リポジトリ | 場所 | skill |
 |---|---|---|
-| kyo1M-business | `.agents/skills/`（実体、git 管理）。`.claude/skills/` は symlink | brutal-advisor, business-planning, contact-profile-drafter, document-drafter, git-commit, hypothesis-map, interview-prep-drafter, project-update-from-meetings, weekly-review |
+| kyo1M-business | `.agents/skills/`（実体、git 管理）。`.claude/skills/` は symlink | business-planning, contact-profile-drafter, document-drafter, git-commit, hypothesis-map, interview-prep-drafter, project-update-from-meetings, weekly-review |
+| writing-articles | 同上 | article-pipeline（note・Zenn 記事の企画→公開準備） |
+| continova-hp | 同上 | continova-business-card（名刺を HTML → Chrome PDF で出力） |
 | vaccinechoice_HH | `.agents/skills/`（実体、git 管理外）。`.claude/skills/` は symlink | vac-gdocs-report, vac-linear-plan, vac-linear-update, vac-minutes, vac-nb, vac-report, vac-report-html, vac-understand |
 
 ## 第三者製（管理外。場所と出所だけ記す）
@@ -71,7 +71,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 ## claude.ai 専用
 
-なし（2026-09-18 に自作 7 件を無効化。ローカルに無かった 3 件は `archive/claude-ai-skills/` に退避）。
+なし。2026-09-29 の点検で、自作 7 件（brutal-advisor、hypothesis-map、html-slide-deck、kpi-structure、meeting-minutes、note-writing-assistant、project-overview）が claude.ai 側で有効のまま `synced/` に同期されていたため、claude.ai での無効化を依頼中（TODO: 無効化後に `--check` の duplicate がゼロになったことを確認する）。ローカルに無かった 3 件の控えは `archive/claude-ai-skills/`。
 
 ## スキル間の使い分け（2 レーン）
 
@@ -88,6 +88,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 ```
 軽い壁打ちなら最初から brainstorming → docs/superpowers/specs/ に設計書 → writing-plans → 実装
 深掘りが要るときは grill-me（論点整理 md）→ brainstorming に接続
+一度で率直な評価だけ欲しいときは brutal-advisor
 ```
 
 書き方原則の正本は `deck-outline/references/writing-principles.md`（ルールと理由）。原則ごとの実例と経緯は `deck-outline/references/tone-examples.md`。要約はグローバル `~/.claude/CLAUDE.md` に常設。新しい書き方フィードバックは 3 か所に反映する。
