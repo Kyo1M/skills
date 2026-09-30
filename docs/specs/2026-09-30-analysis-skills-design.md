@@ -61,9 +61,11 @@ analysis-notebook ─→ analysis-report ─→ docx-export
 ```
 analysis-notebook/
 ├── SKILL.md
-└── references/
-    ├── marimo.md     既定の形式
-    └── jupytext.md   スクリプトを書いて notebook に変換する形式
+├── references/
+│   ├── marimo.md     既定の形式
+│   └── jupytext.md   スクリプトを書いて notebook に変換する形式
+└── scripts/
+    └── read_session.py   marimo の session の出力（JSON）を、セルごとの文字・表・図の要約・エラーで出す
 ```
 
 ### 3.2 SKILL.md に書くこと（vac-nb の形式に依らない部分）

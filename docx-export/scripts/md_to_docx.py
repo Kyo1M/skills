@@ -8,7 +8,7 @@
         docx を作り、見出し・表・画像の数を md と照合する
 
 - frontmatter は消す（Doc の表題が二重になるため）
-- 画像は `![cap](path)`（md のフォルダ基準）と `[FIG] path`（--root 基準、既定は md のフォルダ）の 2 形式を読む
+- 画像は `![cap](path)`（md のフォルダ基準）と `[FIG] path`（--root 基準、既定は git の root、git でなければ md のフォルダ）の 2 形式を読む
 - 表には罫線を直接付ける（--no-borders で付けない）
 - 照合で数が合わなければ終了コード 1
 - pandoc が要る（brew install pandoc）
@@ -32,6 +32,14 @@ TABLE_SEPARATOR = re.compile(r"^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$", 
 
 def strip_code_blocks(text: str) -> str:
     return re.sub(r"^```.*?^```", "", text, flags=re.S | re.M)
+
+
+def git_root(directory: Path) -> Path:
+    """[FIG] の基準。git のリポジトリなら root、そうでなければ md のフォルダ"""
+    result = subprocess.run(
+        ["git", "-C", str(directory), "rev-parse", "--show-toplevel"], capture_output=True, text=True
+    )
+    return Path(result.stdout.strip()) if result.returncode == 0 else directory
 
 
 def find_images(text: str, md_dir: Path, root: Path):
@@ -106,7 +114,7 @@ def main() -> int:
         print(f"md がありません: {md_path}", file=sys.stderr)
         return 2
     text = FRONTMATTER.sub("", md_path.read_text(), count=1)
-    root = Path(args.root).resolve() if args.root else md_path.parent
+    root = Path(args.root).resolve() if args.root else git_root(md_path.parent)
     images = find_images(text, md_path.parent, root)
 
     if args.list or not args.out:
