@@ -1,7 +1,7 @@
 # 分析用の共通 skill 設計書
 
 - 日付: 2026-09-30
-- ステータス: 設計の合意済み（brainstorming で論点ごとに合意し、AI レビュー 2 件の指摘を反映）。本設計書の確認待ち
+- ステータス: 承認済み（brainstorming で論点ごとに合意し、AI レビュー 2 件の指摘を反映）。実装中に、Google への自動アップロードをやめ gdocs-publish を docx-export に変えた（6 章）
 - 対象: ワクチン分析の vac-nb・vac-report・vac-understand・vac-gdocs-report をもとに、どのリポジトリでも使える分析用の skill を `~/Developer/Skills` に作る。あわせてコテラスの分析（`~/Developer/coterrace-context`、台帳 T-27）を共通の skill に合わせる
 - 対象外: vaccinechoice_HH の vac-* の変更・置き換え（AGENTS.md に使い分けの 1 行を足すだけ）、HTML・PDF のレポート（vac-report-html の共通化）、MCMC の収束診断
 
@@ -12,23 +12,22 @@
 | レポートの出し先 | リポジトリの md が正本。Google Docs は共有のための写し | ワクチン分析の流れと、コテラスの「正本と転写先の同期ルール」に合う |
 | HTML のレポート | 作らない。vac-report-html は共通にしない | レポートは Google Docs で渡せれば足りる |
 | ワクチン分析の vac-* | 今のまま使う（置き換えない）。README の vaccinechoice_HH の行も変えない。vaccinechoice_HH の AGENTS.md に「この repo では vac-* を使う」と 1 行足す | 固有の分析環境（Julia・Docker）の専用の skill として成り立っている。共通の skill と同じ頼み方に反応し得るので、repo 側で使い分けを書く |
-| skill の数と名前 | 4 つ: `analysis-notebook`・`analysis-report`・`understand`・`gdocs-publish` | レポートだけ作り直す・分析以外の md を Google Docs にする、を別々に呼べる |
+| skill の数と名前 | 4 つ: `analysis-notebook`・`analysis-report`・`understand`・`docx-export` | レポートだけ作り直す・分析以外の md を docx にする、を別々に呼べる |
 | MCMC の収束診断 | 共通の skill に持たせない（vac-nb の `references/mcmc-convergence.md` に残す） | ワクチン分析でしか使っていない。他で要るようになったら足す |
 | レポートの読み手 | 読み手の型を 2 つ持つ（クライアント向け・研究者向け）。どちらを使うかは規約で選ぶ | コテラスはクライアント（山永さん、その先の AP の役員）、ワクチン分析は共同研究者で、書き方が違う |
 | notebook の形式 | 規約で指定。指定が無ければ marimo | marimo は notebook がそのまま `.py` で、変換・同期が要らない |
-| Google Docs への画像の入れ方 | md → docx（pandoc、画像を埋め込む）→ `gog drive upload --convert`。試してだめなら vac-gdocs-report の公開リンク方式に戻す | 公開リンク方式では、コテラスの人事データの図が「リンクを知っている全員」に見える。アクセストークンを手で作る手順も要らなくなる |
-| Google Docs を置くアカウント | 規約から読み、無ければ公開前に聞く。コテラスで使うアカウントは初めて Docs に出すときに決める | gog に登録されているのは個人の gmail.com 1 つだけ。クライアントのデータを置くかは案件ごとの判断 |
+| Google Docs への出し方 | skill は md から画像を埋め込んだ docx を作るところまで（pandoc）。Google Drive へは手でアップロードして Google ドキュメントに変換する | docx が作れれば、アップロードは手で足りる。画像を公開リンクにする方式・アカウントの選択・アクセストークンの手順が要らない。どのアカウントの Drive に置くかは、アップロードする人がその場で決める |
 | コテラスのレポートの形式 | 分析レポートは `docs/deliverables/yyyymmdd_<slug>-report.md`（`type: deliverable`）を正本にし、Google Docs に写す。スライドは今のまま `.dc.html` | コテラスの AGENTS.md は今、レポートを `-report.html`（HTML が主）としている。7.2 で直す |
 
 ## 2. 全体の構成
 
 ```
-analysis-notebook ─→ analysis-report ─→ gdocs-publish
- (問い駆動の notebook)   (md のレポート。正本)    (Google Docs に写す)
+analysis-notebook ─→ analysis-report ─→ docx-export
+ (問い駆動の notebook)   (md のレポート。正本)    (docx にする。Google Docs へは手で上げる)
           └──────────────┴─→ understand (notebook・レポート・任意の資料を teach-back で理解する)
 ```
 
-どの skill も規約駆動にする。meeting-minutes・table-definition と同じく、対象リポジトリの AGENTS.md / CLAUDE.md（とそこが指すガイド）を最初に読み、下の項目の値を決める。規約に無い項目は既定を使う。決めないと進めない項目（レポートの読み手の型、Google Docs のアカウント・公開先・共有範囲）だけ実行時に聞き、答えを AGENTS.md に足す案として出す。
+どの skill も規約駆動にする。meeting-minutes・table-definition と同じく、対象リポジトリの AGENTS.md / CLAUDE.md（とそこが指すガイド）を最初に読み、下の項目の値を決める。規約に無い項目は既定を使う。決めないと進めない項目（レポートの読み手の型）だけ実行時に聞き、答えを AGENTS.md に足す案として出す。
 
 ### 2.1 規約から読む項目
 
@@ -40,9 +39,9 @@ analysis-notebook ─→ analysis-report ─→ gdocs-publish
 | データの読み方 | notebook | 決まり無し | `load_table("<slug>")` だけ。S3 やファイルを直接読まない |
 | コードに書いてはいけない値 | notebook | ID・個人を指す値はコードに書かない | 実際の値（店舗名・ID・特定店舗の絞り込み条件）を書かない |
 | notebook の説明文に書いてよい数値 | notebook | 集計した値を書く（個人の値は書かない） | 集計した値だけ。計算した値を `mo.md(f"…")` で差し込む |
-| 個人の行・自由記述の原文 | notebook・report・understand・gdocs-publish | notebook の出力では展開してよい。notebook の外（説明文・レポート・explainer・図・メモ）には出さない | 既定と同じ（外に出すときは分類などに言い換える） |
-| 人数の少ない集計値 | report・understand・gdocs-publish | 個人が推測できる少人数の区分（目安 5 人未満）はレポートに出す前に確かめる | 7.2 で決める |
-| 外に出してよいかの確認 | report・understand・gdocs-publish | レポート・explainer・図を書くとき、公開する前にユーザーに確かめる | 載せてよい粒度を山永さんに確かめる。実店舗名が入る結果は近内さんの判断を仰ぐ（AGENTS.md「データの扱い」「テーブル定義の型」） |
+| 個人の行・自由記述の原文 | notebook・report・understand・docx-export | notebook の出力では展開してよい。notebook の外（説明文・レポート・explainer・図・メモ）には出さない | 既定と同じ（外に出すときは分類などに言い換える） |
+| 人数の少ない集計値 | report・understand・docx-export | 個人が推測できる少人数の区分（目安 5 人未満）はレポートに出す前に確かめる | 7.2 で決める |
+| 外に出してよいかの確認 | report・understand・docx-export | レポート・explainer・図を書くとき、docx を作る前にユーザーに確かめる | 載せてよい粒度を山永さんに確かめる。実店舗名が入る結果は近内さんの判断を仰ぐ（AGENTS.md「データの扱い」「テーブル定義の型」） |
 | 図の文字の制約 | notebook | 無し | 無し（Plotly は日本語を描ける） |
 | 成果物の置き場・名前の付け方 | report・understand | レポートは `docs/reports/YYYYMMDD_<name>/`（本文と `figs/`）、explainer は `docs/explainers/YYYYMMDD_<元の名前>_explainer.md` | レポートは `docs/deliverables/yyyymmdd_<slug>-report.md`。explainer と図の置き場は 7.2 で決める（lint がファイル名を `yyyymmdd_<kebab-case>` に限る） |
 | frontmatter | report・understand | 無し | `type`・`title`・`date`・`status` が必須。`type` は lint が許す 8 種から選ぶ（レポートは `deliverable`） |
@@ -51,7 +50,7 @@ analysis-notebook ─→ analysis-report ─→ gdocs-publish
 | 他の成果物の扱い | report・understand | 上書きせず、新しい日付のファイルで並べる | 既定と同じ |
 | レポートの読み手の型 | report | 実行時に聞く | クライアント向け |
 | 共有前の理解の確認 | notebook・report・understand | understand を勧める（必須にしない） | 既定と同じ |
-| Google Docs のアカウント・公開先フォルダ・共有範囲 | gdocs-publish | 実行時に聞く | 初めて Docs に出すときに決める |
+| docx の置き場・書式の雛形 | docx-export | `~/Downloads/`（リポジトリの外）。雛形は無し（表の罫線だけ足す） | 既定と同じ |
 
 完成の目安: コテラスとワクチン分析のどちらも、この表の値を埋めれば共通の skill で動く。実際に確かめるのはコテラスだけ（vac-* は置き換えない）。
 
@@ -138,7 +137,7 @@ analysis-report/
 - 持ち出しのガード（書く前と保存の前）: 個人の行・自由記述の原文・コードに書いてはいけない値が本文・表・図に入っていないかを確かめ、入っていれば分類・集計に言い換える。人数の少ない区分と、外に出してよいかの確認は 2.1 の規約に従う
 - 図: 根拠になる図だけ。直前にどの問いに効くかを書き、目的・軸・計算の仕方・わかったことを添える。参照は `![キャプション](相対パス)` に揃える。図は notebook から png に書き出す
 - 保存: 置き場・名前・frontmatter・検査のコマンド・git は規約に従う（既定は 2.1）。他の成果物は上書きせず、新しい日付のファイルで並べる
-- 仕上げ: 共有の前に understand を勧める。Google Docs に出すなら gdocs-publish を案内する
+- 仕上げ: 共有の前に understand を勧める。docx や Google Docs で渡すなら docx-export を案内する
 - チェックリスト: vac-report のうち、どの読み手にも使える項目（要約表との一致、回答／根拠／限界、未解決の扱い、図の説明、1 論点、説明できない記述のカット、定型構造、考察が数値の再掲で終わっていないか（上位の問いへの意味・競合する説明・次の問い）、指標の定義、記号の一意性、入力と出力の母数の突合、件数の実数、外部データの正式名称、定数の出所、内部の語、付録なしで完結、進行管理の語、用語の一致、まとめが「やったこと → 結果」中心、要旨が限界も運ぶ）と、持ち出しのガード
 
 ### 4.3 references/reader-client.md
@@ -167,7 +166,7 @@ analysis-report/
 - 説明する相手の選択肢: クライアント／共同研究者／自分用／一般
 - notebook は marimo の `.py` か変換型のスクリプトを読み、出力は形式ごとの置き場から読む
 - explainer の置き場・名前・frontmatter・検査のコマンドは規約に従う（既定は 2.1）。explainer は notebook の外なので持ち出しのガードを守る
-- 関連の skill: grill-me（対話の作法）、analysis-notebook（回答検証チェックリスト）、gdocs-publish（配布）。`spec-to-readable-html` と vac-gdocs-report への案内は外す
+- 関連の skill: grill-me（対話の作法）、analysis-notebook（回答検証チェックリスト）、docx-export（配布）。`spec-to-readable-html` と vac-gdocs-report への案内は外す
 
 ### 5.3 変えないところ
 
@@ -176,39 +175,32 @@ analysis-report/
 - 理解度チェックリスト、explainer の構成（元ドキュメント・説明台本・用語と数式・想定問答・残課題）
 - ガード（原文に忠実、原文に無いことを足さない、1 セクション・1 問ずつ）
 
-## 6. gdocs-publish
+## 6. docx-export
+
+実装中の判断（2026-09-30）: docx が作れれば Google Drive へのアップロードは手で足りるので、Google への自動アップロード（`gog drive upload --convert`、公開リンク方式）はやめ、名前を gdocs-publish から docx-export に変えた。
 
 ### 6.1 ファイル
 
-`gdocs-publish/SKILL.md` だけ（手順が安定しないと分かったら `scripts/` を足す）。
+```
+docx-export/
+├── SKILL.md
+└── scripts/md_to_docx.py   画像の一覧・docx の作成・照合（標準ライブラリと pandoc）
+```
 
 ### 6.2 手順
 
-1. md を読む。無ければ中断。Doc の名前は `YYYYMMDD_<最初の # 見出し、無ければ frontmatter の title>`（日付はファイル名から、無ければ当日）
-2. 外に出してよいかを規約で確かめる（2.1 の「外に出してよいかの確認」「個人の行・自由記述の原文」「人数の少ない集計値」）。本文・表・図に出してはいけないものが無いかを見る。規約に無ければユーザーに確かめる
-3. 画像の参照を拾う（`![cap](path)` は md のフォルダから、`[FIG] path` はリポジトリの root から）。一覧（番号・キャプション・パス・存在）を出し、除外する画像を聞く
-4. 使う Google アカウント（`gog auth list` にあるもの）・公開先のフォルダ・共有範囲を規約から読むか聞く。フォルダの共有設定（`gog drive` で権限を見る）を確かめ、上げた Doc がその共有を引き継ぐことを伝える
-5. 作業用のフォルダ（scratchpad か `mktemp -d`）に md の写しを作り、frontmatter を消し（Doc の表題が二重になるため）、除外した画像の行を消し、`[FIG]` を `![cap](絶対パス)` に直す。元の md は変えない
-6. `pandoc <写し>.md -o <name>.docx --resource-path=<md のフォルダ>`（画像を docx に埋め込む）
-7. `gog drive upload <name>.docx --parent <folderId> --convert --name "<Doc の名前>" -j` で Google Docs に変換して上げる（`-a <アカウント>` で使うアカウントを指定する）
-8. 上げた Doc を照合する: 画像の数、見出しと表が崩れていないか、Doc の共有の権限（公開のリンクになっていないか）
-9. 作業用のファイルを消し、Doc の URL・入れた画像の数・除外した画像・照合の結果を報告する。ページレスにしたいときは手で切り替える（ファイル → ページ設定）と添える
+1. md を読む。無ければ中断。docx の名前は `YYYYMMDD_<最初の # 見出し、無ければ frontmatter の title>.docx`（Google ドキュメントに変換したときの文書名になる）
+2. 外に出してよいかを規約で確かめる（2.1 の「外に出してよいかの確認」「個人の行・自由記述の原文」「人数の少ない集計値」）。出してはいけないものがあれば作らずに止める
+3. 画像の参照（`![cap](path)` は md のフォルダ基準、`[FIG] path` はリポジトリの root 基準）の一覧を出し、除外する画像を聞く
+4. `md_to_docx.py` で docx を作る: 写しを一時フォルダに作り、frontmatter を消し、除外した画像を消し、`[FIG]` を画像の記法に直して、`pandoc -f gfm+implicit_figures` にかける（キャプションが図の下に付く）。表には罫線を直接付ける（pandoc の既定では罫線が無いため）。規約に reference docx があれば使う
+5. 見出し・表・画像の数を md と docx（pandoc で md に戻したもの）で照合する。不一致なら未完了として報告する
+6. docx のパスと、Google ドキュメントにする手順（Drive にアップロード →「アプリで開く」→「Google ドキュメント」）を報告する
 
-再公開（md を直した後）: 6.3 で確かめた方法に従う（既存の Doc を更新できなければ、新しい Doc を作り、URL が変わることと古い Doc の扱いを報告で伝える）。
+### 6.3 確かめたこと（2026-09-30、架空の md）
 
-エラーのときの扱い（vac-gdocs-report の表を引き継ぐ）:
-
-| 種別 | エラー | 対応 |
-|---|---|---|
-| 中断 | md が無い／docx への変換に失敗／Doc の作成に失敗／アカウントの認証が切れている | すぐに中断し、エラーと認証の手順を伝える |
-| 部分成功 | 画像の一部が Doc に入らない／表が崩れる | 完了とせず、照合の結果として何が崩れたかを報告する |
-
-### 6.3 実装の最初に確かめること
-
-- pandoc を brew で入れ、テスト用の架空の md（日本語・frontmatter・表・画像 2 枚）で上の手順を試す。画像が Doc に入るか、表と見出しが崩れないか、公開のリンクが作られないかを見る
-- 再公開: `gog drive upload --replace <fileId>` に docx を渡して、既存の Doc が変換されて更新されるかを試す（`--convert` は新規作成のときだけ使える）
-- 画像が入らない・表が崩れるなど使えない場合は、vac-gdocs-report の公開リンク方式（`gog docs write --markdown` → 画像を Drive に上げて公開 → Docs API で差し込み）に戻し、画像が公開のリンクになることを SKILL.md の冒頭と手順 2・4 の確認に書く
-- テストは個人のアカウントで、実行前にユーザーにフォルダを聞く
+- pandoc 3.11 で、日本語・frontmatter・表・画像 2 枚（`![]()` と `[FIG]`）の md から docx を作り、見出し 4・表 1・画像 2 が一致した。除外の指定も効いた。元の md は変わらなかった
+- Quick Look のプレビューで、見出し・表（罫線付き）・画像・キャプションを目で確かめた。箇条書きは docx に番号付けとして入っている（Quick Look は記号を描かない）
+- Google Drive へのアップロードと Google ドキュメントへの変換は手で行うので、skill では確かめていない
 
 ## 7. 作業の順番と完了の条件
 
@@ -216,10 +208,10 @@ analysis-report/
 
 グローバルの CLAUDE.md に従い、ファイルと完了の条件がこの設計書で決まっているので、実装計画は挟まない。
 
-1. gdocs-publish の方式を 6.3 で確かめる
-2. 4 つの skill を作る（`analysis-notebook`・`analysis-report`・`understand`・`gdocs-publish`）
+1. docx-export の変換を 6.3 のとおり確かめる
+2. 4 つの skill を作る（`analysis-notebook`・`analysis-report`・`understand`・`docx-export`）
 3. analysis-notebook の marimo の手順を、scratchpad の試験用 notebook（架空のデータ）で試す（`check --strict`、`export session --force-overwrite`、失敗したセルの検出、png の書き出し）
-4. `scripts/link-skills.sh` を実行し、README の管理表に 4 行を足す（vaccinechoice_HH の行は変えない）。スキル間の使い分けに分析のレーン（analysis-notebook → analysis-report → gdocs-publish、共有前に understand）を足す
+4. `scripts/link-skills.sh` を実行し、README の管理表に 4 行を足す（vaccinechoice_HH の行は変えない）。スキル間の使い分けに分析のレーン（analysis-notebook → analysis-report → docx-export、共有前に understand）を足す
 5. `scripts/link-skills.sh --check` で報告が 0 件になることを確かめる
 6. コミットする
 
@@ -229,7 +221,7 @@ analysis-report/
 - 4 つの skill のフォルダ全体（SKILL.md と references/）に、Julia・Docker・`BrowseTables`・ASCII の図・MCMC・`analysis_notebook_agent_guide.md`・vaccinechoice_HH のパスが残っていない（grep で確かめる）
 - 2.1 の各項目が、どの skill のどこで読まれるかを SKILL.md に書いてある
 - 試験用の notebook で、`export session` がセルの失敗を検出し、再実行で出力が更新されることを確かめた
-- gdocs-publish でテスト用の md から Doc を作り、画像が入り、表と見出しが崩れず、公開のリンクが作られないことを確かめた
+- docx-export でテスト用の md から docx を作り、画像が入り、見出し・表・画像の数が md と一致することを確かめた
 
 ### 7.2 コテラス側（T-27、別の作業）
 
@@ -245,4 +237,4 @@ T-23 のセッションが `chore/20260930-load-table-key-check` で作業中な
 
 ### 7.3 ワクチン分析側
 
-vaccinechoice_HH の AGENTS.md に「この repo の分析・レポート・理解の確認は vac-* を使う（共通の analysis-notebook・analysis-report・understand・gdocs-publish は使わない）」と 1 行足す。vac-* のフォルダは触らない。vaccinechoice_HH の git の決まりに従ってコミットする。
+vaccinechoice_HH の AGENTS.md に「この repo の分析・レポート・理解の確認は vac-* を使う（共通の analysis-notebook・analysis-report・understand・docx-export は使わない）」と 1 行足す。vac-* のフォルダは触らない。vaccinechoice_HH の git の決まりに従ってコミットする。
