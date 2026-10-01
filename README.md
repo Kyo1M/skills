@@ -47,7 +47,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 共有・説明の前に understand（teach-back と explainer）
 ```
 
-vaccinechoice_HH は専用の vac-* を使う（同 repo の AGENTS.md）。
+vaccinechoice_HH は専用の vac-* を使う（同 repo の `ops/AGENTS.md`）。
 
 書き方原則の正本は `deck-outline/references/writing-principles.md` |
 | [html-slide-deck](./html-slide-deck/SKILL.md) | 事業用スライド DS（白地・明朝タイトル・Klein Blue、1920×1080）で `.dc.html`（deck-stage・Claude Design 互換）を生成。20 型・アイコン対応表・機械チェック・セルフレビュー。deck-outline の構成 md を入力に Phase 3 から。ルール正本は `html-slide-deck/references/design-system.md`。旧 continova v1 は `references/legacy/` |

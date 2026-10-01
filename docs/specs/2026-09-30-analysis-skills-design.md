@@ -229,7 +229,7 @@ docx-export/
 
 T-23 のセッションが `chore/20260930-load-table-key-check` で作業中なので、T-23 のマージを取り込んでから、worktree か別のセッションで行う。コテラスの Git の決まり（push しない、ブランチを切る、`npm run lint --prefix scripts`、コミットメッセージの案を見せる、ローカルで `main` にマージしてブランチを消す）に従う。
 
-1. AGENTS.md「データの扱い」を 2026-09-30 の決定に合わせて直す（今は「notebook の説明文に結果の数値を書かない」が残り、個人の行を出力で見てよいことも書かれていない）。`analysis/notebooks/template.py` と `analysis/README.md` の同じ文も直す
+1. ~~AGENTS.md「データの扱い」を 2026-09-30 の決定に合わせて直す~~（コテラスの main の `7049bcc` で反映済み。`template.py` も同じ）
 2. AGENTS.md のレポートの形式を直す（ディレクトリ構造・置き場の表・「クライアント説明資料作成」で `-report.html` としている行を、分析レポートは `-report.md` を正本にして Google Docs に写す、に変える）
 3. 2.1 のコテラスの値を AGENTS.md に書く（「データの扱い」と重ねず、参照で済むところは参照にする）。あわせて決める: explainer の置き場と名前（lint の `type` と名前の形に合わせる）、図の置き場と commit する時点（png は `.gitignore` の対象外なので、載せてよい粒度を確かめる前に commit されないようにする）、人数の少ない集計値の扱い
 4. `template.py` と `data_coverage.py` を analysis-notebook に合わせ、`marimo export session --force-overwrite` で最後まで動くことと回答検証チェックリストを確かめる
@@ -237,6 +237,8 @@ T-23 のセッションが `chore/20260930-load-table-key-check` で作業中な
 6. T-11（分析用テンプレートの切り出し、期限 11 月末）との重なりを確かめる
 7. `tasks/index.md` の T-27 を完了の節へ移す（完了日を書く）
 
-### 7.3 ワクチン分析側
+コテラス側でやることの控えは、コテラスの `tasks/20261001_analysis-skills-alignment.md`（T-27 のタスクファイル）に置く。
 
-vaccinechoice_HH の AGENTS.md に「この repo の分析・レポート・理解の確認は vac-* を使う（共通の analysis-notebook・analysis-report・understand・docx-export は使わない）」と 1 行足す。vac-* のフォルダは触らない。vaccinechoice_HH の git の決まりに従ってコミットする。
+### 7.3 ワクチン分析側（済み）
+
+skill の使い分けは、共有の AGENTS.md ではなく個人用の `ops/AGENTS.md`（private の Kyo1M/vaccinechoice-ops）に書かれているので、そこに「この研究の分析・レポート・理解の確認は vac-* を使い、共通の分析 skill は使わない」と 1 行足した（ops の `52529a1`、2026-10-01）。vac-* のフォルダは触っていない。
