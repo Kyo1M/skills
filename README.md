@@ -43,7 +43,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。**分析レーン**:
 
 ```
-(問いが固まっていなければ) grill-me → analysis-notebook（問い駆動の notebook） → analysis-report（md のレポート） → docx-export（docx。Google Docs へは手で上げる）
+(問いが固まっていなければ) grill-me → analysis-plan（目的・指標・現状把握・仮説検証の計画） → analysis-notebook（問い駆動の notebook） → analysis-report（md のレポート） → docx-export（docx。Google Docs へは手で上げる）
 共有・説明の前に understand（teach-back と explainer）
 ```
 
@@ -56,6 +56,7 @@ vaccinechoice_HH は専用の vac-* を使う（同 repo の `ops/AGENTS.md`）�
 | [gemini-ja-proofread](./gemini-ja-proofread/SKILL.md) | Gemini API で日本語の校正案を作り、ユーザーの文章ルール（`references/preferences.md`）を適用して差分を確認する。`scripts/review.py` |
 | [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記と会議で報告された着手・完了の反映・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う（ID・状態・確認項目はガイドに従う。GitHub Issue 連携を定める repo では前回からの進捗とタスク登録の下書きも。Issue は読むだけ、`references/github-issue-sync.md`）。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
 | [table-definition](./table-definition/SKILL.md) | 規約駆動のテーブル定義整理。定義書（Excel・DDL・ヘッダ）や口頭説明から 1 論理テーブル 1 YAML（粒度・キー・列・関係・注意点）と wiki「データ」表を作る。置き場が無い repo では `docs/tables/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/table-schema.md` |
+| [analysis-plan](./analysis-plan/SKILL.md) | 規約駆動の分析計画。仮説を並べる前に、目的（誰のどの判断に使うか）→ 指標の定義 → 指標ごとの現状把握（概要・具体例・推移・関係。結論は出さない）→ 目的ごとの仮説検証（検証方法の種類と、当たったら・外れたらで変わること）の順で計画 md を組む。計画の行が analysis-notebook の問いになる。雛形は `references/plan-template.md` |
 | [analysis-notebook](./analysis-notebook/SKILL.md) | 規約駆動の問い駆動の分析 notebook。問い定義 → 最小分析設計 → 実装 → 実行・検証 → 結論要約で、各問いに回答／根拠／確度／限界／次アクションを置く。形式は規約で選び、既定は marimo（`references/marimo.md`・`references/jupytext.md`）。marimo の出力は `scripts/read_session.py` で読む |
 | [analysis-report](./analysis-report/SKILL.md) | 規約駆動の分析レポート（md が正本）。notebook のまとめ表と回答を一次ソースにし、答えていないことを補わない。読み手の型はクライアント向け・研究者向け（`references/reader-*.md`）。notebook の外に出してよい範囲を規約で確かめる |
 | [understand](./understand/SKILL.md) | 完成した資料・分析を、ユーザーが説明できるところまで対話で理解させる。質問と想定回答の組の teach-back で確かめ、説明台本・用語と数式・FAQ を explainer として残す。共有前の理解の確認にも使う |
