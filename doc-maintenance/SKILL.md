@@ -33,7 +33,7 @@ description: リポジトリのドキュメントを定期的に点検し、古�
 **節もスクリプトも無いリポジトリ**では、次を入れる案をまとめて 1 回で出し、承認後に入れる。
 
 - `scripts/check_docs.py`：このスキルの `scripts/check_docs.py` の写し（先頭の docstring に正本の場所が書いてある）
-- `scripts/check_docs.toml`：`references/config-example.toml` をもとに、そのリポジトリの置き場に合わせる。`targets` は中身が変わり続ける文書（README・運用ガイド・wiki・共有物・計画）だけにし、その時点の記録（議事録・メモ・決定）は入れない
+- `scripts/check_docs.toml`：`references/config-example.toml` をもとに、そのリポジトリの置き場に合わせる。`targets` は中身が変わり続ける文書（README・運用ガイド・wiki・共有物・計画）だけにし、その時点の記録（議事録・メモ・決定）は入れない。例として書いたリンクは `ignore_links` で外す（`<slug>` や `{{...}}` を含む仮のリンクは書かなくても見ない）。一覧の照合でファイル名の末尾を外す（`.prompt.md` など）ときは `inventory` に `strip` を書く
 - `AGENTS.md` の「ドキュメントの点検」の節：`references/agents-section.md` の雛形
 - frontmatter の型に `reviewed` を足す（規約に frontmatter の型や lint があれば、そこにも足す）
 
