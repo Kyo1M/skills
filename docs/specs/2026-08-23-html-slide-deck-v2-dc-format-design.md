@@ -1,7 +1,7 @@
 # html-slide-deck v2 — 事業用スライド DS（C案 Editorial）への載せ替えと `.dc.html` 出力 設計書
 
 - 日付: 2026-08-23
-- 対象: `~/Developer/Skills/html-slide-deck`（その場で v2 化）、周辺 skill（deck-outline / deck-critique）、利用リポジトリの規約（dxb-data-ai-workflow-context の AGENTS.md / lint）、Claude Design プロジェクトの CLAUDE.md
+- 対象: `~/Developer/Skills/html-slide-deck`（その場で v2 化）、周辺 skill（deck-outline / deck-critique）、利用リポジトリの規約（利用リポジトリ（クライアント案件の context） の AGENTS.md / lint）、Claude Design プロジェクトの CLAUDE.md
 - 経緯: brainstorming（2026-08-23）。Claude Design で育てた「事業用スライド デザインシステム」（export: `~/Downloads/事業用スライドテンプレート作成/`）を正本にして、HTML 作成を Claude Code 側に戻す。pptx 化は Claude Design に持ち込む
 
 ---
@@ -35,7 +35,7 @@
 **スコープ**
 - `html-slide-deck` の SKILL・references・assets を v2 に差し替える
 - `deck-outline` / `deck-critique` / writing-principles / グローバル CLAUDE.md の整合更新
-- dxb-data-ai-workflow-context の AGENTS.md・lint の出力規約更新（`.dc.html`・runtime JS の置き場）
+- 利用リポジトリ（クライアント案件の context） の AGENTS.md・lint の出力規約更新（`.dc.html`・runtime JS の置き場）
 - Claude Design に貼る制作ルール文の生成
 - spike（8/27 S1〜S3 の `.dc.html` 化 → Claude Design 持ち込み確認）
 
@@ -206,7 +206,7 @@ html-slide-deck/
 | `deck-outline/references/writing-principles.md` | 原則 8（リード文）・原則 15（守りの理屈の置き場）を D5/D8 に合わせて改訂。`──` 禁止と見出し付き箇条書きの代替を追加 |
 | グローバル `~/.claude/CLAUDE.md` 書き方原則 | 8・15 の文言を同じく改訂。資料作成フローの記述を「deck-outline → html-slide-deck（.dc.html）→ deck-critique →（pptx は Claude Design）」に |
 | `deck-critique/SKILL.md` | 批評観点に `──`・アイコン密度と置き場所・構成 md からの脱落・発表者ノートの残存を追加 |
-| dxb-data-ai-workflow-context `AGENTS.md` | §5 クライアント説明資料作成: 出力 `docs/deliverables/yyyymmdd_<slug>.dc.html`、runtime JS 2 本を `docs/deliverables/` 直下に置く、ローカル表示は http 経由、pptx は Claude Design。§8 定例準備フロー: 構成 md → html-slide-deck → deck-critique → pptx の導線 |
+| 利用リポジトリ（クライアント案件の context） `AGENTS.md` | §5 クライアント説明資料作成: 出力 `docs/deliverables/yyyymmdd_<slug>.dc.html`、runtime JS 2 本を `docs/deliverables/` 直下に置く、ローカル表示は http 経由、pptx は Claude Design。§8 定例準備フロー: 構成 md → html-slide-deck → deck-critique → pptx の導線 |
 | 同 `scripts/lint-frontmatter.ts` | `FILENAME_RE` の拡張子に `dc\.html` を許可。`.js` は対象外のまま |
 | Claude Design プロジェクト `CLAUDE.md` | `references/claude-design-rules.md` の内容で置き換え（貼るのはユーザー）。既存の「コピー」節（8/23 指示）を削除し、D5〜D11 を反映 |
 | Skills リポジトリ `README.md` | 管理表の html-slide-deck 行を v2 の説明に |

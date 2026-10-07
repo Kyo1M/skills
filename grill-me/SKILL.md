@@ -53,7 +53,7 @@ description: アイデア・プラン・構想を批判的に壁打ちするス�
 - 開いている論点(なぜ開いているか・次に何が要るか)
 - 次のアクション
 
-保存先はリポジトリ規約に従う: その repo の `CLAUDE.md` / `AGENTS.md` から出力先・命名・frontmatter を読み取って適応する(例: dxb-data-ai-workflow-context なら `docs/explorations/`)。規約が無ければ会話内提示か `docs/` 直下にフォールバック。
+保存先はリポジトリ規約に従う: その repo の `CLAUDE.md` / `AGENTS.md` から出力先・命名・frontmatter を読み取って適応する(例: 壁打ちの置き場が `docs/explorations/` と決まっている repo ならそこ)。規約が無ければ会話内提示か `docs/` 直下にフォールバック。
 
 ## 他スキルとの連携
 
