@@ -1,0 +1,27 @@
+# ドキュメントの点検の設定の例（scripts/check_docs.py が読む）。置き場はリポジトリに合わせて直す
+
+# 古くなっていないか・draft のままか・related が置き換え済みを指していないかを見る文書（glob）。
+# 中身が変わり続ける文書だけにする（議事録・メモ・決定のような、その時点の記録は入れない）。
+# frontmatter の derived_from・related に挙げた元のファイルが、文書より後に更新されると知らせる
+targets = ["docs/wiki/*.md", "docs/guide/*.md", "docs/deliverables/*.md"]
+
+# リンクの切れを見る文書（glob）
+link_targets = ["*.md", "docs/**/*.md"]
+
+# 点検しない文書（glob。targets・link_targets の両方から外す）
+exclude = []
+
+# draft のまま何日で知らせるか
+draft_days = 30
+
+# 確かめた日を持つ項目（YAML などの key: "YYYY-MM-DD"）が何日で古いか。要らなければ消す
+[[dated]]
+paths = ["docs/tables/*.yaml"]
+keys = ["values_asof"]
+days = 60
+
+# 置き場のファイルが、一覧の文書に名前で載っているか。要らなければ消す
+[[inventory]]
+files = "docs/guide/*.md"
+exclude = []
+listed_in = "README.md"
