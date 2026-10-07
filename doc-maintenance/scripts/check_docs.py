@@ -41,7 +41,8 @@ except ModuleNotFoundError:  # Python 3.10 以前
 
 CLOSED_STATUSES = {"superseded", "done", "cancelled"}
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-FENCE = re.compile(r"^(```|~~~).*?^\1", re.S | re.M)
+FENCE = re.compile(r"^[ \t]*(```|~~~).*?^[ \t]*\1", re.S | re.M)
+HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 INLINE_CODE = re.compile(r"`[^`\n]*`")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
@@ -190,8 +191,8 @@ def resolve(repo: Repo, doc: Path, target: str) -> Path | None:
 
 
 def body_links(text: str) -> list[str]:
-    """本文の Markdown の相対リンク（HTML の href は見ない）。"""
-    body = INLINE_CODE.sub("", FENCE.sub("", body_of(text)))
+    """本文の Markdown の相対リンク。コードブロック・インラインのコード・HTML コメントの中（例として書いたリンク）と、HTML の href は見ない。"""
+    body = INLINE_CODE.sub("", FENCE.sub("", HTML_COMMENT.sub("", body_of(text))))
     links = []
     for m in LINK.finditer(body):
         target = m.group(1)
