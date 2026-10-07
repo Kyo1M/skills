@@ -61,7 +61,6 @@ vaccinechoice_HH は専用の vac-* を使う（同 repo の `ops/AGENTS.md`）�
 | [analysis-report](./analysis-report/SKILL.md) | 規約駆動の分析レポート（md が正本）。notebook のまとめ表と回答を一次ソースにし、答えていないことを補わない。読み手の型はクライアント向け・研究者向け（`references/reader-*.md`）。notebook の外に出してよい範囲を規約で確かめる |
 | [understand](./understand/SKILL.md) | 完成した資料・分析を、ユーザーが説明できるところまで対話で理解させる。質問と想定回答の組の teach-back で確かめ、説明台本・用語と数式・FAQ を explainer として残す。共有前の理解の確認にも使う |
 | [docx-export](./docx-export/SKILL.md) | md を画像を埋め込んだ docx にする（pandoc、`scripts/md_to_docx.py`）。frontmatter を除き、表に罫線を付け、見出し・表・画像の数を照合する。Google Docs へは docx を手でアップロードして変換する |
-| [doc-maintenance](./doc-maintenance/SKILL.md) | 規約駆動のドキュメント点検。`scripts/check_docs.py`（標準ライブラリだけ）で、元のファイルが後で更新された文書・draft のままの文書・置き換え済みへの参照・リンクの切れ・確かめた日の古い記録・一覧の漏れを一覧にし、1 件ずつ確かめて直す案をまとめて出してから直す。点検の対象は各 repo の `scripts/check_docs.toml` と AGENTS.md の「ドキュメントの点検」の節（雛形は `references/`）。各 repo にはスクリプトの写しを置き、正本はここ |
 | [daily-log](./daily-log/SKILL.md) | 当日の Claude Code / Codex / Linear 活動を `~/Daily/` に保存する。launchd の plist はマシン固有の絶対パスを含むため移植時は要書き換え |
 | [worklog](./worklog/SKILL.md) | Claude Code / Codex のログからプロジェクト・案件ごとの稼働時間をバーで見せ、作業内容を要約する。数字は `worklog` CLI(`~/Developer/claude-worklog`、GitHub Kyo1M/claude-worklog)が出し、skill は素材を読んで要約・稼働報告の下書きを書く |
 
