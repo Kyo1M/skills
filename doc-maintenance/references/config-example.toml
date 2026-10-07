@@ -9,6 +9,9 @@ targets = ["docs/wiki/*.md", "docs/guide/*.md", "docs/deliverables/*.md", "docs/
 # リンクの切れを見る文書（glob）
 link_targets = ["*.md", "docs/**/*.md"]
 
+# 例として書いたリンク（glob）。<slug> や {{...}} を含む仮のリンクは書かなくても見ない
+ignore_links = []
+
 # 点検しない文書（glob。targets・link_targets の両方から外す）
 exclude = []
 
@@ -21,7 +24,8 @@ paths = ["docs/tables/*.yaml"]
 keys = ["values_asof"]
 days = 60
 
-# 置き場のファイルが、一覧の文書に名前で載っているか。要らなければ消す
+# 置き場のファイルが、一覧の文書に名前で載っているか。要らなければ消す。
+# strip を書くと、ファイル名からその末尾を外した名前で探す（例：.prompt.md を外してプロンプト名で探す）
 [[inventory]]
 files = "docs/guide/*.md"
 exclude = []

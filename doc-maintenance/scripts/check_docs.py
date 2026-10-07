@@ -19,9 +19,11 @@ Python 3.11 以上（設定の読み込みに tomllib を使う）。標準ラ�
 - superseded: 置き換えられていない文書の frontmatter の related が、status: superseded の文書を指している
   （derived_from と本文の引用は、古い版を由来・根拠として挙げる正しい書き方なので見ない）
 - broken: 本文の相対リンクの先が無い。link_targets の文書が対象。.gitignore の対象（手元で作る図など）を
-  指すリンクと、frontmatter のパス（別のリポジトリを指すことがある）は見ない
+  指すリンク、<slug> や {{...}} を含む仮のリンク、ignore_links に書いた例のリンクと、frontmatter のパス
+  （別のリポジトリを指すことがある）は見ない
 - dated: YAML などの日付の項目（values_asof・checked など）が days 日より古い
 - inventory: 置き場にあるファイルが、一覧の文書（README など）に名前で載っていない
+  （strip を書くと、ファイル名からその末尾を外した名前で探す。例：.prompt.md）
 """
 
 from __future__ import annotations
@@ -259,9 +261,12 @@ def check(repo: Repo, config: dict, today: dt.date) -> dict[str, list[str]]:
             if path and status_of(path) == "superseded":
                 found["superseded"].append(f"{repo.rel(doc)}: related が置き換え済みの {repo.rel(path)} を指している")
 
-    # broken
+    # broken（<slug> や {{...}} を含む仮のリンクと、ignore_links に書いた例のリンクは見ない）
+    ignore_links = config.get("ignore_links", [])
     for doc in collect("link_targets"):
         for link in sorted(set(body_links(doc.read_text(encoding="utf-8")))):
+            if "<" in link or "{{" in link or any(fnmatch.fnmatch(link, p) for p in ignore_links):
+                continue
             if resolve(repo, doc, link) is None and not repo.ignored(doc.parent / link.split("#", 1)[0]):
                 found["broken"].append(f"{repo.rel(doc)}: リンク先が無い → {link}")
 
@@ -283,7 +288,8 @@ def check(repo: Repo, config: dict, today: dt.date) -> dict[str, list[str]]:
         for path in repo.glob([rule["files"]]):
             if path.name in rule.get("exclude", []):
                 continue
-            if path.name not in listed_text:
+            name = path.name.removesuffix(rule["strip"]) if rule.get("strip") else path.name
+            if name not in listed_text:
                 found["inventory"].append(f"{repo.rel(path)}: {rule['listed_in']} に載っていない")
     return found
 
