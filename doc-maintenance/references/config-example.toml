@@ -2,8 +2,9 @@
 
 # 古くなっていないか・draft のままか・related が置き換え済みを指していないかを見る文書（glob）。
 # 中身が変わり続ける文書だけにする（議事録・メモ・決定のような、その時点の記録は入れない）。
-# frontmatter の derived_from・related に挙げた元のファイルが、文書より後に更新されると知らせる
-targets = ["docs/wiki/*.md", "docs/guide/*.md", "docs/deliverables/*.md"]
+# frontmatter の derived_from・related に挙げた元のファイルが、文書より後に更新されると知らせる。
+# HTML の文書は、先頭の <!-- --> の中の frontmatter を読む
+targets = ["docs/wiki/*.md", "docs/guide/*.md", "docs/deliverables/*.md", "docs/deliverables/*.html"]
 
 # リンクの切れを見る文書（glob）
 link_targets = ["*.md", "docs/**/*.md"]

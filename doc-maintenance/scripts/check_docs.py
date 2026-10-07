@@ -78,8 +78,19 @@ def unquote(value: str) -> str:
     return value
 
 
+def strip_html_comment(text: str) -> str:
+    """HTML の文書は、先頭の <!-- --> の中に frontmatter を書く。その中身を取り出す。"""
+    stripped = text.lstrip()
+    if stripped.startswith("<!--"):
+        end = stripped.find("-->")
+        if end > 0:
+            return stripped[4:end].strip() + "\n"
+    return text
+
+
 def read_frontmatter(text: str) -> dict[str, object]:
     """先頭の --- で囲んだ frontmatter の、トップレベルの key: value と key: [..] と key:\\n  - .. を読む。"""
+    text = strip_html_comment(text)
     if not text.startswith("---"):
         return {}
     end = text.find("\n---", 3)
@@ -179,6 +190,7 @@ def resolve(repo: Repo, doc: Path, target: str) -> Path | None:
 
 
 def body_links(text: str) -> list[str]:
+    """本文の Markdown の相対リンク（HTML の href は見ない）。"""
     body = INLINE_CODE.sub("", FENCE.sub("", body_of(text)))
     links = []
     for m in LINK.finditer(body):
@@ -202,7 +214,7 @@ def check(repo: Repo, config: dict, today: dt.date) -> dict[str, list[str]]:
 
     def status_of(path: Path) -> str:
         if path not in status_cache:
-            fm = read_frontmatter(path.read_text(encoding="utf-8")) if path.suffix == ".md" else {}
+            fm = read_frontmatter(path.read_text(encoding="utf-8")) if path.suffix in (".md", ".html") else {}
             status_cache[path] = str(fm.get("status", ""))
         return status_cache[path]
 
