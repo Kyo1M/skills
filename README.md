@@ -43,7 +43,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。**分析レーン**:
 
 ```
-(問いが固まっていなければ) grill-me → analysis-plan（目的・指標・現状把握・仮説検証の計画と、1 回の分析ごとの分析設計。設計は合意してから分析に入る） → analysis-notebook（問い駆動の notebook。データを見て設計を直しながら） → analysis-report（md のレポート） → docx-export（docx。Google Docs へは手で上げる）
+(問いが固まっていなければ) grill-me → analysis-plan（目的・指標・現状把握・仮説検証の計画と、1 回の分析ごとの分析設計。設計は合意してから分析に入る） → analysis-notebook（問い駆動の notebook。データを見て設計を直しながら） → analysis-report（md のレポート） → docx-export（docx。求められれば Google ドキュメントにして Drive に置く）
 共有・説明の前に understand（teach-back と explainer）
 ```
 
@@ -60,7 +60,7 @@ vaccinechoice_HH は専用の vac-* を使う（同 repo の `ops/AGENTS.md`）�
 | [analysis-notebook](./analysis-notebook/SKILL.md) | 規約駆動の問い駆動の分析 notebook。問い定義 → 最小分析設計 → 実装 → 実行・検証 → 結論要約で、各問いに回答／根拠／確度／限界／次アクションを置く。形式は規約で選び、既定は marimo（`references/marimo.md`・`references/jupytext.md`）。marimo の出力は `scripts/read_session.py` で読む |
 | [analysis-report](./analysis-report/SKILL.md) | 規約駆動の分析レポート（md が正本）。notebook のまとめ表と回答を一次ソースにし、答えていないことを補わない。読み手の型はクライアント向け・研究者向け（`references/reader-*.md`）。notebook の外に出してよい範囲を規約で確かめる |
 | [understand](./understand/SKILL.md) | 完成した資料・分析を、ユーザーが説明できるところまで対話で理解させる。質問と想定回答の組の teach-back で確かめ、説明台本・用語と数式・FAQ を explainer として残す。共有前の理解の確認にも使う |
-| [docx-export](./docx-export/SKILL.md) | md を画像を埋め込んだ docx にする（pandoc、`scripts/md_to_docx.py`）。frontmatter を除き、表に罫線を付け、見出し・表・画像の数を照合する。Google Docs へは docx を手でアップロードして変換する |
+| [docx-export](./docx-export/SKILL.md) | md を画像を埋め込んだ docx にする（pandoc、`scripts/md_to_docx.py`）。frontmatter を除き、表に罫線を付け、見出し・表・画像の数を照合する。求められれば Google ドキュメントにして Drive のフォルダに置き、ページ分けなしにする（`scripts/docx_to_gdocs.py`。認証は gog か任意のトークンのコマンド、作り直しは同じ URL に差し替え） |
 | [daily-log](./daily-log/SKILL.md) | 当日の Claude Code / Codex / Linear 活動を `~/Daily/` に保存する。launchd の plist はマシン固有の絶対パスを含むため移植時は要書き換え |
 | [worklog](./worklog/SKILL.md) | Claude Code / Codex のログからプロジェクト・案件ごとの稼働時間をバーで見せ、作業内容を要約する。数字は `worklog` CLI(`~/Developer/claude-worklog`、GitHub Kyo1M/claude-worklog)が出し、skill は素材を読んで要約・稼働報告の下書きを書く |
 
