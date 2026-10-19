@@ -116,7 +116,7 @@ if __name__ == '__main__':
     parser.add_argument('--output-dir', type=Path, required=True)
     parser.add_argument('--rules', type=Path, action='append', default=[])
     parser.add_argument('--model', default='gemini-3.8-flash')
-    parser.add_argument('--key-file', type=Path, default=Path.home() / '.gemini/dxb-review.env')
+    parser.add_argument('--key-file', type=Path, default=Path.home() / '.gemini/review.env')
     args = parser.parse_args()
     try:
         run(args)
