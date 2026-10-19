@@ -1,24 +1,27 @@
 ---
 name: docx-export
-description: リポジトリの Markdown（分析レポート・explainer・メモなど）を、画像を埋め込んだ docx にするスキル。frontmatter を除き、`![cap](path)` と `[FIG] path` の画像を埋め込み、表に罫線を付け、見出し・表・画像の数を md と照合する。元の md は変えない。Google Docs へは docx を手でアップロードして変換する。外に出してよい範囲は対象リポジトリの AGENTS.md / CLAUDE.md から読む。「レポートを docx にして」「Google Docs に上げたい」「Word で渡したい」「/docx-export」等のリクエスト時に起動。
+description: リポジトリの Markdown（分析レポート・explainer・メモなど）を、画像を埋め込んだ docx にし、求められれば Google ドキュメントにして Google Drive のフォルダに置くスキル。frontmatter を除き、`![cap](path)` と `[FIG] path` の画像を埋め込み、表に罫線を付け、見出し・表・画像の数を md と照合する。Google ドキュメントは docx から変換し、ページ分けなしにする（画像をリンクで公開しない。作り直しは同じ URL のまま中身を差し替える）。元の md は変えない。外に出してよい範囲・置き場・アカウントは対象リポジトリの AGENTS.md / CLAUDE.md から読む。「レポートを docx にして」「Google Docs に上げたい」「Drive のフォルダに置いて」「Word で渡したい」「/docx-export」等のリクエスト時に起動。
 ---
 
-# docx-export — Markdown を docx にする
+# docx-export — Markdown を docx・Google ドキュメントにする
 
-リポジトリの md（正本）から、共有のための docx を作る。Google Docs で共有するときは、この docx を Google Drive に手でアップロードし、Google ドキュメントに変換する。自動のアップロードはしない。
+リポジトリの md（正本）から、共有のための docx を作る。Google ドキュメントで共有するときは、この docx を Google Drive のフォルダに変換して上げ、ページ分けなしにする（手順 7。手で上げてもよい）。
 
 **元の md は一切変えない。** docx は写しで、直すときは md を直して作り直す。
 
 ## 使い方
 
 ```
-/docx-export <md のパス> [--out <docx のパス>]
+/docx-export <md のパス> [--out <docx のパス>] [Google ドキュメントにするなら、フォルダID と、作り直しならドキュメントID]
 ```
 
 ## 前提
 
 - pandoc（`brew install pandoc`）
-- 変換は `scripts/md_to_docx.py`（標準ライブラリと pandoc だけで動く）
+- 変換は `scripts/md_to_docx.py`、Google ドキュメントへは `scripts/docx_to_gdocs.py`（どちらも標準ライブラリと pandoc だけで動く）
+- Google ドキュメントにするときだけ、Google の API のアクセストークンが要る。次のどちらか
+  - gog（Google Workspace CLI）に、フォルダが見えるアカウントを登録する: `gog auth add <email> --services drive,docs`。`!` で実行すると入力を受けないので、そのときは `--remote --step 1` で URL を出し、ユーザーがブラウザで許可したリダイレクトの URL を `--remote --step 2 --auth-url <URL>` に渡す。gog の OAuth アプリがテスト中なら、そのアカウントを Google Cloud Console のテストユーザーに足す
+  - アクセストークンを出す任意のコマンド（`--token-cmd`。例: `gcloud auth print-access-token`。スコープに drive と documents が要る）
 
 ## Step 0: 規約を読む
 
@@ -29,7 +32,9 @@ description: リポジトリの Markdown（分析レポート・explainer・メ�
 | 外に出してよいかの確認 | 作る前に、載せてよい粒度をユーザーに確かめる。規約に確認の相手（クライアントの担当者など）があれば、その確認を済ませたかを聞く |
 | 個人の行・自由記述の原文・人数の少ない区分 | docx に入れない。md に入っていたら作らずに止め、md を直すよう伝える |
 | docx の置き場 | `~/Downloads/YYYYMMDD_<タイトル>.docx`（リポジトリの外。docx はコミットしない） |
-| 書式の雛形 | 無し（pandoc の既定の書式に、表の罫線だけ足す）。規約に reference docx があれば `--reference-doc` で使う |
+| 書式の雛形 | 無し（pandoc の既定の書式に、表の罫線だけ足す）。Google ドキュメントにするときは `--style gdocs`（Arial 11pt・黒の見出し）。規約に reference docx があれば `--reference-doc` で使う |
+| 図の番号 | 付けない。規約で求められていれば `--number-figures`（キャプションの頭に「図1.」） |
+| Google ドキュメントの置き場・アカウント | 無し（上げない）。規約にフォルダ ID と使うアカウントがあれば、それを使う。ユーザーが上げるよう求め、規約に無ければ聞く |
 | `[FIG]` のパスの基準 | リポジトリの root |
 
 ## 手順
@@ -47,15 +52,17 @@ description: リポジトリの Markdown（分析レポート・explainer・メ�
 4. **docx を作る**
 
    ```sh
-   python3 <このスキルのフォルダ>/scripts/md_to_docx.py <md> --out <docx> --root <リポジトリの root> [--exclude 2 3] [--reference-doc <docx>]
+   python3 <このスキルのフォルダ>/scripts/md_to_docx.py <md> --out <docx> --root <リポジトリの root> [--exclude 2 3] [--style gdocs | --reference-doc <docx>] [--number-figures]
    ```
 
    - 写しを一時フォルダに作り、frontmatter を消し（文書の表題が二重になるため）、除外した画像を消し、`[FIG]` を画像の記法に直してから pandoc にかける
    - `![cap](path)` の画像は、キャプションが図の下に付く
    - 表には罫線を直接付ける（pandoc の既定では罫線が無く、Google Docs でも罫線なしになるため）
+   - 手順 7 で Google ドキュメントにするときは `--style gdocs` を付ける。pandoc の既定の雛形の書体を Arial 11pt に、見出しを黒に、和文の言語を日本語にして使う（Google ドキュメントの既定の見た目に寄せる。コードの等幅とリンクの色は残す）
+   - `--number-figures` は、行に画像だけがある図のキャプションの頭に「図1.」を付ける（文中の画像は数えない）
 
 5. **照合する**。スクリプトが見出し・表・画像の数を md と docx で比べて表で出す。不一致があれば終了コード 1 になる。不一致のときは完了とせず、何が合わないかを報告する
-6. **報告する**
+6. **報告する**（Google ドキュメントにしないとき）
 
    ```
    docx を作りました。
@@ -68,6 +75,39 @@ description: リポジトリの Markdown（分析レポート・explainer・メ�
    ページ区切りを無くしたいときは、Google ドキュメントの「ファイル → ページ設定 → ページ分けなし」。
    ```
 
+7. **Google ドキュメントにする**（求められたとき）
+
+   1. フォルダを確かめる。名前・ファイルを作れるか・共有の相手（ドメインと権限ごとの数）が出る
+
+      ```sh
+      python3 <このスキルのフォルダ>/scripts/docx_to_gdocs.py check --folder <フォルダID> (--account <email> | --token-cmd "<コマンド>")
+      ```
+
+      共有の相手が「取得できませんでした」なら、そのことも伝える。フォルダの名前と共有の相手をユーザーに示し、ここに置いてよいかを聞く（外に出す操作なので、ユーザーの了承を取ってから上げる）。「リンクを知っている全員」に共有されていたら、そのことをはっきり伝える
+
+   2. 上げる。docx を Google ドキュメントに変換し、ページ分けなしにして、見出し・表・画像の数を docx と照らす
+
+      ```sh
+      python3 <このスキルのフォルダ>/scripts/docx_to_gdocs.py upload <docx> --folder <フォルダID> (--account <email> | --token-cmd "<コマンド>") [--replace <ドキュメントID>]
+      ```
+
+      - 文書名は docx のファイル名（`--name` で変えられる）
+      - 同じ名前の文書がフォルダにあれば作らずに止まり、その文書の ID を出す。md を直して作り直すときは `--replace <ドキュメントID>` で中身を差し替える（URL・共有の設定はそのまま。本文に付いたコメントは、差し替えた箇所から外れることがある）
+      - ドキュメント ID は URL の `/document/d/<ID>/` の部分。作ったときにスクリプトも出す
+      - 差し替えるときは、その文書の共有の相手も出る。「リンクを知っている全員」が含まれていたら伝える
+      - 画像は docx の中に入っているので、変換で文書に取り込まれる。画像を Drive に別に上げてリンクで公開するやり方は取らない
+
+   3. 報告する
+
+      ```
+      Google ドキュメントにしました。
+
+      - <文書名>: <URL>（ドキュメント ID: <ID>。作り直すときに --replace で使う）
+      - 置き場: <フォルダ名>（共有: <相手の要約>）
+      - ページ分けなし: 設定済み
+      - 照合: 見出し・表・画像の数が docx と一致
+      ```
+
 ## エラーのときの扱い
 
 | 種別 | エラー | 対応 |
@@ -75,9 +115,13 @@ description: リポジトリの Markdown（分析レポート・explainer・メ�
 | 中断 | md が無い／pandoc が無い／画像のファイルが無い（除外していないもの） | すぐに中断し、理由と直し方を伝える |
 | 中断 | 出してはいけないものが md に入っている | docx を作らず、md の該当箇所を伝える |
 | 未完了 | 照合で見出し・表・画像の数が合わない | docx は残し、何が合わないかを報告する。md の書き方（表の区切り行・画像の記法）を確かめる |
+| 中断 | フォルダが見えない（404）・ファイルを作れない | 使っているアカウントにフォルダが共有されているかを聞く。別のアカウントなら gog に登録してもらう |
+| 中断 | 同じ名前の文書がある | 作らずに止め、差し替えるか（`--replace`）、別の名前にするかを聞く |
+| 未完了 | Google ドキュメントの見出し・表・画像の数が docx と合わない | 文書は残し、何が合わないかを報告する |
 
 ## 注意
 
 - docx はリポジトリにコミットしない（正本は md）。規約が置き場を決めていなければリポジトリの外に置く
-- Google Docs に変換した後に直したくなったら、md を直して docx を作り直す。Google Docs 側だけを直すと、正本とずれる
+- Google Docs に変換した後に直したくなったら、md を直して docx を作り直し、`--replace` で同じ文書に差し替える。Google Docs 側だけを直すと、正本とずれる（差し替えると Google Docs 側の手直しは消える）
+- アカウント・フォルダ ID はスキルに書かず、対象リポジトリの規約に書く
 - md の数式は pandoc が Word の数式に変換する。Google ドキュメントへの変換で崩れることがあるので、数式の多いレポートは変換後に目で確かめる
