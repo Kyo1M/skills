@@ -2,6 +2,7 @@
 # table-definition・metric-definition の既定の型（references/*-schema.md）が、
 # 正本の project-context-template の docs/guide/data-definition-guide.md と一致しているかを確かめる。
 # 使い方: scripts/check-schema-copies.sh [テンプレートのパス]（既定 ~/Developer/project-context-template）
+# 比べる相手は、そのパスで今チェックアウトしているブランチのガイド（main とは限らない）。
 set -euo pipefail
 
 skills_root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -29,6 +30,6 @@ check() {
 }
 
 check table-definition/references/table-schema.md "### 2-1." "### 2-5."
-check metric-definition/references/metric-schema.md "### 3-1." "### 3-5."
+check metric-definition/references/metric-schema.md "### 3-1." "### 3-6."
 
 exit "$status"

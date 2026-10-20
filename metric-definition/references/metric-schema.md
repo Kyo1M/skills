@@ -1,8 +1,8 @@
 # 指標の定義の型（既定）
 
-対象リポジトリの規約に型があればそちらを優先する。この型の正本は [project-context-template](https://github.com/Kyo1M/project-context-template) の `docs/guide/data-definition-guide.md` 3 章で、3-1〜3-4 をそのまま写している（直すときはテンプレートを先に直し、`scripts/check-schema-copies.sh` で一致を確かめる）。共通の決まりは同じガイドの 1 章、記載例 2・作る流れは 3-5・3-6 と本 skill の SKILL.md。
+対象リポジトリの規約に型があればそちらを優先する。この型の正本は [project-context-template](https://github.com/Kyo1M/project-context-template) の `docs/guide/data-definition-guide.md` 3 章で、3-1〜3-5 をそのまま写している（直すときはテンプレートを先に直し、`scripts/check-schema-copies.sh` で一致を確かめる）。共通の決まりは同じガイドの 1 章（本 skill の SKILL.md の絶対ルールと同じ）、作る流れは同じガイドの 3-6（本 skill の SKILL.md の Step 1〜7 と同じ）。
 
-<!-- BEGIN: data-definition-guide 3-1..3-4 -->
+<!-- BEGIN: data-definition-guide 3-1..3-5 -->
 ### 3-1. YAML の型
 
 記載例を兼ねます（架空の購入転換率）。自分の案件に翻訳して使ってください。
@@ -44,12 +44,15 @@ notes:
 
 | 項目 | 何を書くか |
 |---|---|
+| `aliases`・`category` | 任意。資料・クライアント・SQL の列名での呼び名と、案件の KPI の分け方にそろえた分類 |
 | `status` | AI が案を出した時点は `draft`。`checks` の突き合わせが済み、人が確かめたら `active`。突き合わせ先が無い指標は `checks` に `against: なし（理由）` と書き、人が定義を確かめたら `active` にしてよい。突き合わせで合わないときは理由が分かるまで `draft` のまま |
 | `derived_from` | もとにした定義書（ファイル名とシート名）・参考にした SQL のパス・「貼り付けの SQL（要旨）」・「口頭」。複数あれば列挙する。正とした取り方の SQL があれば、そのパスを先頭に書く |
 | `definition` | 1 行の式か数え方。あわせて、期間に入れる日付の列（受注日か出荷日か）、基準日（いつ時点の値か、起点の日）、通貨、税込か税抜か、返品の扱いのように、取り方で値が変わる決めごとを書く。SQL のコメントにしか無い決めごとも、ここか `notes` に移す |
 | `numerator`・`denominator`・`scale` | 率の指標だけ。分子・分母はそれぞれ何をどの条件で数えるか（ユニーク数か件数か）まで書く |
 | `unit` | 3-1 の値から選ぶ。通貨の種類は `definition` に書く |
 | `grain`・`keys`・`time_key` | 指標の値が決まる単位と、それを表す集計の出力の列名。会員ごとの値なら「会員×年」、率なら「月」「店舗×月」のように、値が 1 つに決まる単位にする |
+| `window` | 任意。直近 12 か月のように、値を決める期間の窓がある指標だけ |
+| `polarity` | 高いほど良い（`higher_is_better`）・低いほど良い（`lower_is_better`）・どちらでもない（`neutral`） |
 | `population` | 対象に含める条件と除く条件。wiki の「用語」表に定義がある条件（社員アカウントの除外など）は、その用語を名指しして参照する。用語が無ければ条件をここに直接書く |
 | `tables` | 使うテーブルの `docs/tables/` の slug（2 章）。定義が無いテーブルは配列に入れず、`notes` に「<物理名> のテーブル定義が無い（要確認）」と書き、先にテーブル定義を作ることを勧める |
 | `basis` | 3-3 の 6 つから 1 つ。中央値なども並べて出すときは `notes` に書く |
@@ -83,6 +86,48 @@ notes:
 | [購入転換率](../metrics/purchase-conversion-rate.yaml) | 購入者数 ÷ 訪問者数 × 100（束ね方: 分子・分母を数え直してから割る） |
 ```
 
-`llms.txt` の「Metrics」節には `- [購入転換率](./docs/metrics/purchase-conversion-rate.yaml): 購入者数 ÷ 訪問者数 × 100` の形で 1 行足します。wiki に「直近更新」節があれば、その 1 行も差分に含めます。
+`llms.txt` の「Metrics」節には `- [docs/metrics/purchase-conversion-rate.yaml](./docs/metrics/purchase-conversion-rate.yaml): 購入転換率（購入者数 ÷ 訪問者数 × 100）` の形で 1 行足します。wiki に「直近更新」節があれば、その 1 行も差分に含めます。
+
+### 3-5. 記載例 2（区分を持つ指標）
+
+会員ごとの値を区分で束ねる指標の例です（架空の年間購入回数）。
+
+```yaml
+type: metric
+name: annual-purchase-count
+title: 年間購入回数
+aliases: [購入頻度, F]
+date: "YYYY-MM-DD"
+status: active
+category: 顧客
+derived_from:
+  - analysis/sql/customer-yearly-summary.sql
+  - 口頭（年の区切りと返品の扱い）
+definition: 会員ごとに、受注日の暦年に入る注文のうち、注文番号ごとの amount の合計（返品の行を含む）が正の注文を数える。年は受注日の暦年（1〜12 月）
+unit: count
+grain: 会員×年
+keys: [customer_id, year]
+time_key: year
+population: その年に 1 回以上購入した会員（非会員の注文・社員アカウントを除く）
+tables: [order-detail, customer-master]
+polarity: higher_is_better
+basis: simple_avg
+bands:
+  - label: 1 回
+    rule: 1 回
+  - label: 2 回
+    rule: 2 回
+  - label: 3〜4 回
+    rule: 3 回以上 4 回以下
+  - label: 5 回以上
+    rule: 5 回以上
+checks:
+  - against: なし（クライアントに同じ指標の集計が無いため）
+    result: 突き合わせ先が無いため、年の区切りと返品の扱いを担当者が確かめた
+    checked: "YYYY-MM-DD"
+notes:
+  - 区分や年で束ねるときは会員ごとの値の単純な平均を取る。分布が偏るので中央値も並べて出すことが多い
+  - 伝票数（order_id のユニーク数）で数える取り方は採らなかった。全額を返品した注文も 1 回に数えてしまうため
+```
 
 <!-- END -->

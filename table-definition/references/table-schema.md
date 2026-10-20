@@ -92,6 +92,6 @@ notes:                         # テーブル全体の注意点・集計時の�
 | [受注明細](../tables/order-detail.yaml) | 1 注文 × 1 商品 | order_id, line_no（結合: customer_id, item_id） | 返品は負の値。円換算の方向は要確認 |
 ```
 
-`llms.txt` の「Data」節には `- [受注明細](./docs/tables/order-detail.yaml): 1 注文 × 1 商品` の形で 1 行足します。wiki に「直近更新」節があれば、その 1 行も差分に含めます。
+`llms.txt` の「Data」節には `- [docs/tables/order-detail.yaml](./docs/tables/order-detail.yaml): 受注明細（1 注文 × 1 商品）` の形で 1 行足します（ほかの節と同じく、リンクの文字はパス）。wiki に「直近更新」節があれば、その 1 行も差分に含めます。
 
 <!-- END -->

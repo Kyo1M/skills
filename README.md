@@ -45,7 +45,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。**分析レーン**:
 
 ```
-(問いが固まっていなければ) grill-me → analysis-plan（目的・指標・現状把握・仮説検証の計画と、1 回の分析ごとの分析設計。設計は合意してから分析に入る） → analysis-notebook（問い駆動の notebook。データを見て設計を直しながら） → analysis-report（md のレポート） → docx-export（docx。求められれば Google ドキュメントにして Drive に置く）
+(問いが固まっていなければ) grill-me → table-definition・metric-definition（使うテーブルと指標の定義を YAML に。分析設計の前でも途中でもよい） → analysis-plan（目的・指標・現状把握・仮説検証の計画と、1 回の分析ごとの分析設計。設計は合意してから分析に入る） → analysis-notebook（問い駆動の notebook。データを見て設計を直しながら） → analysis-report（md のレポート） → docx-export（docx。求められれば Google ドキュメントにして Drive に置く）
 共有・説明の前に understand（teach-back と explainer）
 ```
 
