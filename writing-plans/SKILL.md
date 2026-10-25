@@ -175,7 +175,7 @@ them to review the plan and choose an execution method before implementation.
 **"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Please review the plan. Which execution approach would you prefer?**
 
 - **Subagent-driven** - A fresh subagent implements each task and a fresh reviewer checks it before the next one starts, then a whole-branch review at the end. Most thorough; costs a fresh context per task and per review.
-- **Native** - I implement every task myself in this session, the way this harness runs work, then one fresh reviewer on the most capable model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well with a mid-tier session model, since the plan carries the design.
+- **Native** - I implement every task myself in this session, the way this harness runs work, then one end-of-branch review (a Claude subagent and Codex in parallel, see below) checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well with a mid-tier session model, since the plan carries the design.
 
 **For this plan I recommend <one of the two>, because <one sentence from the plan: how much the tasks depend on each other's interfaces, how many there are, what a shipped mistake would cost>. Does the plan capture what you want, and which approach should we use?"**
 
@@ -183,6 +183,8 @@ them to review the plan and choose an execution method before implementation.
 
 **"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Please review the plan. Does it capture what you want?"**
 
-**If Subagent-driven chosen:** for each task in order, dispatch a fresh subagent with the plan path, the spec path and the task number; when it returns, dispatch a fresh reviewer subagent to check that task against the plan and run its tests; fix what the reviewer finds before starting the next task. After the last task, run `/code-review` on the whole branch.
+**If Subagent-driven chosen:** for each task in order, dispatch a fresh subagent with the plan path, the spec path and the task number; when it returns, dispatch a fresh reviewer subagent to check that task against the plan and run its tests; fix what the reviewer finds before starting the next task. After the last task, run the end-of-branch review below.
 
-**If Native chosen:** implement each task yourself in this session, running its tests and committing as the plan says, then run `/code-review` on the whole branch.
+**If Native chosen:** implement each task yourself in this session, running its tests and committing as the plan says, then run the end-of-branch review below.
+
+**End-of-branch review (both methods):** run it once. Dispatch a Claude reviewer subagent and the `codex:codex-rescue` agent (review only, no edits) in parallel, and give both the same inputs: the spec path, the plan path, the branch diff (`git diff <base>...HEAD`), and a short list of decisions made with your human partner. Do not pass your own reasoning or justifications. Compare the two results, check each finding against the code before acting on it, and prefer findings both reviewers raised. Report which findings you fixed and which you skipped, noting which reviewer raised each.
