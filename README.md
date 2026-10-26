@@ -26,7 +26,7 @@ $EDITOR ~/Developer/Skills/$NAME/SKILL.md
 ~/Developer/Skills/scripts/link-skills.sh      # ~/.claude/skills と ~/.agents/skills に symlink
 ```
 
-Claude Code と Codex を再起動して認識を確認したら、`git add` & commit し、下の管理表に追記する。`scripts/link-skills.sh --check` が管理表との食い違いを報告する。
+Claude Code と Codex を再起動して認識を確認したら、`git add` & commit し、下の管理表に追記する。`scripts/link-skills.sh --check` が管理表との食い違いを報告する。`~/Developer/Skills` の作業ツリーが symlink の参照先なので、作業はブランチを切った worktree で行い、`~/Developer/Skills` は main のままにする（別のブランチに切り替えると、そのブランチに無い skill やグローバル CLAUDE.md が読み込む `writing-core.md` が消える）。
 
 ## 定期点検
 
@@ -38,7 +38,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 | skill | 説明 |
 |-------|------|
-| [grill-me](./grill-me/SKILL.md) | 批判的壁打ち。前提を疑い・論点ツリーを整理し・ヌケモレと反証を指摘する。アイデア壁打ちモード・プラン精査モード（終了時に論点整理 md を残す）と、率直な評価を一度で返す一度で評価モードの 3 モード |
+| [grill-me](./grill-me/SKILL.md) | 批判的壁打ち。前提を疑い・論点ツリーを整理し・ヌケモレと反証を指摘する。アイデア壁打ちモード・プラン精査モード（終了時に論点整理 md を残す）と、率直な評価を往復なしで返すモード（一度で評価モード）の 3 モード |
 | [brainstorming](./brainstorming/SKILL.md) | 対話で要件と設計を固め、`docs/superpowers/specs/` に設計書を書いて writing-plans へ渡す。superpowers 6.4.1（MIT、Jesse Vincent）から取り込み、他の superpowers skill への参照を外した |
 | [writing-plans](./writing-plans/SKILL.md) | 設計書から実装計画を作り、実行方法（サブエージェント／このセッション）を選んでもらう。superpowers 6.4.1（MIT）から取り込み |
 | [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。書き方原則の正本（`references/writing-principles.md`）と要約（常時適用の `writing-core.md`、資料・レポート用の `principles-digest.md`）を持ち、手直しされた最終版から原則を学ぶ手順もここにある |
@@ -81,7 +81,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 **資料作成レーン**:
 
 ```
-(論点が固まっていなければ) grill-me → deck-outline（構成 md） → pptx（構成 md から Codex・Claude で直接作るか、html-slide-deck で `.dc.html` にして Claude Design で pptx 化） → deck-critique（批評）
+(論点が固まっていなければ) grill-me → deck-outline（構成 md） → deck-critique（構成 md の批評） → pptx（構成 md から Codex・Claude で直接作るか、html-slide-deck で `.dc.html` にして Claude Design で pptx 化。`.dc.html` は deck-critique で再批評できる）
 ```
 
 初稿の文章ルールは `deck-outline/references/principles-digest.md`（書き方原則の要約）。

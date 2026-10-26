@@ -46,7 +46,7 @@ description: 問い駆動の分析 notebook の結論から、Markdown のレポ
 
 ## Step 1: 一次ソースを読む
 
-先に `analysis-plan/references/analysis-principles.md`（分析の考え方）と、この分析の設計 md（`analysis-plan` の分析設計）を読む。設計 md が無ければ、レポートの目次を決める前に作るよう提案する。
+先に `analysis-plan/references/analysis-principles.md`（分析の考え方）と、この分析の設計 md（`analysis-plan` の分析設計）を読む。書き方は `deck-outline/references/principles-digest.md` の「分析レポート」「表と図」「補足・注・Appendix」に従う。設計 md が無ければ、レポートの目次を決める前に作るよう提案する。
 
 読む順番:
 
@@ -150,7 +150,7 @@ description: 問い駆動の分析 notebook の結論から、Markdown のレポ
 | 「さっきと矛盾しない？」 | 概要の文を本文の図表と照らし、条件をつけた 2 文に分ける |
 | 「それは誰の考え？」 | 相手の見立てか、分析者のたたきかを書く |
 
-保存の前の最後に、AI っぽい書き方の点検を 1 回通す（`deck-outline/references/writing-principles.md` の 7。規約やグローバルの書き方原則に同じ項目があれば、そちらに従う）。書き始める前に `deck-outline/references/principles-digest.md` の「分析レポート」「表と図」「補足・注・Appendix」を読む。
+保存の前の最後に、AI っぽい書き方の点検を 1 回通す（`deck-outline/references/writing-principles.md` の 7。規約やグローバルの書き方原則に同じ項目があれば、そちらに従う）。
 
 - 題は句読点を入れない名詞句にする。章・節の見出し、太字の見出し、箇条書きの頭を順に読み、読点を含む文や句点＋動詞の文で終わっているものを名詞に直す（「〜は、〜まで挙がる。」→「〜の店：13 店舗」）
 - 概要は、経営層が概要だけを読んでも主要なメッセージが分かるようにし、限界・注記の「ただし〜」を重ねない（限界は本文と「解釈とまだ言えないこと」に置く）
