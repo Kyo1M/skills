@@ -46,7 +46,7 @@ description: 問い駆動の分析 notebook の結論から、Markdown のレポ
 
 ## Step 1: 一次ソースを読む
 
-先に `analysis-plan/references/analysis-principles.md`（分析の考え方）と、この分析の設計 md（`analysis-plan` の分析設計）を読む。設計 md が無ければ、レポートの目次を決める前に作るよう提案する。
+先に `analysis-plan/references/analysis-principles.md`（分析の考え方）と、この分析の設計 md（`analysis-plan` の分析設計）を読む。書き方は `deck-outline/references/principles-digest.md` の「分析レポート」「表と図」「補足・注・Appendix」に従う。設計 md が無ければ、レポートの目次を決める前に作るよう提案する。
 
 読む順番:
 

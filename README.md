@@ -26,11 +26,11 @@ $EDITOR ~/Developer/Skills/$NAME/SKILL.md
 ~/Developer/Skills/scripts/link-skills.sh      # ~/.claude/skills と ~/.agents/skills に symlink
 ```
 
-Claude Code と Codex を再起動して認識を確認したら、`git add` & commit し、下の管理表に追記する。`scripts/link-skills.sh --check` が管理表との食い違いを報告する。
+Claude Code と Codex を再起動して認識を確認したら、`git add` & commit し、下の管理表に追記する。`scripts/link-skills.sh --check` が管理表との食い違いを報告する。`~/Developer/Skills` の作業ツリーが symlink の参照先なので、作業はブランチを切った worktree で行い、`~/Developer/Skills` は main のままにする（別のブランチに切り替えると、そのブランチに無い skill やグローバル CLAUDE.md が読み込む `writing-core.md` が消える）。
 
 ## 定期点検
 
-月初の weekly-review の前に `scripts/link-skills.sh --check` を 1 回走らせ、壊れたリンク・未配置・同名の別実体（claude.ai から同期された同名 skill を含む）・管理表との食い違いをゼロにする。
+月初に `scripts/link-skills.sh --check` を 1 回走らせ、壊れたリンク・未配置・同名の別実体（claude.ai から同期された同名 skill を含む）・管理表との食い違いをゼロにする。
 
 `table-definition`・`metric-definition` の既定の型（`references/*-schema.md`）は、[project-context-template](https://github.com/Kyo1M/project-context-template) の `docs/guide/data-definition-guide.md` 2・3 章の写し。型はテンプレートのガイドを先に直してから写し、`scripts/check-schema-copies.sh` で一致を確かめる。
 
@@ -38,22 +38,12 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 | skill | 説明 |
 |-------|------|
-| [brutal-advisor](./brutal-advisor/SKILL.md) | 事業案・計画・意思決定への率直な批判的フィードバック。事実・推論・未確認を分け、弱い前提と改善の優先順位を根拠付きで一度に返す（往復の壁打ちと論点整理 md は grill-me） |
-| [grill-me](./grill-me/SKILL.md) | 批判的壁打ち。前提を疑い・論点ツリーを整理し・ヌケモレと反証を指摘する。アイデア壁打ちモードとプラン精査モードの 2 モード。終了時に論点整理 md を残す |
+| [grill-me](./grill-me/SKILL.md) | 批判的壁打ち。前提を疑い・論点ツリーを整理し・ヌケモレと反証を指摘する。アイデア壁打ちモード・プラン精査モード（終了時に論点整理 md を残す）と、率直な評価を往復なしで返すモード（一度で評価モード）の 3 モード |
 | [brainstorming](./brainstorming/SKILL.md) | 対話で要件と設計を固め、`docs/superpowers/specs/` に設計書を書いて writing-plans へ渡す。superpowers 6.4.1（MIT、Jesse Vincent）から取り込み、他の superpowers skill への参照を外した |
 | [writing-plans](./writing-plans/SKILL.md) | 設計書から実装計画を作り、実行方法（サブエージェント／このセッション）を選んでもらう。superpowers 6.4.1（MIT）から取り込み |
-| [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。**分析レーン**:
-
-```
-(問いが固まっていなければ) grill-me → table-definition・metric-definition（使うテーブルと指標の定義を YAML に。分析設計の前でも途中でもよい） → analysis-plan（目的・指標・現状把握・仮説検証の計画と、1 回の分析ごとの分析設計。設計は合意してから分析に入る） → analysis-notebook（問い駆動の notebook。データを見て設計を直しながら） → analysis-report（md のレポート） → docx-export（docx。求められれば Google ドキュメントにして Drive に置く）
-共有・説明の前に understand（teach-back と explainer）
-```
-
-書き方原則の正本は `deck-outline/references/writing-principles.md` |
+| [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。書き方原則の正本（`references/writing-principles.md`）と要約（常時適用の `writing-core.md`、資料・レポート用の `principles-digest.md`）を持ち、手直しされた最終版から原則を学ぶ手順もここにある |
 | [html-slide-deck](./html-slide-deck/SKILL.md) | 事業用スライド DS（白地・明朝タイトル・Klein Blue、1920×1080）で `.dc.html`（deck-stage・Claude Design 互換）を生成。20 型・アイコン対応表・機械チェック・セルフレビュー。deck-outline の構成 md を入力に Phase 3 から。ルール正本は `html-slide-deck/references/design-system.md`。旧 continova v1 は `references/legacy/` |
 | [deck-critique](./deck-critique/SKILL.md) | 資料（構成 md / 完成 `.dc.html`）を作成とは別の目で批評・推敲する。指摘リスト+修正案を返す（勝手に直さない） |
-| [business-slide-writing](./business-slide-writing/SKILL.md) | 日本語の業務スライドの構成・初稿・リライトで、共有する対象と相談事項を明確にし、作業・利用状況を適切な粒度で書く。文章ルールは `references/principles.md`。deck-outline / html-slide-deck が初稿前に参照する |
-| [gemini-ja-proofread](./gemini-ja-proofread/SKILL.md) | Gemini API で日本語の校正案を作り、ユーザーの文章ルール（`references/preferences.md`）を適用して差分を確認する。`scripts/review.py` |
 | [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記と会議で報告された着手・完了の反映・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う（ID・状態・確認項目はガイドに従う。GitHub Issue 連携を定める repo では前回からの進捗とタスク登録の下書きも。Issue は読むだけ、`references/github-issue-sync.md`）。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
 | [table-definition](./table-definition/SKILL.md) | 規約駆動のテーブル定義整理。定義書（Excel・DDL・ヘッダ）や口頭説明から 1 論理テーブル 1 YAML（粒度・キー・列・関係・注意点）と wiki「データ」表を作る。置き場が無い repo では `docs/tables/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/table-schema.md` |
 | [metric-definition](./metric-definition/SKILL.md) | 規約駆動の指標の定義整理。既存の SQL・指標定義書・分析設計や口頭説明から 1 指標 1 YAML（式・分子と分母・母集団・束ね方・区分・突き合わせの結果）と wiki「用語」表の行を作る。SQL ごとの取り方の割れを並べて正を決めてもらう。置き場が無い repo では `docs/metrics/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/metric-schema.md` |
@@ -69,7 +59,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 | リポジトリ | 場所 | skill |
 |---|---|---|
-| kyo1M-business | `.agents/skills/`（実体、git 管理）。`.claude/skills/` は symlink | business-planning, contact-profile-drafter, document-drafter, git-commit, hypothesis-map, interview-prep-drafter, project-update-from-meetings, weekly-review |
+| kyo1M-business | `.agents/skills/`（実体、git 管理）。`.claude/skills/` は symlink | business-planning, contact-profile-drafter, document-drafter, git-commit, hypothesis-map, project-update-from-meetings, weekly-review |
 | writing-articles | 同上 | article-pipeline（note・Zenn 記事の企画→公開準備） |
 | continova-hp | 同上 | continova-business-card（名刺を HTML → Chrome PDF で出力） |
 | 非公開の案件リポジトリ | `.agents/skills/`（実体、git 管理外）。`.claude/skills/` は symlink | 各リポジトリの AGENTS.md に記す |
@@ -80,9 +70,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 |---|---|---|
 | gog | `~/.claude/skills/gog`（実体） | steipete/gogcli |
 | agmsg | `~/.agents/skills/agmsg` | 導入物（`VERSION`・`uninstall.sh` を持つ） |
-| find-skills | `~/.agents/skills/find-skills` | vercel-labs/skills（`npx skills add`、`~/.agents/.skill-lock.json`） |
 | orca-cli, orchestration | `~/.agents/skills/` | stablyai/orca（同上） |
-| linear | `~/.agents/skills/linear` | Linear 公式の Codex 向け skill（Apache-2.0） |
 
 ## claude.ai 専用
 
@@ -93,20 +81,27 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 **資料作成レーン**:
 
 ```
-(論点が固まっていなければ) grill-me → deck-outline（構成 md） → html-slide-deck（`.dc.html` 実装） → deck-critique（批評） → pptx が要れば `.dc.html` を Claude Design に持ち込む
+(論点が固まっていなければ) grill-me → deck-outline（構成 md） → deck-critique（構成 md の批評） → pptx（構成 md から Codex・Claude で直接作るか、html-slide-deck で `.dc.html` にして Claude Design で pptx 化。`.dc.html` は deck-critique で再批評できる）
 ```
 
-初稿の文章ルールは business-slide-writing の `references/principles.md`、Gemini で校正するときは gemini-ja-proofread。
+初稿の文章ルールは `deck-outline/references/principles-digest.md`（書き方原則の要約）。
+
+**分析レーン**:
+
+```
+(問いが固まっていなければ) grill-me → table-definition・metric-definition（使うテーブルと指標の定義を YAML に。分析設計の前でも途中でもよい） → analysis-plan（目的・指標・現状把握・仮説検証の計画と、1 回の分析ごとの分析設計。設計は合意してから分析に入る） → analysis-notebook（問い駆動の notebook。データを見て設計を直しながら） → analysis-report（md のレポート） → docx-export（docx。求められれば Google ドキュメントにして Drive に置く）
+共有・説明の前に understand（teach-back と explainer）
+```
 
 **設計・実装レーン**:
 
 ```
 軽い壁打ちなら最初から brainstorming → docs/superpowers/specs/ に設計書 → writing-plans → 実装
 深掘りが要るときは grill-me（論点整理 md）→ brainstorming に接続
-一度で率直な評価だけ欲しいときは brutal-advisor
+一度で率直な評価だけ欲しいときは grill-me の一度で評価モード
 ```
 
-書き方原則の正本は `deck-outline/references/writing-principles.md`（ルールと理由）。原則ごとの実例と経緯は `deck-outline/references/tone-examples.md`。要約はグローバル `~/.claude/CLAUDE.md` に常設。新しい書き方フィードバックは 3 か所に反映する。
+書き方原則の正本は `deck-outline/references/writing-principles.md`（ルールと理由）。原則ごとの実例と経緯は `deck-outline/references/tone-examples.md`。要約は 2 つで、資料以外の文章にも常に効く原則は `writing-core.md`（グローバル `~/.claude/CLAUDE.md` が `@` で読み込み、`~/.codex/AGENTS.md` はこのファイルへの symlink）、資料・レポートの制作で引く原則は `principles-digest.md`。新しい書き方フィードバックは正本・tone-examples・principles-digest に必ず反映し、常時適用の原則が変わるときだけ writing-core も直す。
 
 ## 注意
 
