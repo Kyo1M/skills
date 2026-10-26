@@ -59,7 +59,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 | リポジトリ | 場所 | skill |
 |---|---|---|
-| kyo1M-business | `.agents/skills/`（実体、git 管理）。`.claude/skills/` は symlink | business-planning, contact-profile-drafter, document-drafter, git-commit, hypothesis-map, project-update-from-meetings, weekly-review |
+| kyo1M-business | `.agents/skills/`（実体、git 管理）。`.claude/skills/` は symlink | business-planning, contact-profile-drafter, git-commit, hypothesis-map, project-update-from-meetings |
 | writing-articles | 同上 | article-pipeline（note・Zenn 記事の企画→公開準備） |
 | continova-hp | 同上 | continova-business-card（名刺を HTML → Chrome PDF で出力） |
 | 非公開の案件リポジトリ | `.agents/skills/`（実体、git 管理外）。`.claude/skills/` は symlink | 各リポジトリの AGENTS.md に記す |
