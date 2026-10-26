@@ -101,7 +101,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 一度で率直な評価だけ欲しいときは grill-me の一度で評価モード
 ```
 
-書き方原則の正本は `deck-outline/references/writing-principles.md`（ルールと理由）。原則ごとの実例と経緯は `deck-outline/references/tone-examples.md`。要約は 2 つで、資料以外の文章にも常に効く原則は `writing-core.md`（グローバル `~/.claude/CLAUDE.md` が `@` で読み込み、`~/.codex/AGENTS.md` はこのファイルへの symlink）、資料・レポートの制作で引く原則は `principles-digest.md`。新しい書き方フィードバックは正本・tone-examples・principles-digest に必ず反映し、常時適用の原則が変わるときだけ writing-core も直す。
+書き方原則の正本は `deck-outline/references/writing-principles.md`（ルールと理由）。原則ごとの実例と経緯は `deck-outline/references/tone-examples.md`。要約は 2 つで、資料以外の文章にも常に効く原則は `writing-core.md`（グローバル `~/.claude/CLAUDE.md` が `@` で読み込み、`~/.codex/AGENTS.md` はこのファイルを読むよう指示している）、資料・レポートの制作で引く原則は `principles-digest.md`。新しい書き方フィードバックは正本・tone-examples・principles-digest に必ず反映し、常時適用の原則が変わるときだけ writing-core も直す。
 
 ## 注意
 
