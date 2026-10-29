@@ -29,6 +29,6 @@ python3 "$SKILL_DIR/scripts/pptx-slide-numbers.py" final.pptx --skip-slide 1
 
 - 出力直後のキャッシュ値を実際のスライド順に合わせる。`--output` を省くと、固定文字が残っていないことと値の整合を検査する。
 - PowerPoint 上での追加・削除・並べ替えに追従するのは標準フィールド。初めて使う変換経路では作業用コピーを PowerPoint で開き、削除・並べ替えと番号表示を確認する。プレビュー環境によっては保存時のキャッシュ値だけを表示する。
-- 総ページ数は PowerPoint の標準機能では自動更新されないため、既定では付けない。本文の「○ページを参照」や表紙の流れは別途照合する。参照先は可能ならページ名でも示す。
+- 総ページ数は PowerPoint の標準機能では自動更新されないため、既定では付けない。本文・アジェンダ・目次には「○ページを参照」「p8」のようなページ参照を書かず、別のページはページの題で示す（自動番号は本文の参照までは追従しないため。deck-outline 原則 77）。表紙の流れと題の対応は別途照合する。
 
 根拠: [Microsoft のスライド番号フィールド仕様](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.drawing.field?view=openxml-3.0.1)、[スライド番号と総枚数の説明](https://support.microsoft.com/en-US/PowerPoint/show-the-slide-number-and-total-number-of-slides-on-every-slide)。
