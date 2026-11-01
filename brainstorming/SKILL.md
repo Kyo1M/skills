@@ -22,11 +22,19 @@ recognize and correct, grounded in what they want to accomplish.
    intended use before proposing features or an approach. Knowing the app
    genre does not tell you why your partner wants it. Gathering missing
    requirements does not ask them to authorize the task again.
-2. **Write back your understanding.** Summarize the intended outcome,
+2. **Derive what the purpose needs before adopting the stated plan.**
+   Treat your partner's ideas and the points recorded in meeting notes as
+   inputs, not as the answer. From the purpose, list the elements a good
+   result requires (how the outcome is defined, the full set of candidate
+   factors, what the decision-maker needs to know, how long data takes to
+   accumulate, the effort to collect it), compare that list with what has
+   been discussed, and name the missing elements. Treat views agreed in a
+   meeting as hypotheses until they are checked.
+3. **Write back your understanding.** Summarize the intended outcome,
    relevant constraints, and success criteria in a short note your partner
    can assess. Separate what they said from assumptions. Invite correction
    and incorporate their answer before treating this as the design brief.
-3. **Carry intent into the design.** Preserve the agreed understanding in
+4. **Carry intent into the design.** Preserve the agreed understanding in
    the selected path's design artifact: the written spec for architectural
    work, or the in-chat design/probe for bounded work and spikes. Check
    proposed features and technical choices against that understanding.
