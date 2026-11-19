@@ -44,6 +44,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。書き方原則の正本（`references/writing-principles.md`）と要約（常時適用の `writing-core.md`、資料・レポート用の `principles-digest.md`）を持ち、手直しされた最終版から原則を学ぶ手順もここにある |
 | [html-slide-deck](./html-slide-deck/SKILL.md) | 事業用スライド DS（白地・明朝タイトル・Klein Blue、1920×1080）で `.dc.html`（deck-stage・Claude Design 互換）を生成。20 型・アイコン対応表・機械チェック・セルフレビュー。deck-outline の構成 md を入力に Phase 3 から。ルール正本は `html-slide-deck/references/design-system.md`。旧 continova v1 は `references/legacy/` |
 | [deck-critique](./deck-critique/SKILL.md) | 資料（構成 md / 完成 `.dc.html`）を作成とは別の目で批評・推敲する。指摘リスト+修正案を返す（勝手に直さない） |
+| [deck-infographic](./deck-infographic/SKILL.md) | 完成済みの pptx に、ページごとのインフォグラフィック案（16:9 の PNG）を元のページの直後に足した新しい版を作る。元のページは残し、採否は依頼者が選ぶ。図は SVG を Python で描き Chrome headless で PNG に書き出す（`scripts/render.sh`、例は `references/example-cycle.py`、型の選び方は `references/figure-types.md`） |
 | [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記と会議で報告された着手・完了の反映・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う（ID・状態・確認項目はガイドに従う。GitHub Issue 連携を定める repo では前回からの進捗とタスク登録の下書きも。Issue は読むだけ、`references/github-issue-sync.md`）。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
 | [table-definition](./table-definition/SKILL.md) | 規約駆動のテーブル定義整理。定義書（Excel・DDL・ヘッダ）や口頭説明から 1 論理テーブル 1 YAML（粒度・キー・列・関係・注意点）と wiki「データ」表を作る。置き場が無い repo では `docs/tables/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/table-schema.md` |
 | [metric-definition](./metric-definition/SKILL.md) | 規約駆動の指標の定義整理。既存の SQL・指標定義書・分析設計や口頭説明から 1 指標 1 YAML（式・分子と分母・母集団・束ね方・区分・突き合わせの結果）と wiki「用語」表の行を作る。SQL ごとの取り方の割れを並べて正を決めてもらう。置き場が無い repo では `docs/metrics/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/metric-schema.md` |
@@ -82,6 +83,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 
 ```
 (論点が固まっていなければ) grill-me → deck-outline（構成 md） → deck-critique（構成 md の批評） → pptx（構成 md から Codex・Claude で直接作るか、html-slide-deck で `.dc.html` にして Claude Design で pptx 化。`.dc.html` は deck-critique で再批評できる）
+完成した pptx を図で分かりやすくしたいとき → deck-infographic（元のページの直後に図の案を足した新しい版）
 ```
 
 初稿の文章ルールは `deck-outline/references/principles-digest.md`（書き方原則の要約）。
