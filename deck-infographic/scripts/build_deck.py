@@ -130,7 +130,7 @@ def settext(sp, t):
     """最初の段落と最初の文字の書式を残して、文字だけ差し替える。
 
     `**語句**` で囲んだ所だけを太字にする（リードの結論の語句。deck-outline の原則 95）。
-    囲みの外は、元の書式が太字でも細字にする。"""
+    `**` を含むときだけ囲みの外を細字にし、含まないとき（タイトル・フッターなど）は元の書式のまま。"""
     import re
     body = sp.find("p:txBody", ns)
     oldp = body.find("a:p", ns)
@@ -147,7 +147,8 @@ def settext(sp, t):
             continue
         run = E.SubElement(par, f"{{{A}}}r")
         r2 = copy.deepcopy(rpr) if rpr is not None else E.Element(f"{{{A}}}rPr")
-        r2.set("b", "1" if i % 2 else "0")
+        if "**" in t:
+            r2.set("b", "1" if i % 2 else "0")
         run.append(r2)
         E.SubElement(run, f"{{{A}}}t").text = piece
 
