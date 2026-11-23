@@ -127,7 +127,11 @@ def resolve(base_part, target):
 
 
 def settext(sp, t):
-    """最初の段落と最初の文字の書式を残して、文字だけ差し替える。"""
+    """最初の段落と最初の文字の書式を残して、文字だけ差し替える。
+
+    `**語句**` で囲んだ所だけを太字にする（リードの結論の語句。deck-outline の原則 95）。
+    `**` を含むときだけ囲みの外を細字にし、含まないとき（タイトル・フッターなど）は元の書式のまま。"""
+    import re
     body = sp.find("p:txBody", ns)
     oldp = body.find("a:p", ns)
     rpr = oldp.find(".//a:rPr", ns)
@@ -138,10 +142,15 @@ def settext(sp, t):
     pp = oldp.find("a:pPr", ns)
     if pp is not None:
         par.append(copy.deepcopy(pp))
-    run = E.SubElement(par, f"{{{A}}}r")
-    if rpr is not None:
-        run.append(copy.deepcopy(rpr))
-    E.SubElement(run, f"{{{A}}}t").text = t
+    for i, piece in enumerate(re.split(r"\*\*(.+?)\*\*", t)):
+        if not piece:
+            continue
+        run = E.SubElement(par, f"{{{A}}}r")
+        r2 = copy.deepcopy(rpr) if rpr is not None else E.Element(f"{{{A}}}rPr")
+        if "**" in t:
+            r2.set("b", "1" if i % 2 else "0")
+        run.append(r2)
+        E.SubElement(run, f"{{{A}}}t").text = piece
 
 
 def figures(fig_dir, meta_dir):
