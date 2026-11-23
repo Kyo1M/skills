@@ -95,9 +95,7 @@ for i, (ic, s) in enumerate(quals):
     out.append(soft(qx + 34, cy, 34, ic, 34))
     out.append(text(qx + 88, cy + 8, s, 24, INK, 300))
 
-# 図の見方（凡例）。線の種類を 2 つ以上使うときは必ず置く
-out += legend(1392, 820, kinds=("human", "ai", "check"),
-              arrows=(("solid", "作業の順序"), ("dotted", "案件の情報の参照・更新"), ("dashed", "改善の戻し先")))
+# 凡例（図の見方）は既定で置かない。線の意味は線のそばのラベル（「更新」「参照」など）で示す
 
 # タイトル・リードは元のページのまま。図に合わせて変えるときだけ、依頼者に確かめてから
 # write(out, page=PAGE, top=TOP, title="…", lead="…") のように渡す（pptx の文字が差し替わる）

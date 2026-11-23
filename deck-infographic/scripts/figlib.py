@@ -169,7 +169,7 @@ def arc(c, r, a0, a1):
 
 
 def legend(x, y, kinds=("human", "ai", "check"), arrows=(("solid", "作業の順序"),), horizontal=False, extra=()):
-    """図の見方。kinds は塗りの説明、arrows は (線種, ラベル)。
+    """図の見方（凡例）。既定では置かず、依頼者が求めたときだけ使う。kinds は塗りの説明、arrows は (線種, ラベル)。
     extra は線以外の意味のある印（フォルダの印・太字など）で、(描く関数 f(cx, cy) -> str, ラベルまでの幅, ラベル) の組。"""
     out = [text(x, y, "図の見方", 16, SUB, 600)]
     items = []
