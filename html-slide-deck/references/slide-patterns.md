@@ -152,7 +152,7 @@
   <div style="border-right:1px solid #E6E4DE; padding:20px 18px; display:flex; align-items:center; gap:12px;">
     <div style="font-size:25px; font-weight:700; color:#111; line-height:1.35; white-space:nowrap;">メンバーの利用</div>
   </div>
-  <div style="border-right:1px solid #E6E4DE; padding:20px 14px; font-size:24px; line-height:1.4; color:#2F3135;">根岸さんが議事録作成を開始</div>
+  <div style="border-right:1px solid #E6E4DE; padding:20px 14px; font-size:24px; line-height:1.4; color:#2F3135;">A さんが議事録作成を開始</div>
   <!-- … -->
 </div>
 ```
