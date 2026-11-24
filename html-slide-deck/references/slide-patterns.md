@@ -152,7 +152,7 @@
   <div style="border-right:1px solid #E6E4DE; padding:20px 18px; display:flex; align-items:center; gap:12px;">
     <div style="font-size:25px; font-weight:700; color:#111; line-height:1.35; white-space:nowrap;">メンバーの利用</div>
   </div>
-  <div style="border-right:1px solid #E6E4DE; padding:20px 14px; font-size:24px; line-height:1.4; color:#2F3135;">根岸さんが議事録作成を開始</div>
+  <div style="border-right:1px solid #E6E4DE; padding:20px 14px; font-size:24px; line-height:1.4; color:#2F3135;">A さんが議事録作成を開始</div>
   <!-- … -->
 </div>
 ```
@@ -245,7 +245,7 @@
 ```html
 <div style="border:2px dashed #B7B7B7; background:#FAFAF8; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:40px; color:#6F7175;">
   <div data-role="kicker" style="font-size:20px; letter-spacing:0.16em; font-weight:700; color:#6F7175;">既存ページを流用</div>
-  <div style="font-size:30px; font-weight:700; color:#2F3135; text-align:center; line-height:1.5;">20260820_BI部定例.pptx　p.2<br>「（再掲）分析ワークフロー全体像」</div>
+  <div style="font-size:30px; font-weight:700; color:#2F3135; text-align:center; line-height:1.5;">20260820_定例.pptx　p.2<br>「（再掲）分析ワークフロー全体像」</div>
   <div style="font-size:24px; line-height:1.5; text-align:center; max-width:1100px;">工程 ①〜⑥ の帯と実装状況。日付だけ更新して差し替える。</div>
 </div>
 ```
