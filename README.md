@@ -44,7 +44,7 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 | [deck-outline](./deck-outline/SKILL.md) | 資料・スライドの「構成」を実装前に実文言の Markdown で設計する。入力メモのインベントリ化とトレーサビリティで、依頼者のメモの黙った省略を防ぐ。書き方原則の正本（`references/writing-principles.md`）と要約（常時適用の `writing-core.md`、資料・レポート用の `principles-digest.md`）を持ち、手直しされた最終版から原則を学ぶ手順もここにある |
 | [html-slide-deck](./html-slide-deck/SKILL.md) | 事業用スライド DS（白地・明朝タイトル・Klein Blue、1920×1080）で `.dc.html`（deck-stage・Claude Design 互換）を生成。20 型・アイコン対応表・機械チェック・セルフレビュー。deck-outline の構成 md を入力に Phase 3 から。ルール正本は `html-slide-deck/references/design-system.md`。旧 continova v1 は `references/legacy/` |
 | [deck-critique](./deck-critique/SKILL.md) | 資料（構成 md / 完成 `.dc.html`）を作成とは別の目で批評・推敲する。指摘リスト+修正案を返す（勝手に直さない） |
-| [deck-infographic](./deck-infographic/SKILL.md) | 完成済みの pptx に、ページごとのインフォグラフィック案を元のページの直後に足した新しい版を作る。案のページはタイトル・リード・フッターを pptx の文字で残し、本文だけを図の PNG にする。元のページは残し、採否は依頼者が選ぶ。図は SVG を Python で描き Chrome headless で PNG に書き出す（部品は `scripts/figlib.py`、書き出しは `scripts/render.sh`、pptx の組み立ては `scripts/build_deck.py`、例は `references/example-cycle.py`、型の選び方は `references/figure-types.md`） |
+| [deck-infographic](./deck-infographic/SKILL.md) | 完成済みの pptx に、ページごとのインフォグラフィック案を元のページの直後に足した新しい版を作る。案のページはタイトル・リード・フッターを pptx の文字で残し、本文を図にする（箱・矢印・アイコンは PNG、図の中の文字は PowerPoint で直せるテキストボックスで、図と 1 つのグループ）。元のページは残し、採否は依頼者が選ぶ。図は SVG を Python で描き Chrome headless で PNG に書き出す（部品は `scripts/figlib.py`、書き出しは `scripts/render.sh`、pptx の組み立ては `scripts/build_deck.py`、例は `references/example-cycle.py`、型の選び方は `references/figure-types.md`） |
 | [meeting-minutes](./meeting-minutes/SKILL.md) | 規約駆動の議事録作成。対象 repo の CLAUDE.md / AGENTS.md と運用ガイドから出力先・命名・スキーマ・型・承認レベル・git 運用を読み取って適応する。規約にタスク台帳があれば、台帳追記と会議で報告された着手・完了の反映・重い決定だけの決定案・llms.txt・wiki 差分まで 1 回で行う（ID・状態・確認項目はガイドに従う。GitHub Issue 連携を定める repo では前回からの進捗とタスク登録の下書きも。Issue は読むだけ、`references/github-issue-sync.md`）。質問は日付と人物が分からないときと保存前の確認 1 回だけ |
 | [table-definition](./table-definition/SKILL.md) | 規約駆動のテーブル定義整理。定義書（Excel・DDL・ヘッダ）や口頭説明から 1 論理テーブル 1 YAML（粒度・キー・列・関係・注意点）と wiki「データ」表を作る。置き場が無い repo では `docs/tables/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/table-schema.md` |
 | [metric-definition](./metric-definition/SKILL.md) | 規約駆動の指標の定義整理。既存の SQL・指標定義書・分析設計や口頭説明から 1 指標 1 YAML（式・分子と分母・母集団・束ね方・区分・突き合わせの結果）と wiki「用語」表の行を作る。SQL ごとの取り方の割れを並べて正を決めてもらう。置き場が無い repo では `docs/metrics/` の新設を承認後に足す。値・ID・件数は書かない。型の既定は `references/metric-schema.md` |
@@ -104,6 +104,22 @@ Claude Code と Codex を再起動して認識を確認したら、`git add` & c
 ```
 
 書き方原則の正本は `deck-outline/references/writing-principles.md`（ルールと理由）。原則ごとの実例と経緯は `deck-outline/references/tone-examples.md`。要約は 2 つで、資料以外の文章にも常に効く原則は `writing-core.md`（グローバル `~/.claude/CLAUDE.md` が `@` で読み込み、`~/.codex/AGENTS.md` はこのファイルを読むよう指示している）、資料・レポートの制作で引く原則は `principles-digest.md`。新しい書き方フィードバックは正本・tone-examples・principles-digest に必ず反映し、常時適用の原則が変わるときだけ writing-core も直す。
+
+## 別の Mac での始め方
+
+```bash
+git clone https://github.com/Kyo1M/skills.git ~/Developer/Skills
+~/Developer/Skills/scripts/link-skills.sh            # ~/.claude/skills と ~/.agents/skills に symlink
+brew install uv poppler                              # 資料系のスクリプトは uv run で動き、依存は各ファイルの先頭にある
+brew install --cask libreoffice google-chrome        # pptx の画像化と、インフォグラフィックの図の書き出し
+~/Developer/Skills/deck-pptx/scripts/selftest.sh     # 例の資料を組み、照合・画像化・図の書き出しまで確かめる
+```
+
+Claude Code と Codex を再起動して skill が見えることを確かめる。書体はヒラギノ（Mac の標準）を前提にしている。
+
+## ライセンス
+
+[MIT](./LICENSE)。ただし `deck-pptx/assets/templates/` のロゴあり版に含まれるロゴと社名（continova）は対象外。自分の資料にはロゴなし版を使うか、ロゴを差し替える（手順は `deck-pptx/references/template-guide.md`）。superpowers から取り込んだ skill（brainstorming・writing-plans）は元の MIT ライセンス（Jesse Vincent）に従う。
 
 ## 注意
 

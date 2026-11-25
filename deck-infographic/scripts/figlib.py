@@ -5,6 +5,7 @@
 呼ばれ（render.sh から）、最後に write() で本文の範囲だけを書き出す。
 """
 import math
+import re
 import sys
 from xml.sax.saxutils import escape
 
@@ -88,9 +89,21 @@ def icon(name, cx, cy, size, color, sw=2.0):
             f'stroke-linejoin="round">{ICONS[name]}</g>')
 
 
+IMAGE_TEXTS = {}  # 回転など変形した文字（画像に残す）
+TEXTS = {}  # text() が描いた文字の控え（SVG の文字列 → 位置・大きさ・色）。write() が pptx の文字にする分を JSON に書く
+
+
 def text(x, y, s, size, color=INK, weight=300, anchor="start", family=GOTHIC, extra=""):
-    return (f'<text x="{x}" y="{y}" font-family="{family}" font-size="{size}" font-weight="{weight}" '
-            f'fill="{color}" text-anchor="{anchor}" {extra}>{escape(str(s))}</text>')
+    """文字（y はベースライン）。回転など extra に transform を含む文字は画像に残し、それ以外は pptx の文字にする"""
+    svg = (f'<text x="{x}" y="{y}" font-family="{family}" font-size="{size}" font-weight="{weight}" '
+           f'fill="{color}" text-anchor="{anchor}" {extra}>{escape(str(s))}</text>')
+    if "transform" in extra and str(s).strip():
+        IMAGE_TEXTS[svg] = str(s)
+    elif str(s).strip():
+        TEXTS[svg] = {"x": float(x), "y": float(y), "text": str(s), "size": float(size), "color": color,
+                      "weight": int(weight), "anchor": anchor,
+                      "font": "mincho" if "Mincho" in family else "gothic"}
+    return svg
 
 
 def tw(s, size):
@@ -208,6 +221,18 @@ BODY_X0, BODY_X1 = 96, 1824
 BODY_BOTTOM = 985
 
 
+def _inside_transform(s, i):
+    """s の i 文字目が、transform を持つ <g> の中にあるか"""
+    stack = []
+    for m in re.finditer(r"<g\b[^>]*>|</g>", s[:i]):
+        if m.group(0) == "</g>":
+            if stack:
+                stack.pop()
+        else:
+            stack.append("transform" in m.group(0))
+    return any(stack)
+
+
 def write(svg_body, page, top, title=None, lead=None, argv=None, x0=None, x1=None, bottom=None):
     """本文だけの SVG・HTML と、大きさの JSON を書く。
 
@@ -227,15 +252,41 @@ def write(svg_body, page, top, title=None, lead=None, argv=None, x0=None, x1=Non
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
            f'viewBox="{x0} {top} {w} {h}">'
            f'<rect x="0" y="0" width="{W}" height="{H}" fill="#FFFFFF"/>{DEFS}' + "\n".join(svg_body) + "</svg>")
-    html = ('<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;'
-            'background:#fff}svg{display:block}</style></head><body>' + svg + '</body></html>')
     import xml.dom.minidom
     xml.dom.minidom.parseString(svg.encode("utf-8"))   # 壊れた SVG を書き出さない（& や < は text() が逃がす）
-    with open(argv[1], "w", encoding="utf-8") as f:
-        f.write(html)
+    # pptx の文字にする文字（本文の範囲に描いたもの）を控え、その文字を抜いた図も書く
+    # （部品が複数の文字を 1 つの文字列にまとめて返すこともあるので、文字列の中から探す）
+    joined = "\n".join(svg_body)
+    texts, keep = [], [s for k, s in IMAGE_TEXTS.items() if k in joined]
+    for key, info in TEXTS.items():
+        if not (x0 <= info["x"] <= x1 and top <= info["y"] <= bottom):
+            continue
+        pos = 0
+        while True:
+            i = joined.find(key, pos)
+            if i < 0:
+                break
+            if _inside_transform(joined, i):
+                keep.append(info["text"])  # 変形した <g> の中の文字は位置が変わるので、画像に残す
+            else:
+                texts.append(info)
+                joined = joined[:i] + joined[i + len(key):]
+                continue
+            pos = i + len(key)
+    svg_nt = svg.replace(DEFS + "\n".join(svg_body), DEFS + joined)
+
+    def page_html(s):
+        return ('<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;'
+                'background:#fff}svg{display:block}</style></head><body>' + s + '</body></html>')
+
+    with open(argv[1], "w", encoding="utf-8") as f:   # 文字入り（確かめ用・--text image 用）
+        f.write(page_html(svg))
+    with open(os.path.splitext(argv[1])[0] + ".notext.html", "w", encoding="utf-8") as f:
+        f.write(page_html(svg_nt))
     if len(argv) > 2:
         with open(argv[2], "w", encoding="utf-8") as f:
             f.write(svg)
-    meta = {"page": page, "x": x0, "top": top, "width": w, "height": h, "title": title, "lead": lead}
+    meta = {"page": page, "x": x0, "top": top, "width": w, "height": h, "title": title, "lead": lead,
+            "texts": texts, "texts_in_image": keep}
     with open(os.path.splitext(argv[1])[0] + ".json", "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=1)
