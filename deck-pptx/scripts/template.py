@@ -505,7 +505,10 @@ def keep_slides(prs, slides):
 
 def _copy_part(part, package):
     """グラフなどのパーツを、関係ごと写す"""
-    tmpl = re.sub(r"\d+(\.\w+)$", r"%d\1", str(part.partname))
+    name = str(part.partname)
+    tmpl = re.sub(r"\d+(\.\w+)$", r"%d\1", name)
+    if "%d" not in tmpl:  # 番号の無い名前（image.png など）は、拡張子の前に番号を入れる
+        tmpl = re.sub(r"(\.\w+)$", r"%d\1", name)
     pn = package.next_partname(tmpl)
     new = type(part).load(pn, part.content_type, package, part.blob)
     remap = {}

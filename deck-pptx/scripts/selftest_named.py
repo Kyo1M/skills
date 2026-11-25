@@ -68,7 +68,12 @@ r = T.duplicate(prs, S[1])
 T.strip_body(r)
 T.set_title(r, "写したページ")
 T.import_slide(r, other, 8, drop=lambda sh: sh.is_placeholder)  # 960pt → 1440pt（比 1.5）
-T.keep_slides(prs, [S[0], s, r])
+q = T.duplicate(prs, S[1])  # 画像入りのページ（例の資料の 4 枚目）も写す
+T.strip_body(q)
+T.set_title(q, "図を写したページ")
+T.import_slide(q, other, 4, drop=lambda sh: sh.is_placeholder)
+assert any(sh.shape_type == 13 for sh in q.shapes), "画像が写っていない"
+T.keep_slides(prs, [S[0], s, r, q])
 T.finalize(prs, out / "named-out.pptx", title="架空の定例")
 texts = [sh.text_frame.text for sh in Presentation(out / "named-out.pptx").slides[1].shapes if sh.has_text_frame]
 assert "今回の題" in texts and "架空の定例" in texts, texts

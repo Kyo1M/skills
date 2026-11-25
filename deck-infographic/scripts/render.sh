@@ -21,6 +21,7 @@ if command -v uv >/dev/null; then PY=(uv run -q --no-project --with pillow pytho
 # 図のスクリプトは標準ライブラリだけで動く。uv があれば uv の Python で動かす
 if command -v uv >/dev/null; then FIG=(uv run -q --no-project python3); else FIG=(python3); fi
 (cd "$dir" && "${FIG[@]}" "$script" "$dir/$name.html" "$dir/$name.svg")
+[ -f "$dir/$name.notext.html" ] || { echo "$dir/$name.notext.html が無い。source/ の figlib.py が古いので、<スキル>/scripts/figlib.py を写し直す" >&2; exit 1; }
 size="$(python3 -c "import json,sys; m=json.load(open(sys.argv[1])); print(f\"{m['width']},{m['height']}\")" "$dir/$name.json")"
 rm -f "$out" "$out_full"   # Chrome が失敗したとき、前回の PNG で確認を通さないため
 shot() {

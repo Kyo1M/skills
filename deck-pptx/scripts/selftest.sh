@@ -67,7 +67,7 @@ ok "版上げ: 差し替えた所だけが変わった"
 run ../scripts/selftest_named.py "$tmp/continova.pptx" "$tmp/named" >/dev/null || ng "名前付きの枠の資料からの組み立て"
 run ../scripts/check_package.py "$tmp/named/named-out.pptx" >/dev/null || ng "名前付きの枠の資料のパッケージ"
 n="$(../scripts/pptx_to_png.sh "$tmp/named/named-out.pptx" "$tmp/named/png" 40)"
-[ "$n" = 3 ] || ng "名前付きの枠の資料の画像の枚数（$n）"
+[ "$n" = 4 ] || ng "名前付きの枠の資料の画像の枚数（$n）"
 ok "前回の資料（1440×810pt・名前付きの枠）から組めた"
 
 # 4. インフォグラフィック案（図 1 枚を書き出し、文字を pptx の文字にして足す）
