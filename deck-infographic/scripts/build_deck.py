@@ -170,12 +170,16 @@ def tw(s, size):
 
 
 def text_box(t, px, sid, k):
-    """figlib が控えた文字 1 つ → 折り返しなし・余白なしのテキストボックス。座標は 1920x1080 の px"""
+    """figlib が控えた文字のまとまり 1 つ → 折り返しなし・余白なしのテキストボックス。座標は 1920x1080 の px。
+    lines() で描いた複数行は 1 つの箱の 1 段落にし、行は改行（Shift+Enter）で分け、行送りを固定する"""
     size = t["size"]
-    bw = tw(t["text"], size) * 1.12 + size * 0.6
-    bh = size * 1.45
+    rows = t.get("lines") or [t["text"]]
+    lh = t.get("lh") or size * 1.42
+    bw = max(tw(r, size) for r in rows) * 1.12 + size * 0.6
+    bh = size * 1.45 + lh * (len(rows) - 1)
+    last = t["y"] + lh * (len(rows) - 1)   # 最後の行のベースライン
     left = {"start": t["x"] - size * 0.05, "middle": t["x"] - bw / 2, "end": t["x"] - bw + size * 0.05}[t["anchor"]]
-    top = t["y"] + size * 0.26 - bh   # 下ぞろえの枠の下端を、ベースラインの少し下（文字の下の余白）に置く
+    top = last + size * 0.26 - bh   # 下ぞろえの枠の下端を、最後の行のベースラインの少し下（文字の下の余白）に置く
     algn = {"start": "l", "middle": "ctr", "end": "r"}[t["anchor"]]
     font = FONTS[t.get("font", "gothic")]
     color = t["color"].lstrip("#").upper()
@@ -183,13 +187,16 @@ def text_box(t, px, sid, k):
         color = "".join(c * 2 for c in color)
     sz = round(size * px / 12700 * 100)
     from xml.sax.saxutils import escape
+    rpr = (f'<a:rPr lang="ja-JP" altLang="en-US" sz="{sz}" b="{1 if t["weight"] >= 600 else 0}" dirty="0">'
+           f'<a:solidFill><a:srgbClr val="{color}"/></a:solidFill><a:latin typeface="{font}"/>'
+           f'<a:ea typeface="{font}"/></a:rPr>')
+    runs = f"<a:br>{rpr}</a:br>".join(f"<a:r>{rpr}<a:t>{escape(r)}</a:t></a:r>" for r in rows)
+    spc = (f'<a:lnSpc><a:spcPts val="{round(lh * px / 12700 * 100)}"/></a:lnSpc>' if len(rows) > 1 else "")
     return xml(f'''<p:sp xmlns:p="{P}" xmlns:a="{A}"><p:nvSpPr><p:cNvPr id="{sid}" name="図の文字 {k}"/>
 <p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="{round(left * px)}" y="{round(top * px)}"/>
 <a:ext cx="{round(bw * px)}" cy="{round(bh * px)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>
 <p:txBody><a:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="b"><a:noAutofit/></a:bodyPr><a:lstStyle/>
-<a:p><a:pPr algn="{algn}"/><a:r><a:rPr lang="ja-JP" altLang="en-US" sz="{sz}" b="{1 if t["weight"] >= 600 else 0}" dirty="0">
-<a:solidFill><a:srgbClr val="{color}"/></a:solidFill><a:latin typeface="{font}"/><a:ea typeface="{font}"/></a:rPr>
-<a:t>{escape(t["text"])}</a:t></a:r></a:p></p:txBody></p:sp>'''.encode())
+<a:p><a:pPr algn="{algn}">{spc}</a:pPr>{runs}</a:p></p:txBody></p:sp>'''.encode())
 
 
 def group_with_texts(pic, texts, px, first_id, nn):

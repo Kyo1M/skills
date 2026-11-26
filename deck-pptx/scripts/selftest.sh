@@ -81,7 +81,11 @@ if [ -d "$IG" ]; then
   run ../scripts/check_package.py "$tmp/ig/out.pptx" >/dev/null || ng "図の案のパッケージ"
   texts="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["figures"][0]["editableTexts"])' "$tmp/ig/source/build-report.json")"
   [ "$texts" -gt 0 ] || ng "図の文字が pptx の文字になっていない"
-  ok "インフォグラフィック案: 図の文字 $texts 個を pptx の文字にした"
+  multi="$(python3 -c 'import json,sys; print(sum(1 for t in json.load(open(sys.argv[1]))["texts"] if len(t.get("lines") or []) > 1))' "$tmp/ig/source/fig01_cycle.json")"
+  [ "$multi" -gt 0 ] || ng "lines() で描いた複数行が 1 つのテキストボックスになっていない"
+  printf 'from figlib import *\nwrite([text(600, 300, "外", 24)], page=1, top=380)\n' > "$tmp/ig/source/fig09_out.py"
+  ! (cd "$tmp/ig/source" && python3 fig09_out.py x.html) >/dev/null 2>&1 || ng "本文の範囲の外の文字で止まらない"
+  ok "インフォグラフィック案: 図の文字を $texts 個のテキストボックスにした（複数行のまとまり $multi 個）。範囲の外の文字で止まる"
 else
   echo "--  deck-infographic が見つからないので、インフォグラフィック案の確認は飛ばした"
 fi

@@ -111,9 +111,21 @@ def tw(s, size):
     return sum(size * (0.6 if ord(c) < 128 else 1.0) for c in s)
 
 
+_BLOCK = [0]
+
+
 def lines(x, y, rows, size, color=INK, weight=300, anchor="start", lh=None):
+    """複数行の文字（y は 1 行目のベースライン、lh は行送り）。1 回の呼び出しで描いた行は、pptx では 1 つのテキストボックスになる。
+    1 つの文・1 つのまとまりは、行ごとに text() を呼ばず lines() で描く"""
     lh = lh or round(size * 1.42)
-    return [text(x, y + i * lh, r, size, color, weight, anchor) for i, r in enumerate(rows)]
+    _BLOCK[0] += 1
+    out = []
+    for i, r in enumerate(rows):
+        svg = text(x, y + i * lh, r, size, color, weight, anchor)
+        if svg in TEXTS:
+            TEXTS[svg] = dict(TEXTS[svg], block=_BLOCK[0], row=i, rows=len(rows), lh=float(lh))
+        out.append(svg)
+    return out
 
 
 DEFS = """<defs>
@@ -233,6 +245,37 @@ def _inside_transform(s, i):
     return any(stack)
 
 
+def _merge_blocks(texts):
+    """lines() の 1 回の呼び出しで描いた行を 1 つにまとめる（"lines" に行、"lh" に行送り、y は 1 行目のベースライン）。
+    一部の行だけが画像に残ったまとまりは、行ごとのままにする"""
+    out, seen = [], {}
+    for t in texts:
+        b = t.get("block")
+        if b is None:
+            out.append(t)
+            continue
+        if b not in seen:
+            seen[b] = {}
+            out.append(("block", b))
+        seen[b][t["row"]] = t
+    merged = []
+    for t in out:
+        if not isinstance(t, tuple):
+            merged.append({k: v for k, v in t.items() if k not in ("block", "row", "rows", "lh")})
+            continue
+        rows = seen[t[1]]
+        first = rows[min(rows)]
+        if len(rows) != first["rows"] or len(rows) == 1:
+            merged += [{k: v for k, v in rows[i].items() if k not in ("block", "row", "rows", "lh")}
+                       for i in sorted(rows)]
+            continue
+        m = {k: v for k, v in first.items() if k not in ("block", "row", "rows")}
+        m["lines"] = [rows[i]["text"] for i in sorted(rows)]
+        m["text"] = "\n".join(m["lines"])
+        merged.append(m)
+    return merged
+
+
 def write(svg_body, page, top, title=None, lead=None, argv=None, x0=None, x1=None, bottom=None):
     """本文だけの SVG・HTML と、大きさの JSON を書く。
 
@@ -258,9 +301,12 @@ def write(svg_body, page, top, title=None, lead=None, argv=None, x0=None, x1=Non
     # （部品が複数の文字を 1 つの文字列にまとめて返すこともあるので、文字列の中から探す）
     joined = "\n".join(svg_body)
     texts, keep = [], [s for k, s in IMAGE_TEXTS.items() if k in joined]
+    outside = [info["text"] for key, info in TEXTS.items() if key in joined
+               and not (x0 <= info["x"] <= x1 and top + info["size"] * 0.7 <= info["y"] <= bottom)]
+    if outside:   # 本文の範囲の外の文字は、画像では切れ、pptx の文字にもならない
+        raise SystemExit(f"本文の範囲（x={x0}〜{x1}・y={top}〜{bottom}）の外に文字がある: {outside[:5]}。"
+                         "図の座標を top・bottom に合わせて組み直す")
     for key, info in TEXTS.items():
-        if not (x0 <= info["x"] <= x1 and top <= info["y"] <= bottom):
-            continue
         pos = 0
         while True:
             i = joined.find(key, pos)
@@ -274,6 +320,7 @@ def write(svg_body, page, top, title=None, lead=None, argv=None, x0=None, x1=Non
                 continue
             pos = i + len(key)
     svg_nt = svg.replace(DEFS + "\n".join(svg_body), DEFS + joined)
+    texts = _merge_blocks(texts)
 
     def page_html(s):
         return ('<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;'
@@ -281,12 +328,16 @@ def write(svg_body, page, top, title=None, lead=None, argv=None, x0=None, x1=Non
 
     with open(argv[1], "w", encoding="utf-8") as f:   # 文字入り（確かめ用・--text image 用）
         f.write(page_html(svg))
+    with open(os.path.splitext(argv[1])[0] + ".page.html", "w", encoding="utf-8") as f:
+        # ページ全体の大きさの図（render.sh が、本文の範囲の外に描いたものが無いかを確かめる）
+        f.write(page_html(svg.replace(f'width="{w}" height="{h}" viewBox="{x0} {top} {w} {h}"',
+                                      f'width="{W}" height="{H}" viewBox="0 0 {W} {H}"', 1)))
     with open(os.path.splitext(argv[1])[0] + ".notext.html", "w", encoding="utf-8") as f:
         f.write(page_html(svg_nt))
     if len(argv) > 2:
         with open(argv[2], "w", encoding="utf-8") as f:
             f.write(svg)
-    meta = {"page": page, "x": x0, "top": top, "width": w, "height": h, "title": title, "lead": lead,
+    meta = {"page": page, "x": x0, "top": top, "bottom": bottom, "width": w, "height": h, "title": title, "lead": lead,
             "texts": texts, "texts_in_image": keep}
     with open(os.path.splitext(argv[1])[0] + ".json", "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=1)
