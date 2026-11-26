@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["python-pptx>=1.0", "lxml", "Pillow"]
+# dependencies = ["python-pptx>=1.0", "lxml", "Pillow", "budoux>=0.6"]
 # ///
 """例の構成 md（example-outline.md）から、同梱のテンプレートで pptx を組む。新しい資料はこれを写して始める。
 

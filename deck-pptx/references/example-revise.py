@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["python-pptx>=1.0", "lxml", "Pillow"]
+# dependencies = ["python-pptx>=1.0", "lxml", "Pillow", "budoux>=0.6"]
 # ///
 """版上げの例。前回の資料を土台に、ページを並べ替え・複製・写し、文言と表と図を差し替える。
 

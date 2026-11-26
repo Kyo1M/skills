@@ -12,6 +12,7 @@ build.py からは `pages = outline.read(path)` で読み、`page = outline.by_i
 読む文法:
 - ページの見出しは `###` か `####` ＋ ID ＋題。ID は英字 1 字＋番号＋枝番（S1・A2・S7b・R1）
 - 欄は `- **タイトル**: …` の形（全角コロン、欄名の後ろの括弧書きも読む）。題の欄が無ければ見出しの題を使う
+- 太字でない `- 副題：…`・`- 流用元：…` などは、PLAIN_SHOWN・PLAIN_HIDDEN の欄名のときだけ欄として読む（載せる欄は値だけを照合する）
 - リード文は 1 行の値・子の箇条書き・`**リード文**` の後の段落のどれでもよい
 - ボディは `- **ボディ**:` の子の箇条書きと、欄でない箇条書き。階層を保って読む
 - md の表、図のパス（`…png`・`![…](…)`）、図版指示（`- **図版指示**:` か `**図版**：`）の型の名前
@@ -25,16 +26,22 @@ from pathlib import Path
 
 HEADING = re.compile(r"^(#{1,6})\s+(.*)$")
 PAGE = re.compile(r"^#{3,4}\s+(?P<id>[A-Za-z]\d+[a-z]?)\b\s*(?P<title>.*)$")
-FIELD = re.compile(r"^(?P<ind> *)- \*\*(?P<name>[^*]+?)\*\*(?:[（(][^）)]*[）)])?\s*[:：]\s?(?P<val>.*)$")
-FIELD_BARE = re.compile(r"^(?P<ind> *)- \*\*(?P<name>[^*]+?)\*\*(?:[（(][^）)]*[）)])?\s*$")
+PAREN = r"(?:[（(](?:[^（）()]|[（(][^（）()]*[）)])*[）)])?"  # 欄名の後ろの括弧書き（1 段の入れ子まで）
+FIELD = re.compile(r"^(?P<ind> *)- \*\*(?P<name>[^*]+?)\*\*" + PAREN + r"\s*[:：]\s?(?P<val>.*)$")
+FIELD_BARE = re.compile(r"^(?P<ind> *)- \*\*(?P<name>[^*]+?)\*\*" + PAREN + r"\s*$")
+# 太字でない欄（`- 副題：…`）。PLAIN の欄名のときだけ欄として読み、ほかは本文の箇条書きにする
+FIELD_PLAIN = re.compile(r"^- (?P<name>[^*：:\s][^：:]{0,7}?)[：:]\s?(?P<val>.*)$")
 ITEM = re.compile(r"^(?P<ind> *)(?:[-*+]|\d+\.)\s+(?P<text>.*)$")
-BOLD_PARA = re.compile(r"^\*\*(?P<name>[^*]+?)\*\*(?:[（(](?P<paren>[^）)]*)[）)])?\s*(?:[:：]\s*(?P<val>.*))?$")
+BOLD_PARA = re.compile(r"^\*\*(?P<name>[^*]+?)\*\*" + PAREN + r"\s*(?:[:：]\s*(?P<val>.*))?$")
 FIGURE = re.compile(r"`([^`]+\.(?:png|jpe?g|gif))`|!\[[^\]]*\]\(([^)]+)\)")
 
 # 載せる欄と載せない欄
 SHOWN = {"タイトル", "kicker", "リード文", "ボディ"}
 HIDDEN = {"役割", "図版指示", "図版", "スクショ", "スクショ（実物）", "補足", "流用元", "実物", "型", "メモ", "制作メモ"}
 KNOWN = SHOWN | HIDDEN | {"サブタイトル", "作成日", "ご提出先", "日付", "宛先"}
+# 太字でなくても欄として読む名前。載せる欄（値だけをスライドに載せる）と載せない欄
+PLAIN_SHOWN = {"副題", "サブタイトル", "日付", "作成日", "章番号", "章名", "章名の下"}
+PLAIN_HIDDEN = {"流用元", "役割", "型", "補足", "メモ", "制作メモ", "スクショ", "スクショ（実物）"}
 
 
 @dataclass
@@ -110,6 +117,7 @@ class Page:
         k = self.fields.get("kicker", "")
         if k and k != "なし":
             out.append(k)
+        out += [self.fields[n] for n in sorted(PLAIN_SHOWN) if self.fields.get(n) and n != "タイトル"]
         out += self.lead
         for n in self.body:
             for x in n.walk():
@@ -238,6 +246,14 @@ def read(path, warnings=None):
                 mode = ("hidden", name)
                 for m in FIGURE.finditer(val):
                     cur.figures.append(m.group(1) or m.group(2))
+            continue
+        fp = FIELD_PLAIN.match(line)
+        if fp and mode not in ("body",) and _field_name(fp.group("name")) in PLAIN_SHOWN | PLAIN_HIDDEN:
+            name = _field_name(fp.group("name"))
+            cur.fields[name] = fp.group("val").strip()
+            mode, stack = (("hidden", name) if name in PLAIN_HIDDEN else None), []
+            for m in FIGURE.finditer(fp.group("val")):
+                cur.figures.append(m.group(1) or m.group(2))
             continue
         b = BOLD_PARA.match(line.strip())
         if b and not line.startswith(" "):

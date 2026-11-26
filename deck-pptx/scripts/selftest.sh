@@ -63,6 +63,11 @@ run ../scripts/check_text.py --against "$tmp/unbranded.pptx" --changes "$tmp/cha
 run ../scripts/check_package.py "$tmp/revised.pptx" >/dev/null || ng "版上げのパッケージ"
 ok "版上げ: 差し替えた所だけが変わった"
 
+# 3a. 文節の途中の折り返しの確認が動く（見つかった件数は問わない。止まらないこと）
+rc=0; run ../scripts/check_breaks.py "$tmp/unbranded.pptx" > "$tmp/breaks.txt" 2>&1 || rc=$?
+[ "$rc" -le 1 ] && tail -1 "$tmp/breaks.txt" | grep -qE '^(OK|[0-9]+ 件)$' || { cat "$tmp/breaks.txt"; ng "折り返しの確認"; }
+ok "折り返しの確認: $(tail -1 "$tmp/breaks.txt")"
+
 # 3b. テンプレートの系統でない資料（1440×810pt、名前付きの枠）を土台にする
 run ../scripts/selftest_named.py "$tmp/continova.pptx" "$tmp/named" >/dev/null || ng "名前付きの枠の資料からの組み立て"
 run ../scripts/check_package.py "$tmp/named/named-out.pptx" >/dev/null || ng "名前付きの枠の資料のパッケージ"

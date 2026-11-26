@@ -1,10 +1,10 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["python-pptx>=1.0", "lxml", "Pillow"]
+# dependencies = ["python-pptx>=1.0", "lxml", "Pillow", "budoux>=0.6"]
 # ///
 """土台（テンプレート・前回の資料）の操作と、土台の設定。
 
-    uv run template.py --inspect <pptx|potx> [--page N]   # レイアウト・ページの一覧。--page で図形の一覧と設定の候補
+    uv run template.py --inspect <pptx|potx> [--page N]   # レイアウト・ページの一覧。--page でそのページの図形の一覧と設定の候補だけ
 
 資料ごとの build.py から読み込んで使う:
 
@@ -79,6 +79,9 @@ class Base:
     bullet_char2: str = "－"
     bullet_color: str | None = None
     lead_line: float = 1.15                     # リード文の行間
+    head_fill: str = "surface"                  # カード・ステップの見出し帯の地（色の名前か 16 進）
+    head_color: str = "ink"                     # 見出し帯の文字の色
+    phrase_wrap: bool = True                    # 狭い枠の文字を文節の区切りで改行する（parts.phrase_wrap。BudouX が要る）
 
     @classmethod
     def from_deck(cls, prs, page, title, lead, number=None, keep=(), **overrides):
@@ -86,7 +89,9 @@ class Base:
 
         title・lead・number は枠の図形の名前。keep は本文を外しても残す図形の名前（罫線・フッターなど）。
         本文の範囲は、そのページの枠以外の図形の範囲から測る。文字の大きさは題・リード文・本文の文字から読む。
-        測った値は --inspect で確かめ、合わなければ overrides（body=…, sizes=… など）で直す。
+        見出し帯（色の地に白い文字）の色は全ページから測り、カード・ステップの見出し帯をその色にする（無ければ淡い地）。
+        測った値は --inspect で確かめ、合わなければ overrides（body=…, sizes=… など）で直す。sizes は渡した分だけを替える。
+        表だけのページで測ると本文の文字の大きさが表の大きさになるので、本文に箇条書きのあるページで測る。
         """
         if not hasattr(prs, "slides"):
             prs = _load(prs)
@@ -130,10 +135,43 @@ class Base:
             if c:
                 colors["line"] = c
                 break
+        head = _head_band(prs, names)
+        if head:   # 前回の資料の見出し帯（色の地に白い文字の図形）の色に合わせる
+            colors["head"] = head
         b = cls(name="deck", frame="named", title=title, lead=lead, number=number,
                 keep=tuple(names - {None}), body=(round(x0), round(y0), round(x1 - x0), round(y1 - y0)),
-                sizes=sizes, font=font, head_font=head_font, colors=colors)
+                sizes=sizes, font=font, head_font=head_font, colors=colors,
+                **({"head_fill": "head", "head_color": "white"} if head else {}))
+        if "sizes" in overrides:   # sizes は渡した分だけを替える（辞書を丸ごと替えない）
+            overrides = dict(overrides, sizes={**b.sizes, **overrides["sizes"]})
         return replace(b, **overrides) if overrides else b
+
+
+def _head_band(prs, frame_names):
+    """全ページの本文から、白い文字が乗る色の地（見出し帯）で最も多い色。無ければ None。
+    地と文字が 1 つの図形のときも、色の矩形の上に白い文字の枠を重ねたときも数える"""
+    from collections import Counter
+    cnt = Counter()
+    for slide in prs.slides:
+        shapes = [sh for sh in slide.shapes if sh.name not in frame_names]
+        bands = [(sh, _fill_color(sh).upper()) for sh in shapes if _fill_color(sh) and _saturated(_fill_color(sh))]
+        for sh in shapes:
+            if not sh.has_text_frame or not sh.text_frame.text.strip():
+                continue
+            if (_first_color(sh) or "").upper() != "FFFFFF":
+                continue
+            cx, cy = sh.left + sh.width / 2, sh.top + sh.height / 2
+            for b, fill in bands:
+                if b is sh or (b.left <= cx <= b.left + b.width and b.top <= cy <= b.top + b.height):
+                    cnt[fill] += 1
+                    break
+    return cnt.most_common(1)[0][0] if cnt else None
+
+
+def _saturated(hexc):
+    """はっきりした色か（淡い地・灰色を除く）"""
+    r, g, b = (int(hexc[i:i + 2], 16) for i in (0, 2, 4))
+    return max(r, g, b) - min(r, g, b) > 60 and min(r, g, b) < 200
 
 
 def _first_size(sh, k):
@@ -749,14 +787,16 @@ def inspect(path, page=None):
     k = prs.slide_width / 1920
     print(f"{path}")
     print(f"  大きさ: {prs.slide_width / 12700:.0f}×{prs.slide_height / 12700:.0f}pt（1px = {k / 12700:.3f}pt）")
-    print("  レイアウト:")
-    for lo in prs.slide_layouts:
-        phs = ", ".join(f"{ph.placeholder_format.idx}:{ph.name}" for ph in lo.placeholders)
-        print(f"    {lo.name}  [{phs}]")
-    print("  ページ:")
-    for i, s in enumerate(prs.slides, 1):
-        texts = [sh.text_frame.text.replace("\n", " ")[:24] for sh in s.shapes if sh.has_text_frame and sh.text_frame.text.strip()]
-        print(f"    {i:>3}  {s.slide_layout.name:<16} {' | '.join(texts[:2])}")
+    if not page:   # --page のときは、そのページの図形の一覧だけを出す
+        print("  レイアウト:")
+        for lo in prs.slide_layouts:
+            phs = ", ".join(f"{ph.placeholder_format.idx}:{ph.name}" for ph in lo.placeholders)
+            print(f"    {lo.name}  [{phs}]")
+        print("  ページ:")
+        for i, s in enumerate(prs.slides, 1):
+            texts = [sh.text_frame.text.replace("\n", " ")[:24] for sh in s.shapes
+                     if sh.has_text_frame and sh.text_frame.text.strip()]
+            print(f"    {i:>3}  {s.slide_layout.name:<16} {' | '.join(texts[:2])}")
     if page:
         s = prs.slides[page - 1]
         print(f"  {page} 枚目の図形（px）:")

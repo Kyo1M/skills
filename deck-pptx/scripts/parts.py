@@ -7,7 +7,7 @@
 文字列の中の記法:
   **太字**  {強:…}青の太字  {悪:…}赤の太字  {良:…}緑の太字  {灰:…}灰色  {太:…}太字
   {b|…}{g|…}{r|…} 青・緑・赤  {B|…}{G|…}{R|…} 同じ色の太字
-  [文字](https://…) リンク付きの文字   （TODO: …）は赤にする   段落の中の改行は \\n
+  [文字](https://…) リンク付きの文字   （TODO: …）・（TODO）は赤にする   段落の中の改行は \\n
 """
 from __future__ import annotations
 
@@ -106,7 +106,7 @@ TOKEN = re.compile(
     r"|\{(?P<jk>[強悪良灰太]):(?P<jt>.+?)\}"
     r"|\{(?P<ek>[bgrBGR])\|(?P<et>.+?)\}"
     r"|\[(?P<lt>[^\]]+)\]\((?P<lu>https?://[^)]+)\)"
-    r"|(?P<todo>（TODO[:：][^）]*）)"
+    r"|(?P<todo>（TODO(?:[:：](?:[^（）]|（[^（）]*）)*)?）)"   # （TODO）・（TODO: …）。括弧は 1 段の入れ子まで
 )
 JA = {"強": ("accent", True), "悪": ("bad", True), "良": ("good", True), "灰": ("sub", None), "太": (None, True)}
 EN = {"b": "accent", "g": "good", "r": "bad"}
@@ -123,7 +123,7 @@ def runs_of(s, color, bold):
                 out.append((t, c, b, u))
         elif m.group("jk"):
             ckey, b = JA[m.group("jk")]
-            out.append((m.group("jt"), C(ckey) if ckey else color, bold if b is None else b, None))
+            out += runs_of(m.group("jt"), C(ckey) if ckey else color, bold if b is None else b)
         elif m.group("ek"):
             k = m.group("ek")
             out.append((m.group("et"), C(EN[k.lower()]), bold or k.isupper(), None))
@@ -232,8 +232,53 @@ def _strip_style(sh):
 # ---------------------------------------------------------------- 文字と図形
 
 
+NARROW = 640   # これより狭い枠（カード・ステップ・マトリクスの列）では、文節の区切りで改行してから置く
+
+
+def phrase_wrap(s, size, width):
+    """文字列を、文節（BudouX）の区切りで改行（\\n）した文字列にする。1 行に収まるもの・記法を含むもの・
+    BudouX が無いときはそのまま返す。幅の見積もりのずれに備えて、行は枠の 94% までにする。
+    最後の行が 2 字以下になるときは、前の行の最後の文節を下ろす"""
+    if "\n" in s or plain(s) != s or text_width(s, size) <= width:
+        return s
+    try:
+        import budoux
+    except ImportError:
+        return s
+    global _PARSER
+    if _PARSER is None:
+        _PARSER = budoux.load_default_japanese_parser()
+    lines, cur = [], []
+    for ph in _PARSER.parse(s):
+        if cur and text_width("".join(cur) + ph, size) > width * 0.94:
+            lines.append(cur)
+            cur = []
+        cur.append(ph)
+    if cur:
+        lines.append(cur)
+    if len(lines) > 1 and len("".join(lines[-1])) <= 2 and len(lines[-2]) > 1:
+        lines[-1].insert(0, lines[-2].pop())
+    if any(text_width("".join(ln), size) > width for ln in lines):
+        return s   # 1 つの文節が枠より長い。PowerPoint の折り返しに任せる
+    return "\n".join("".join(ln) for ln in lines)
+
+
+_PARSER = None
+
+
+def _wrap_paras(paras, w, size, bullet=False):
+    out = []
+    for o in _as_dicts(paras):
+        sz = S(o.get("size", size))
+        avail = w - (sz * 0.95 * (o.get("level", 0) + 1) if o.get("bullet", bullet) else sz * 0.95 * o.get("level", 0))
+        out.append(dict(o, text=phrase_wrap(o["text"], sz, avail)))
+    return out
+
+
 def text(slide, x, y, w, h, paras, name=None, anchor="t", ins=0, wrap=True, **kw):
-    """テキストボックス。kw は write_paras と同じ"""
+    """テキストボックス。kw は write_paras と同じ。NARROW より狭い枠では、文節の区切りで改行してから置く（phrase_wrap）"""
+    if wrap and w < NARROW and BASE.phrase_wrap:
+        paras = _wrap_paras(paras, w - 2 * ins, kw.get("size", "body"), kw.get("bullet", False))
     sh = slide.shapes.add_textbox(E(slide, x), E(slide, y), E(slide, w), E(slide, h))
     if name:
         sh.name = name
@@ -323,12 +368,14 @@ def note(slide, texts, y=None, x=None, w=None, size="note"):
 
 
 def bullets(items, level=0):
-    """[文字 | (文字, [子の文字])] → 箇条書きの段落"""
+    """[文字 | dict | (文字, [子の文字])] → 箇条書きの段落。dict は行ごとの色・太字など（{"text": …, "color": "good", "bold": True}）"""
     out = []
     for it in items:
         if isinstance(it, (tuple, list)):
             out.append({"text": it[0], "bullet": True, "level": level})
             out.extend(bullets(it[1], level + 1))
+        elif isinstance(it, dict):
+            out.append({"bullet": True, "level": level, **it})
         else:
             out.append({"text": it, "bullet": True, "level": level})
     return out
@@ -379,30 +426,54 @@ def warn_band(slide, x, y, w, text_, size="body"):
     return h
 
 
-def cards(slide, heads, items, area=None, numbered=False, head_h=None, size="body", head_size="head",
-          head_fill="surface", head_color="ink", fill="white", line="line", gap=24, emph=None, fit=True):
-    """見出し帯カードの列。heads は見出し、items はカードごとの箇条書き（文字の並び）。
+def card_height(head, items, w, size="body", head_size="head"):
+    """card() が中身に合わせたときの高さ"""
+    hs = S(head_size)
+    head_h = max(hs * 2.2, text_height([head], hs, w - 32) + 24)
+    return head_h + (text_height(bullets(items), S(size), w - 40) + 56 if items else 0)
 
-    emph に番号（0 始まり）を渡すと、そのカードの見出しを青にする。カードの下端の y を返す
+
+def card(slide, x, y, w, head, items, h=None, size="body", head_size="head", head_fill=None, head_color=None,
+         fill="white", line="line", emph=False, head_h=None):
+    """見出し帯カード 1 枚。items は箇条書き（文字・dict・(文字, [子])）。h を渡さなければ中身に合わせる。下端の y を返す。
+    見出し帯の色は、渡さなければ土台の設定（Base.head_fill・head_color。前回の資料から始めたときは前回の見出し帯の色）。
+    emph=True で見出し帯を強調色にする"""
+    hs = S(head_size)
+    head_h = head_h or max(hs * 2.2, text_height([head], hs, w - 32) + 24)
+    h = h or card_height(head, items, w, size, head_size)
+    rect(slide, x, y, w, h, fill=fill, line=line)
+    rect(slide, x, y, w, head_h, fill="accent" if emph else (head_fill or BASE.head_fill),
+         paras=[head], size=hs, bold=True, color="white" if emph else (head_color or BASE.head_color),
+         anchor="ctr", ins=16)
+    if items:
+        text(slide, x + 20, y + head_h + 20, w - 40, h - head_h - 32, bullets(items), size=size)
+    return y + h
+
+
+def cards(slide, heads, items, area=None, numbered=False, head_h=None, size="body", head_size="head",
+          head_fill=None, head_color=None, fill="white", line="line", gap=24, emph=None, fit=True):
+    """見出し帯カードの列（高さをそろえる）。heads は見出し、items はカードごとの箇条書き。
+
+    emph に番号（0 始まり）を渡すと、そのカードの見出しを強調色にする。カードの下端の y を返す。
+    高さを中身ごとに変えたいときや、列にしないときは card() を 1 枚ずつ置く
     """
     x0, y0, w0, h0 = area or BASE.body
     n = len(heads)
     cw = (w0 - gap * (n - 1)) / n
     hs = S(head_size)
-    head_h = head_h or max(hs * 2.2, max(text_height([h], hs, cw - 32) for h in heads) + 24)
+    labels = [f"{i + 1}. {hd}" if numbered else hd for i, hd in enumerate(heads)]
+    head_h = head_h or max(hs * 2.2, max(text_height([h], hs, cw - 32) for h in labels) + 24)
     if fit:  # カードの高さを中身に合わせる（範囲より高くはしない）
         need = max(text_height(bullets(its), S(size), cw - 40) for its in items) if any(items) else 0
         h0 = min(h0, head_h + need + 56)
-    for i, (hd, its) in enumerate(zip(heads, items)):
-        x = x0 + i * (cw + gap)
-        label = f"{i + 1}. {hd}" if numbered else hd
-        on = emph is not None and i in (emph if isinstance(emph, (list, tuple, set)) else [emph])
-        rect(slide, x, y0, cw, h0, fill=fill, line=line)
-        rect(slide, x, y0, cw, head_h, fill="accent" if on else head_fill,
-             paras=[label], size=hs, bold=True, color="white" if on else head_color, anchor="ctr", ins=16)
-        if its:
-            text(slide, x + 20, y0 + head_h + 20, cw - 40, h0 - head_h - 32, bullets(its), size=size)
+    on = set(emph if isinstance(emph, (list, tuple, set)) else ([] if emph is None else [emph]))
+    for i, (label, its) in enumerate(zip(labels, items)):
+        card(slide, x0 + i * (cw + gap), y0, cw, label, its, h=h0, size=size, head_size=head_size,
+             head_fill=head_fill, head_color=head_color, fill=fill, line=line, emph=i in on, head_h=head_h)
     return y0 + h0
+
+
+NUMBERED = re.compile(r"^(?:[①-⑳]|\d{1,2}[.．、　 ])")   # 番号を書いてある見出し（部品の番号を足さない）
 
 
 def steps(slide, nodes, area=None, size="body", head_size="head", owner_h=None, gap=56, fit=True):
@@ -414,7 +485,9 @@ def steps(slide, nodes, area=None, size="body", head_size="head", owner_h=None, 
     n = len(nodes)
     cw = (w0 - gap * (n - 1)) / n
     hs, sz = S(head_size), S(size)
-    owner_h = owner_h if owner_h is not None else (sz * 1.8 if any(nd.get("owner") for nd in nodes) else 0)
+    if owner_h is None:   # 主体のラベルの高さ（2 行になる主体もあるので、文字から見積もる）
+        owners = [nd["owner"] for nd in nodes if nd.get("owner")]
+        owner_h = max(text_height([o], sz, cw, gap=0) for o in owners) + sz * 0.5 if owners else 0
     head_h = max(hs * 2.2, max(text_height([nd["head"]], hs, cw - 32) for nd in nodes) + 24)
     if fit:
         need = max(text_height(bullets(nd.get("items") or []), sz, cw - 40) for nd in nodes)
@@ -425,8 +498,9 @@ def steps(slide, nodes, area=None, size="body", head_size="head", owner_h=None, 
             text(slide, x, y0, cw, owner_h, [nd["owner"]], size=sz, color="sub", bold=True, align="center", anchor="ctr")
         y = y0 + owner_h
         on = nd.get("emph")
-        rect(slide, x, y, cw, head_h, fill="accent" if on else "surface",
-             paras=[f"{i + 1}　{nd['head']}"], size=hs, bold=True, color="white" if on else "ink", ins=16)
+        rect(slide, x, y, cw, head_h, fill="accent" if on else BASE.head_fill,
+             paras=[nd["head"] if NUMBERED.match(nd["head"]) else f"{i + 1}　{nd['head']}"], size=hs, bold=True,
+             color="white" if on else BASE.head_color, ins=16)
         rect(slide, x, y + head_h, cw, h0 - owner_h - head_h, fill="white", line="line")
         if nd.get("items"):
             text(slide, x + 20, y + head_h + 20, cw - 40, h0 - owner_h - head_h - 32, bullets(nd["items"]), size=sz)

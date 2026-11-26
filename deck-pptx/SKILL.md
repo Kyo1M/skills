@@ -23,10 +23,11 @@ description: 構成 md（deck-outline の成果物）から、PowerPoint で直�
 | ファイル | 役割 |
 |---|---|
 | `scripts/template.py` | 土台を開く（`open_deck`）、レイアウトでページを足す（`new_slide`）、題・リード文（`set_title`・`set_lead`・`set_text`）、本文の範囲（`body_area`）、サンプル・前回のページの複製（`find_sample`・`duplicate`）、並べ替え・外す（`keep_slides`・`move_slide`・`delete_slide`）、枠だけ残す（`strip_body`）、別の資料から写す（`import_slide`）、コメントを読む・外す、保存の後始末（`finalize`）。`--inspect` でレイアウト・ページ・図形の一覧 |
-| `scripts/parts.py` | 部品。文言（`text`・`body_text`・`bullets`・`note`）、図形（`rect`・`arrow`・`heading`・`cards`・`steps`・`chevrons`・`flow`・`matrix`・`quad2`・`month_band`・`callout`・`ask_box`・`warn_band`）、表（`table`・`gantt`・`mark_cell`）、図（`picture`・`figure_page`・`shot_placeholder`）、版上げ（`shape`・`replace_paras`・`set_cell`・`rebuild_table`・`replace_picture`・`move`・`delete`・`clone_shape`）、見積もり（`text_height`・`fit_size`・`n_lines`） |
+| `scripts/parts.py` | 部品。文言（`text`・`body_text`・`bullets`（行ごとの色・太字は dict で渡す）・`note`）、図形（`rect`・`arrow`・`heading`・`card`（1 枚。高さを中身に合わせる）・`cards`（列）・`steps`・`chevrons`・`flow`・`matrix`・`quad2`・`month_band`・`callout`・`ask_box`・`warn_band`）、表（`table`・`gantt`・`mark_cell`）、図（`picture`・`figure_page`・`shot_placeholder`）、版上げ（`shape`・`replace_paras`・`set_cell`・`rebuild_table`・`replace_picture`・`move`・`delete`・`clone_shape`）、見積もり（`text_height`・`fit_size`・`n_lines`） |
 | `scripts/outline.py` | 構成 md を読む。`--check` で読めない行・知らない欄・ID の重複を出して止める。`--dump` で読んだ中身 |
 | `scripts/check_text.py` | 構成 md と pptx の文言の照合（新しく作ったとき）、元の pptx と差し替えの一覧の照合（版を上げたとき） |
 | `scripts/check_package.py` | パッケージの確認（PowerPoint が修復を求める壊れ方が無いか） |
+| `scripts/check_breaks.py` | 文節の途中の折り返し（「推進チー／ム」）と、最後の行が 2 字以下の段落を出す（LibreOffice で PDF にし、BudouX で文節に分けて見る） |
 | `scripts/pptx_to_png.sh` | pptx → 全ページの PNG（LibreOffice・poppler）。ImageMagick があれば全ページを並べた `contact.png` も |
 | `scripts/slide_text.py` | 全ページの文言を書き出す |
 | `scripts/selftest.sh` | スキルそのものの確認（別の Mac に入れたときもこれで確かめる）。テンプレートから組む・版を上げる・テンプレートの系統でない資料（1440×810pt・名前付きの枠、`selftest_named.py`）から組む・インフォグラフィック案、の 4 つの経路を通す |
@@ -37,7 +38,7 @@ description: 構成 md（deck-outline の成果物）から、PowerPoint で直�
 | `references/example-outline.md` | 例の構成 md（架空のテーマ） |
 | `references/template-guide.md` | テンプレートの使い方・ロゴの差し替え方・改訂の手順 |
 
-座標と文字の大きさは 1920×1080 の px で書く。土台のスライドの大きさに換算されるので、テンプレート（960×540pt）でも 1440×810pt の資料でも同じ値で書ける。文字列の記法は `**太字**`・`{強:…}`（青の太字）・`{悪:…}`（赤の太字）・`{良:…}`（緑の太字）・`{灰:…}`・`[文字](URL)`。「（TODO: …）」は自動で赤になる。
+座標と文字の大きさは 1920×1080 の px で書く。土台のスライドの大きさに換算されるので、テンプレート（960×540pt）でも 1440×810pt の資料でも同じ値で書ける。文字列の記法は `**太字**`・`{強:…}`（青の太字）・`{悪:…}`（赤の太字）・`{良:…}`（緑の太字）・`{灰:…}`・`[文字](URL)`。狭い枠（幅 640px 未満。カード・ステップ・マトリクスの列）の文字は、文節（BudouX）の区切りで改行してから置く（`Base.phrase_wrap=False` で止める）。「（TODO: …）」「（TODO）」は自動で赤になる（色・太字の記法の中でも赤。括弧は 1 段の入れ子まで）。
 
 面の使い方（骨格と詳細、見出し帯カード・ステップノード列・マトリクス、表は列で読む必然があるページだけ）は `../html-slide-deck/references/design-system.md` に従う。文言は構成 md のとおりにし、組むときに言い換えない。
 
@@ -58,6 +59,8 @@ description: 構成 md（deck-outline の成果物）から、PowerPoint で直�
    - 最後に `T.finalize(prs, <出力>, title=<資料の題>)` で保存する。中身の無いプレースホルダー・使っていない画像・前の資料のページの題の一覧を外し、パッケージを確かめる。
 6. **確かめる（組むたびに）。**
    - `uv run <スキル>/scripts/check_text.py <構成 md> <pptx>`：欠けた文言・別のページに入った文言・構成 md に無い文言（複製元の文言の残り）・重複を出す。フッターの資料名など構成 md に無い固定の文言は `--ignore` で外す。ページの対応が 1 対 1 でないときは `--map S1=1,S2=2,…`
+   - `uv run <スキル>/scripts/check_breaks.py <pptx>`：文節の途中の折り返しと、最後の行が 2 字以下の段落を出す。直すときは、文言を短くするか、枠を広げるか、文節の境目に改行（`\n`）を入れる。改行は PowerPoint で文言を直すと残ってしまうので、リード文では文言を短くするほうを先に考える。行末は LibreOffice の描画なので、PowerPoint では 1〜2 字ずれることがある
+   - 表の列・カードの見出しなどに分けて置いた文言は、`check_text.py` が区切り（：／→（）、・）で分けた断片で照合し、件数を出す（失敗にはしない）。`--ignore` は文言の全体と一致したものだけを外す
    - `<スキル>/scripts/pptx_to_png.sh <pptx>` で全ページを画像にして見る。見る点は、型どおりか、はみ出し・重なり、1〜2 文字だけの折り返し・語の途中の折り返し、行頭の空白、同じ役割のページの位置のそろい。Read の表示は縮小されるので、文字が密な所は原寸で切り出して見る。
    - 3 回で収まらなければ残る差を添えて依頼者に聞く。型の読み違いに気づいたら最初から組み直す。
 7. **渡す。** 残る差を並べ、PowerPoint か Keynote で見てもらう（LibreOffice の描画は PowerPoint と完全には一致しない）。置き場と名前はリポジトリの規約に従い、無ければ構成 md と同じフォルダに `<日付>_<題>_v1.pptx`。
