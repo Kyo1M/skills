@@ -4,19 +4,24 @@
 同じフォルダに scripts/figlib.py を写しておく。
 書き出し: scripts/render.sh figNN_<内容>.py ../../inputs/<版>/NN-<内容>.png
 
-タイトル・リードは pptx の文字のまま残し、ここでは本文（y=TOP〜985）だけを描く。
-座標は pptx のページと同じ 1920x1080。
+タイトル・リードは pptx の文字のまま残し、ここでは本文（y=TOP〜BOTTOM）だけを描く。
+座標は pptx のページと同じ 1920x1080。位置は TOP・BOTTOM から決めているので、本文の高さが異なるページにも写せる
+（範囲の外に描くと、write() と render.sh が止まる）。
 """
 from figlib import *
 
 PAGE = 5      # 元のページ番号
 TOP = 270     # 元のページの本文の上端（リードの下。ページごとに確かめる）
+BOTTOM = BODY_BOTTOM   # 本文の下端（フッターの罫線の上）
 out = []
 
-C = (690, 530)
-R = 250        # 循環の半径
-NR = 48        # 工程の円の半径
-HR = 106       # 中心（案件の情報）の半径
+# 縦の割り振り: 循環（直径 2R）→ 改善の戻し先の矢印（RET）→ 土台の帯（BH）
+BH, RET = 116, 60
+R = min(250, (BOTTOM - TOP - 12 - RET - BH) / 2)   # 循環の半径（本文が低いページでは小さくする）
+by0 = BOTTOM - BH                                   # 土台の帯の上端
+C = (690, by0 - RET - R)
+NR = 48 if R >= 230 else 44   # 工程の円の半径
+HR = 106 if R >= 230 else 96  # 中心（案件の情報）の半径
 
 # 循環の軌道と作業の順序（実線の矢印）
 out.append(f'<circle cx="{C[0]}" cy="{C[1]}" r="{R}" fill="none" stroke="{TRACK}" stroke-width="2"/>')
@@ -67,31 +72,31 @@ for key, ic, human, title, subs, anchor in steps:
     out += lines(f"{tx:.1f}", ty + 36, subs, 21, INK, 300, anchor, 30)
 
 # 改善の戻し先（灰色の破線）
-out.append(arrow(C[0], C[1] + R + 12, C[0], C[1] + R + 66, DASHED))
-out.append(text(C[0] + 22, C[1] + R + 47, "案件での改善を、組織が用意する共通の型へ戻す", 19, INK, 300))
+out.append(arrow(C[0], C[1] + R + 10, C[0], C[1] + R + RET - 6, DASHED))
+out.append(text(C[0] + 22, C[1] + R + 42, "案件での改善を、組織が用意する共通の型へ戻す", 19, INK, 300))
 
 # 循環を支えるもの（土台）
-by0, bh = 850, 132
-out.append(f'<rect x="96" y="{by0}" width="1194" height="{bh}" fill="{LIGHT}"/>')
+out.append(f'<rect x="96" y="{by0}" width="1194" height="{BH}" fill="{LIGHT}"/>')
 out.append(f'<rect x="96" y="{by0}" width="1194" height="3" fill="{BLUE}"/>')
-out.append(icon("layers", 150, by0 + 68, 46, BLUE, 2))
-out.append(text(196, by0 + 50, "この循環を支えるもの", 18, SUB, 300))
-out.append(text(196, by0 + 92, "組織が用意する型と支援", 30, BLUE, 600))
-out.append(icon("checks", 800, by0 + 44, 28, BLUE, 2))
-out.append(text(830, by0 + 52, "共通の進め方・レビュー観点", 22, INK, 300))
-out.append(icon("kanban", 800, by0 + 94, 28, BLUE, 2))
-out.append(text(830, by0 + 102, "プロジェクト管理・AI利用環境", 22, INK, 300))
+out.append(icon("layers", 150, by0 + BH / 2 + 2, 46, BLUE, 2))
+out.append(text(196, by0 + 46, "この循環を支えるもの", 18, SUB, 300))
+out.append(text(196, by0 + 88, "組織が用意する型と支援", 30, BLUE, 600))
+out.append(icon("checks", 800, by0 + 40, 28, BLUE, 2))
+out.append(text(830, by0 + 48, "共通の進め方・レビュー観点", 22, INK, 300))
+out.append(icon("kanban", 800, by0 + 86, 28, BLUE, 2))
+out.append(text(830, by0 + 94, "プロジェクト管理・AI利用環境", 22, INK, 300))
 
-# 結果の列（右）
-out.append(f'<line x1="1336" y1="288" x2="1336" y2="740" stroke="{RULE}" stroke-width="2"/>')
-qx = 1392
-out.append(text(qx, 330, "目指す品質", 30, BLUE, 600))
-out.append(f'<rect x="{qx}" y="348" width="48" height="3" fill="{BLUE}"/>')
+# 結果の列（右）。上端は本文の上端に、項目の間隔は帯の上までの高さに合わせる
+qx, qy = 1392, TOP + 60
+gap = min(112, (by0 - 40 - (qy + 106)) / 2.6)
+out.append(f'<line x1="1336" y1="{TOP + 18}" x2="1336" y2="{qy + 106 + gap * 2 + 52:.0f}" stroke="{RULE}" stroke-width="2"/>')
+out.append(text(qx, qy, "目指す品質", 30, BLUE, 600))
+out.append(f'<rect x="{qx}" y="{qy + 18}" width="48" height="3" fill="{BLUE}"/>')
 quals = [("filecheck", "提出前に定義との不一致を確認"),
          ("history", "担当交代後も経緯を確認"),
          ("spread", "改善を別の案件でも使う")]
 for i, (ic, s) in enumerate(quals):
-    cy = 436 + i * 112
+    cy = qy + 106 + i * gap
     out.append(soft(qx + 34, cy, 34, ic, 34))
     out.append(text(qx + 88, cy + 8, s, 24, INK, 300))
 
@@ -99,4 +104,4 @@ for i, (ic, s) in enumerate(quals):
 
 # タイトル・リードは元のページのまま。図に合わせて変えるときだけ、依頼者に確かめてから
 # write(out, page=PAGE, top=TOP, title="…", lead="…") のように渡す（pptx の文字が差し替わる）
-write(out, page=PAGE, top=TOP)
+write(out, page=PAGE, top=TOP, bottom=BOTTOM)

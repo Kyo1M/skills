@@ -1,4 +1,12 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["lxml", "Pillow"]
+# ///
 """元の pptx の全ページを残し、図の案のページを元のページの直後に足した新しい版を作る。
+
+図の中の文字は、既定で pptx のテキストボックスにする（figlib.text が控えた位置・大きさ・色・そろえで置き、
+文字を抜いた PNG と 1 つのグループにまとめる）。--text image で、今までどおり文字入りの PNG だけを貼る。
+回転した文字など、figlib が控えなかった文字は PNG に残る。
 
 案のページは元のページを複製し、タイトル・リード・罫線・フッターを pptx の文字のまま残す。
 本文（上端が --body-top〜--body-bottom にある図形）を外し、本文の範囲に図の PNG を貼る。
@@ -153,9 +161,71 @@ def settext(sp, t):
         E.SubElement(run, f"{{{A}}}t").text = piece
 
 
-def figures(fig_dir, meta_dir):
+FONTS = {"gothic": "Hiragino Sans", "mincho": "Hiragino Mincho ProN"}
+
+
+def tw(s, size):
+    """文字列の幅の見積もり（figlib.tw と同じ。英数字は全角の約 0.6）"""
+    return sum(size * (0.6 if ord(c) < 128 else 1.0) for c in s)
+
+
+def text_box(t, px, sid, k):
+    """figlib が控えた文字のまとまり 1 つ → 折り返しなし・余白なしのテキストボックス。座標は 1920x1080 の px。
+    lines() で描いた複数行は 1 つの箱の 1 段落にし、行は改行（Shift+Enter）で分け、行送りを固定する"""
+    size = t["size"]
+    rows = t.get("lines") or [t["text"]]
+    lh = t.get("lh") or size * 1.42
+    bw = max(tw(r, size) for r in rows) * 1.12 + size * 0.6
+    bh = size * 1.45 + lh * (len(rows) - 1)
+    last = t["y"] + lh * (len(rows) - 1)   # 最後の行のベースライン
+    left = {"start": t["x"] - size * 0.05, "middle": t["x"] - bw / 2, "end": t["x"] - bw + size * 0.05}[t["anchor"]]
+    top = last + size * 0.26 - bh   # 下ぞろえの枠の下端を、最後の行のベースラインの少し下（文字の下の余白）に置く
+    algn = {"start": "l", "middle": "ctr", "end": "r"}[t["anchor"]]
+    font = FONTS[t.get("font", "gothic")]
+    color = t["color"].lstrip("#").upper()
+    if len(color) == 3:
+        color = "".join(c * 2 for c in color)
+    sz = round(size * px / 12700 * 100)
+    from xml.sax.saxutils import escape
+    rpr = (f'<a:rPr lang="ja-JP" altLang="en-US" sz="{sz}" b="{1 if t["weight"] >= 600 else 0}" dirty="0">'
+           f'<a:solidFill><a:srgbClr val="{color}"/></a:solidFill><a:latin typeface="{font}"/>'
+           f'<a:ea typeface="{font}"/></a:rPr>')
+    runs = f"<a:br>{rpr}</a:br>".join(f"<a:r>{rpr}<a:t>{escape(r)}</a:t></a:r>" for r in rows)
+    spc = (f'<a:lnSpc><a:spcPts val="{round(lh * px / 12700 * 100)}"/></a:lnSpc>' if len(rows) > 1 else "")
+    return xml(f'''<p:sp xmlns:p="{P}" xmlns:a="{A}"><p:nvSpPr><p:cNvPr id="{sid}" name="図の文字 {k}"/>
+<p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="{round(left * px)}" y="{round(top * px)}"/>
+<a:ext cx="{round(bw * px)}" cy="{round(bh * px)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>
+<p:txBody><a:bodyPr wrap="none" lIns="0" tIns="0" rIns="0" bIns="0" anchor="b"><a:noAutofit/></a:bodyPr><a:lstStyle/>
+<a:p><a:pPr algn="{algn}">{spc}</a:pPr>{runs}</a:p></p:txBody></p:sp>'''.encode())
+
+
+def group_with_texts(pic, texts, px, first_id, nn):
+    """図とその上の文字を 1 つのグループにする。グループの中の文字はそのまま直せる"""
+    boxes = [text_box(t, px, first_id + k, k + 1) for k, t in enumerate(texts)]
+    xs, ys, xe, ye = [], [], [], []
+    for el in [pic] + boxes:
+        off = el.find(".//a:xfrm/a:off", ns)
+        ext = el.find(".//a:xfrm/a:ext", ns)
+        x, y, cx, cy = (int(off.get("x")), int(off.get("y")), int(ext.get("cx")), int(ext.get("cy")))
+        xs.append(x), ys.append(y), xe.append(x + cx), ye.append(y + cy)
+    x0, y0, x1, y1 = min(xs), min(ys), max(xe), max(ye)
+    g = xml(f'''<p:grpSp xmlns:p="{P}" xmlns:a="{A}"><p:nvGrpSpPr><p:cNvPr id="{first_id + len(boxes)}" name="図の案 {nn}（図と文字）"/>
+<p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="{x0}" y="{y0}"/><a:ext cx="{x1 - x0}" cy="{y1 - y0}"/>
+<a:chOff x="{x0}" y="{y0}"/><a:chExt cx="{x1 - x0}" cy="{y1 - y0}"/></a:xfrm></p:grpSpPr></p:grpSp>'''.encode())
+    g.append(pic)
+    for b in boxes:
+        g.append(b)
+    return g
+
+
+def figures(fig_dir, meta_dir, text_mode="pptx"):
     out = []
     for png in sorted(glob.glob(os.path.join(fig_dir, "[0-9][0-9]-*.png"))):
+        if text_mode == "image":   # 文字入りの PNG（render.sh が with-text/ に書く）を使う
+            alt = os.path.join(fig_dir, "with-text", os.path.basename(png))
+            if not os.path.exists(alt):
+                raise SystemExit(f"{alt} が無い（--text image には文字入りの PNG が要る）")
+            png = alt
         nn = os.path.basename(png)[:2]
         metas = glob.glob(os.path.join(meta_dir, f"fig{nn}_*.json"))
         if len(metas) != 1:
@@ -238,7 +308,7 @@ def build(a):
 
     new_after = {}
     report = []
-    for k, (nn, png, meta) in enumerate(figures(a.figures, a.meta), 1):
+    for k, (nn, png, meta) in enumerate(figures(a.figures, a.meta, a.text), 1):
         n = meta["page"]
         if n not in page_part:
             raise SystemExit(f"図{nn}: 元のページ {n} が無い（全 {len(sld)} ページ）")
@@ -311,6 +381,10 @@ def build(a):
 <p:spPr><a:xfrm><a:off x="{round(meta['x'] * px)}" y="{round(meta['top'] * px)}"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm>
 <a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>'''.encode())
         pic.find("p:nvPicPr/p:cNvPr", ns).set("descr", f"{meta.get('title') or ''}図の案（元p.{n}）")
+        texts = meta.get("texts") or []
+        if a.text == "pptx" and texts:
+            # 図の中の文字を pptx の文字にし、図と 1 つのグループにまとめる（図を動かすと文字も動く）
+            pic = group_with_texts(pic, texts, px, max(ids, default=1) + 2, nn)
         ext_lst = tree.find("p:extLst", ns)
         if ext_lst is not None:
             ext_lst.addprevious(pic)   # extLst は図形の並びの最後に置く決まり
@@ -352,6 +426,8 @@ def build(a):
             raise SystemExit("ページの id が上限を超える")
         new_after.setdefault(n, []).append(E.Element(f"{{{P}}}sldId", id=str(new_id), attrib={f"{{{R}}}id": rid}))
         report.append({"figure": nn, "sourcePage": n, "png": os.path.basename(png), "removed": removed,
+                       "editableTexts": len(texts) if a.text == "pptx" else 0,
+                       "textsInImage": meta.get("texts_in_image", []) if a.text == "pptx" else "all",
                        "kept": kept, "replacedTitle": found["title"], "replacedLead": found["lead"],
                        "sourceHidden": s.get("show") == "0"})
 
@@ -416,6 +492,8 @@ def main():
     ap.add_argument("--footer-name", default="SlideNumber", help="ページ番号の枠の図形名（空にすると触らない）")
     ap.add_argument("--footer-x", type=float, default=1450, help="ページ番号の枠の左端（px）")
     ap.add_argument("--footer-w", type=float, default=350, help="ページ番号の枠の幅（px）")
+    ap.add_argument("--text", choices=("pptx", "image"), default="pptx",
+                    help="図の中の文字を pptx の文字にする（既定。図と文字を 1 つのグループにする）か、PNG に残すか")
     a = ap.parse_args()
     if a.dry_run:
         dry_run(a)
